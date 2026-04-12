@@ -1,23 +1,22 @@
 package cn.lysoy.jingu3.common.api;
 
 import cn.lysoy.jingu3.common.enums.ErrorCode;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 统一 HTTP 响应体。
- *
- * @param success 是否成功
- * @param code    业务码（成功为 0）
- * @param message 说明文案
- * @param data    成功时负载
- * @param timestamp 毫秒时间戳
  */
-public record ApiResult<T>(
-        boolean success,
-        String code,
-        String message,
-        T data,
-        long timestamp
-) {
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class ApiResult<T> {
+
+    private final boolean success;
+    private final String code;
+    private final String message;
+    private final T data;
+    private final long timestamp;
 
     public static <T> ApiResult<T> ok(T data) {
         return new ApiResult<>(

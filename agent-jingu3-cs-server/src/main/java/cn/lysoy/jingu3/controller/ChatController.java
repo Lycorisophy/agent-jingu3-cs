@@ -1,65 +1,49 @@
 package cn.lysoy.jingu3.controller;
 
 import cn.lysoy.jingu3.common.api.ApiResult;
-import cn.lysoy.jingu3.component.UserConstants;
-import cn.lysoy.jingu3.engine.ExecutionContext;
-import cn.lysoy.jingu3.engine.ModeRegistry;
-import cn.lysoy.jingu3.engine.routing.IntentRouter;
-import cn.lysoy.jingu3.engine.routing.RoutingDecision;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.common.vo.ChatVo;
+import cn.lysoy.jingu3.service.ChatService;
+import cn.lysoy.jingu3.service.ChatStreamService;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
- * v0.1 对话 HTTP API。
+ * 对话 REST 入口：{@code POST /api/v1/chat} 返回完整 JSON（兼容旧客户端）；
+ * {@code POST /api/v1/chat/stream} 返回 SSE，事件体与 WebSocket 一致，见 {@link cn.lysoy.jingu3.stream.StreamEvent}。
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class ChatController {
 
-    private final IntentRouter intentRouter;
-    private final ModeRegistry modeRegistry;
-    private final UserConstants userConstants;
+    private final ChatService chatService;
+    private final ChatStreamService chatStreamService;
 
-    public ChatController(IntentRouter intentRouter, ModeRegistry modeRegistry, UserConstants userConstants) {
-        this.intentRouter = intentRouter;
-        this.modeRegistry = modeRegistry;
-        this.userConstants = userConstants;
+    public ChatController(ChatService chatService, ChatStreamService chatStreamService) {
+        this.chatService = chatService;
+        this.chatStreamService = chatStreamService;
     }
 
+    /**
+     * 同步一轮对话，体与 {@link ChatRequest} 一致；内部走意图路由与 {@link cn.lysoy.jingu3.engine.ModeRegistry}。
+     */
     @PostMapping("/chat")
     public ApiResult<ChatVo> chat(@Valid @RequestBody ChatRequest request) {
-        RoutingDecision decision = intentRouter.resolve(request.message(), request.mode());
-        log.info("routing userId={} source={} mode={} conv={}",
-                userConstants.getId(),
-                decision.source(),
-                decision.mode(),
-                request.conversationId());
+        return ApiResult.ok(chatService.chat(request));
+    }
 
-        var ctx = new ExecutionContext(
-                userConstants.getId(),
-                userConstants.getUsername(),
-                request.conversationId() == null ? "default" : request.conversationId(),
-                request.message(),
-                decision.mode(),
-                decision.source(),
-                java.util.List.of()
-        );
-        var handler = modeRegistry.get(decision.mode());
-        String reply = handler.execute(ctx);
-        ChatVo vo = new ChatVo(
-                userConstants.getId(),
-                userConstants.getUsername(),
-                reply,
-                decision.mode().name(),
-                decision.source().name()
-        );
-        return ApiResult.ok(vo);
+    /**
+     * SSE 流式：长连接默认 10 分钟，事件 payload 为 {@code application/json} 的 {@link cn.lysoy.jingu3.stream.StreamEvent}。
+     */
+    @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter chatStream(@Valid @RequestBody ChatRequest request) {
+        SseEmitter emitter = new SseEmitter(600_000L);
+        chatStreamService.startSseStream(request, emitter);
+        return emitter;
     }
 }

@@ -14,9 +14,17 @@ management:
       show-details: when_authorized
 
 jingu3:
+  engine:
+    react:
+      max-steps: 4
+    plan:
+      max-subtasks: 8
+      replan-enabled: true
   ollama:
     base-url: http://localhost:11434
     chat-model: gnremy/qwen3.5-abliterated:35b-a3b
   user:
     id: "001"
     name: user
+  cron:
+    demo-schedule: "0 0 9 * * MON-FRI"

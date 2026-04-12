@@ -10,16 +10,16 @@ class ApiResultTest {
     @Test
     void ok_wrapsData() {
         ApiResult<String> r = ApiResult.ok("x");
-        assertThat(r.success()).isTrue();
-        assertThat(r.code()).isEqualTo("0");
-        assertThat(r.data()).isEqualTo("x");
+        assertThat(r.isSuccess()).isTrue();
+        assertThat(r.getCode()).isEqualTo("0");
+        assertThat(r.getData()).isEqualTo("x");
     }
 
     @Test
     void fail_usesErrorCode() {
         ApiResult<Void> r = ApiResult.fail(ErrorCode.BAD_REQUEST, "bad");
-        assertThat(r.success()).isFalse();
-        assertThat(r.code()).isEqualTo(ErrorCode.BAD_REQUEST.getCode());
-        assertThat(r.message()).isEqualTo("bad");
+        assertThat(r.isSuccess()).isFalse();
+        assertThat(r.getCode()).isEqualTo(ErrorCode.BAD_REQUEST.getCode());
+        assertThat(r.getMessage()).isEqualTo("bad");
     }
 }

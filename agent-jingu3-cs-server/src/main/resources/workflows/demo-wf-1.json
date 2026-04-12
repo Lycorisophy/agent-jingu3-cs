@@ -1,0 +1,13 @@
+{
+  "id": "demo-wf-1",
+  "nodes": [
+    {
+      "id": "summarize",
+      "instruction": "请用两三句话概括用户核心诉求与约束。"
+    },
+    {
+      "id": "solution",
+      "instruction": "基于上文概括，给出分条、可执行的行动方案（中文）。"
+    }
+  ]
+}

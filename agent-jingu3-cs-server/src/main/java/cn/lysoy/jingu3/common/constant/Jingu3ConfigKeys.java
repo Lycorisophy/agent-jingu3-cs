@@ -13,4 +13,7 @@ public final class Jingu3ConfigKeys {
     public static final String JINGU3_OLLAMA_CHAT_MODEL = "jingu3.ollama.chat-model";
     public static final String JINGU3_USER_ID = "jingu3.user.id";
     public static final String JINGU3_USER_NAME = "jingu3.user.name";
+
+    /** Cron MVP 演示用调度表达式（自然语言说明用）。 */
+    public static final String JINGU3_CRON_DEMO_SCHEDULE = "jingu3.cron.demo-schedule";
 }

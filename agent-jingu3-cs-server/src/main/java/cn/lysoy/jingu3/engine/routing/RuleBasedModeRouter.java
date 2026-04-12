@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 基于关键词的简单规则路由（v0.1）；后续可换配置表或脚本引擎。
+ * 基于关键词的简单规则路由。
+ * <p>不映射 CRON / STATE_TRACKING / HUMAN_IN_LOOP（对话不可选，见 {@link cn.lysoy.jingu3.engine.ActionModePolicy}）。</p>
  */
 @Component
 public class RuleBasedModeRouter {
@@ -21,9 +22,6 @@ public class RuleBasedModeRouter {
         keywordToMode = new LinkedHashMap<>();
         keywordToMode.put(RoutingRuleKeywords.PLAN, ActionMode.PLAN_AND_EXECUTE);
         keywordToMode.put(RoutingRuleKeywords.WORKFLOW, ActionMode.WORKFLOW);
-        keywordToMode.put(RoutingRuleKeywords.CRON, ActionMode.CRON);
-        keywordToMode.put(RoutingRuleKeywords.STATE, ActionMode.STATE_TRACKING);
-        keywordToMode.put(RoutingRuleKeywords.HUMAN_LOOP, ActionMode.HUMAN_IN_LOOP);
         keywordToMode.put(RoutingRuleKeywords.AGENT_TEAM, ActionMode.AGENT_TEAM);
     }
 

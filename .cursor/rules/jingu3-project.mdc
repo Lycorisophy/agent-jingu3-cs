@@ -48,7 +48,9 @@ alwaysApply: true
 
 - **日志**：生产类使用 Lombok `@Slf4j`，禁止 `LoggerFactory.getLogger`。
 - **注入**：优先构造器注入，禁止字段 `@Autowired`（测试除外）。
-- **分包**：`common.constant` / `common.enums` / `common.api` / `common.exception`；**入参 DTO** → `common.dto`；**出参 VO** → `common.vo`；**REST 控制器** → `controller`；**全局异常、可注入常量组件** → `component`（如 `ApiExceptionHandler`、`UserConstants`）；领域枚举可留在 `engine` 等包。
+- **分包**：`common.constant` / `common.enums` / `common.api` / `common.exception`；**入参 DTO** → `common.dto`；**出参 VO** → `common.vo`；**应用服务** → `service`（业务编排、事务边界；**Controller 薄**，仅 HTTP 与 `ApiResult`）；**REST 控制器** → `controller`；**全局异常、可注入常量组件** → `component`（如 `ApiExceptionHandler`、`UserConstants`、`ChatRequestValidator`）；领域枚举可留在 `engine` 等包。
+- **数据载体**：`common.dto` / `common.vo` / `ApiResult` 等使用 **Lombok + 传统 JavaBean**（如 `@Getter`/`@Setter`），**不使用** `record`。
+- **行动模式（对话 API）**：仅允许在 `mode` / `modePlan` 中选取 **ASK、REACT、PLAN_AND_EXECUTE、WORKFLOW、AGENT_TEAM**。**CRON、STATE_TRACKING、HUMAN_IN_LOOP** 不得通过对话接口选取（定时任务走独立模块或技能；状态追踪/人在环为其它模式的辅助）。选用 **WORKFLOW** 或编排中含 **WORKFLOW** 时必须传 **`workflowId`**。
 - **配置注入**：所有 `@Value("${...}")` **必须写默认值**（与 `application.yml` 一致），例如 `@Value("${jingu3.user.id:001}")`；默认值中含冒号时用 `\\:` 转义（如 Ollama 模型名）。
 - **API**：统一返回 `ApiResult<T>`；错误码用 `ErrorCode`；业务问题抛 `ServiceException`；全局异常由 `ApiExceptionHandler` 转为 `ApiResult`。
 - **文案与提示词**：系统/用户提示框架、路由关键词、Stub/校验/日志占位字符串放在 `common.constant`（如 `PromptTemplates`、`PromptFragments`、`EngineMessages`）；业务代码禁止内联长魔法字符串（符合 Alibaba / Sonar 重复字面量规约）。

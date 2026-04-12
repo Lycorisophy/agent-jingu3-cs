@@ -6,5 +6,7 @@ package cn.lysoy.jingu3.engine.routing;
 public enum RoutingSource {
     CLIENT_EXPLICIT,
     RULE,
-    MODEL
+    MODEL,
+    /** 客户端显式 mode 无法解析时降级为 REACT */
+    FALLBACK
 }

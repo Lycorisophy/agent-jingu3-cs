@@ -21,6 +21,11 @@ public final class PromptFragments {
      */
     public static final String USER_INPUT_LABEL_WITH_NEWLINE = "用户输入：\n";
 
+    /**
+     * 编排多步时，将上一步模型输出拼入下一步 {@link cn.lysoy.jingu3.engine.ExecutionContext#getTaskPayload()}。
+     */
+    public static final String PLAN_CHAIN_SEPARATOR = "\n---\n上一步输出：\n";
+
     private PromptFragments() {
     }
 }
