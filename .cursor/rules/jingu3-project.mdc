@@ -44,8 +44,26 @@ alwaysApply: true
 - 遵守 [docs/规范/Agent 辅助开发标准作业程序（SOP）.md](docs/规范/Agent%20辅助开发标准作业程序（SOP）.md) 与 [企业使用AI代理进行代码开发的规范_2026Q1_v1_简略版.md](docs/规范/企业使用AI代理进行代码开发的规范_2026Q1_v1_简略版.md) 中的数据与流程红线。
 - 回复用户时使用**简体中文**（若用户未指定其他语言）。
 
+## Java 服务端（`agent-jingu3-cs-server`）编码
+
+- **日志**：生产类使用 Lombok `@Slf4j`，禁止 `LoggerFactory.getLogger`。
+- **注入**：优先构造器注入，禁止字段 `@Autowired`（测试除外）。
+- **分包**：`common.constant` / `common.enums` / `common.api` / `common.exception`；**入参 DTO** → `common.dto`；**出参 VO** → `common.vo`；**REST 控制器** → `controller`；**全局异常、可注入常量组件** → `component`（如 `ApiExceptionHandler`、`UserConstants`）；领域枚举可留在 `engine` 等包。
+- **配置注入**：所有 `@Value("${...}")` **必须写默认值**（与 `application.yml` 一致），例如 `@Value("${jingu3.user.id:001}")`；默认值中含冒号时用 `\\:` 转义（如 Ollama 模型名）。
+- **API**：统一返回 `ApiResult<T>`；错误码用 `ErrorCode`；业务问题抛 `ServiceException`；全局异常由 `ApiExceptionHandler` 转为 `ApiResult`。
+- **文案与提示词**：系统/用户提示框架、路由关键词、Stub/校验/日志占位字符串放在 `common.constant`（如 `PromptTemplates`、`PromptFragments`、`EngineMessages`）；业务代码禁止内联长魔法字符串（符合 Alibaba / Sonar 重复字面量规约）。
+
+## 代码质量门禁（Alibaba / SonarLint / Qodana）
+
+- **阿里巴巴 Java 手册**：Maven 已绑定 **P3C PMD** 规则集（`mvn verify` 含 `pmd:check`）。
+- **潜在缺陷**：同一 `verify` 含 **SpotBugs**（`spotbugs:check`）；与 Sonar 的 Bug 类规则互补。
+- **SonarLint**：IDE 中安装 SonarLint，提交前处理阻断/严重告警；与 Maven 静态分析并行，不互相替代。
+- **Qodana**：仓库根 [qodana.yaml](qodana.yaml) + JetBrains `qodana-jvm`；本地需 Docker，命令见 [docs/规范/代码质量与扫描.md](docs/规范/代码质量与扫描.md)。
+
 ## 实现前自检
 
 - 是否影响意图场景识别或八大行动模式契约？  
 - 是否违反史诗顺序（记忆/工具/用户提前落地）？  
-- 本版本 `docs/v0.x/` 文档是否随功能同步更新？
+- 本版本 `docs/v0.x/` 文档是否随功能同步更新？  
+- 新增接口是否走 `ApiResult` 与标准错误码？
+- 是否在 `agent-jingu3-cs-server` 下执行过 `mvn clean verify`（或至少 `pmd:check` + `spotbugs:check`）且无新增违规？

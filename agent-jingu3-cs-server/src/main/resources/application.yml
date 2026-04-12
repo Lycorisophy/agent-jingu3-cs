@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: agent-jingu3-cs-server
+  profiles:
+    active: dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+jingu3:
+  ollama:
+    base-url: http://localhost:11434
+    chat-model: gnremy/qwen3.5-abliterated:35b-a3b
+  user:
+    id: "001"
+    name: user

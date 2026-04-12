@@ -1,0 +1,11 @@
+# 本地开发 profile：与 application.yml 中 dev 段合并使用
+# 启动示例：mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    cn.lysoy.jingu3: INFO

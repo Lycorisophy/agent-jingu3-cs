@@ -1,0 +1,8 @@
+# JetBrains Qodana JVM（与 IDE / Sonar 互补）
+# 本地：docker run --rm -v "%CD%:/data/project" -p 8080:8080 jetbrains/qodana-jvm:latest --show-report
+# 文档：https://www.jetbrains.com/help/qodana/qodana-jvm.html
+version: "1.0"
+linter: jetbrains/qodana-jvm:latest
+projectJDK: "17"
+profile:
+  name: qodana.recommended
