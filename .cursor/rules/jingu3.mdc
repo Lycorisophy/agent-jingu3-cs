@@ -1,0 +1,11 @@
+---
+description: 薄引用 jingu3 开发规范 §1.1～§1.4、§2（避免与 jingu3-project 重复长文）
+globs:
+alwaysApply: true
+---
+
+# jingu3 开发规范（薄壳）
+
+**强制阅读**：[docs/规范/jingu3-开发规范.md](docs/规范/jingu3-开发规范.md) 的 **§1.1 技术选型边界**、**§1.2 记忆必读文档**、**§1.3 技能必读文档**、**§1.4 客户端 UI 与提示词可见性**（含 [JinGu3-AI-Agent客户端UI设计规范.md](docs/设计/JinGu3-AI-Agent客户端UI设计规范.md)）、**§2 史诗交付顺序**（与 [开发路线图 v2.0](docs/计划/开发路线图.md) 一致）。
+
+**详细项目约定**（Java 分包、ApiResult、单用户、Ollama、代码质量等）见同目录 [jingu3-project.mdc](jingu3-project.mdc)；两处勿重复维护相同长列表。

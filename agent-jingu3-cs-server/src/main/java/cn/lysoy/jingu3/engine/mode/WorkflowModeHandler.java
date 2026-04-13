@@ -49,7 +49,7 @@ public class WorkflowModeHandler implements ActionModeHandler {
         WorkflowDefinition def = workflowDefinitionRegistry.get(wf);
         if (def == null || def.getNodes() == null || def.getNodes().isEmpty()) {
             log.warn("workflow definition not found for id={}, fallback two-step", wf);
-            return fallbackTwoStep(in, context.getUserMessage());
+            return fallbackTwoStep(context, in, context.getUserMessage());
         }
 
         // 顺序链：每节点把「节点指令 + 已累计的中间结果 + 原始用户话」交给模型，形成链式上下文
@@ -57,7 +57,7 @@ public class WorkflowModeHandler implements ActionModeHandler {
         for (WorkflowNode node : def.getNodes()) {
             String instr = node.getInstruction() != null ? node.getInstruction() : "";
             accumulated = chat.generate(
-                    prompts.buildWorkflowNodePrompt(instr, accumulated, context.getUserMessage()));
+                    prompts.buildWorkflowNodePrompt(context, instr, accumulated, context.getUserMessage()));
         }
         return accumulated;
     }
@@ -75,7 +75,7 @@ public class WorkflowModeHandler implements ActionModeHandler {
         WorkflowDefinition def = workflowDefinitionRegistry.get(wf);
         if (def == null || def.getNodes() == null || def.getNodes().isEmpty()) {
             log.warn("workflow definition not found for id={}, fallback two-step stream", wf);
-            streamFallbackTwoStep(in, context.getUserMessage(), sink);
+            streamFallbackTwoStep(context, in, context.getUserMessage(), sink);
             return;
         }
 
@@ -86,7 +86,7 @@ public class WorkflowModeHandler implements ActionModeHandler {
             sink.stepBegin(step, nid);
             String instr = node.getInstruction() != null ? node.getInstruction() : "";
             accumulated = chat.generate(
-                    prompts.buildWorkflowNodePrompt(instr, accumulated, context.getUserMessage()));
+                    prompts.buildWorkflowNodePrompt(context, instr, accumulated, context.getUserMessage()));
             sink.block(accumulated == null ? "" : accumulated);
             sink.stepEnd(step);
             step++;
@@ -94,20 +94,21 @@ public class WorkflowModeHandler implements ActionModeHandler {
         sink.done();
     }
 
-    private void streamFallbackTwoStep(String llmInput, String originalUserMessage, StreamEventSink sink) {
+    private void streamFallbackTwoStep(
+            ExecutionContext context, String llmInput, String originalUserMessage, StreamEventSink sink) {
         sink.stepBegin(1, "workflow_fallback_1");
-        String summary = chat.generate(prompts.buildWorkflowStep1Prompt(llmInput));
+        String summary = chat.generate(prompts.buildWorkflowStep1Prompt(context, llmInput));
         sink.block(summary == null ? "" : summary);
         sink.stepEnd(1);
         sink.stepBegin(2, "workflow_fallback_2");
-        String out = chat.generate(prompts.buildWorkflowStep2Prompt(summary, originalUserMessage));
+        String out = chat.generate(prompts.buildWorkflowStep2Prompt(context, summary, originalUserMessage));
         sink.block(out == null ? "" : out);
         sink.stepEnd(2);
         sink.done();
     }
 
-    private String fallbackTwoStep(String llmInput, String originalUserMessage) {
-        String summary = chat.generate(prompts.buildWorkflowStep1Prompt(llmInput));
-        return chat.generate(prompts.buildWorkflowStep2Prompt(summary, originalUserMessage));
+    private String fallbackTwoStep(ExecutionContext context, String llmInput, String originalUserMessage) {
+        String summary = chat.generate(prompts.buildWorkflowStep1Prompt(context, llmInput));
+        return chat.generate(prompts.buildWorkflowStep2Prompt(context, summary, originalUserMessage));
     }
 }

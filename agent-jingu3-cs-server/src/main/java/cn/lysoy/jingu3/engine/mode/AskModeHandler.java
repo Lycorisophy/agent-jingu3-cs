@@ -43,7 +43,7 @@ public class AskModeHandler implements ActionModeHandler {
      */
     @Override
     public String execute(ExecutionContext context) {
-        String combined = prompts.buildAskCombinedPrompt(context.llmInput());
+        String combined = prompts.buildAskCombinedPrompt(context);
         return chat.generate(combined);
     }
 
@@ -55,7 +55,7 @@ public class AskModeHandler implements ActionModeHandler {
      * @param sink    事件出口（SSE 或 WebSocket 适配）
      */
     public void stream(ExecutionContext context, StreamEventSink sink) {
-        String combined = prompts.buildAskCombinedPrompt(context.llmInput());
+        String combined = prompts.buildAskCombinedPrompt(context);
         // LangChain4j：单条 UserMessage 承载「系统+用户」合并文案，与阻塞 API 语义对齐
         streamingChat.generate(
                 List.of(UserMessage.from(combined)),

@@ -14,7 +14,7 @@ import java.util.Locale;
 /**
  * 指南 §2 中「模型辅助选型」的实现：当既无显式 {@code mode} 又未命中规则路由时，用一次短 LLM 调用输出枚举名。
  * 非流式、非用户可见回复，故仍用阻塞 {@link ChatLanguageModel}。
- * <p>仅允许 {@link ActionModePolicy} 中的对话可选模式；其它解析结果降级为 REACT 并记日志。</p>
+ * <p>仅允许 {@link ActionModePolicy} 中的对话可选模式；其它解析结果或调用失败时降级为 ASK 并记日志。</p>
  */
 @Slf4j
 @Component
@@ -39,16 +39,16 @@ public class ModelIntentClassifier {
                 ActionMode mode = ActionMode.fromFlexibleName(text);
                 if (!ActionModePolicy.isConversationSelectable(mode)) {
                     log.warn(LogMessagePatterns.INTENT_CLASSIFIER_UNPARSEABLE_OUTPUT, text);
-                    return ActionMode.REACT;
+                    return ActionMode.ASK;
                 }
                 return mode;
             } catch (IllegalArgumentException ex) {
                 log.warn(LogMessagePatterns.INTENT_CLASSIFIER_UNPARSEABLE_OUTPUT, text);
-                return ActionMode.REACT;
+                return ActionMode.ASK;
             }
         } catch (Exception e) {
             log.warn(LogMessagePatterns.INTENT_CLASSIFIER_FAILED, e.toString());
-            return ActionMode.REACT;
+            return ActionMode.ASK;
         }
     }
 }

@@ -8,6 +8,7 @@ import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.engine.ActionMode;
 import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.engine.ModeRegistry;
+import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -56,7 +57,8 @@ public class ModePlanExecutor {
         String chainPayload = null;
         ActionMode lastMode = ActionMode.ASK;
         for (String token : raw) {
-            ActionMode mode = parseOrReact(token);
+            ActionMode mode =
+                    RoutingFallbacks.modePlanStepOrAskIfWorkflowWithoutId(parseOrReact(token), request.getWorkflowId());
             lastMode = mode;
             String workflowId = mode == ActionMode.WORKFLOW ? request.getWorkflowId() : null;
             ExecutionContext ctx = new ExecutionContext(
@@ -98,4 +100,5 @@ public class ModePlanExecutor {
             return ActionMode.REACT;
         }
     }
+
 }

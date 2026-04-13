@@ -18,6 +18,7 @@ import cn.lysoy.jingu3.engine.mode.WorkflowModeHandler;
 import cn.lysoy.jingu3.engine.orchestration.ModePlanExecutor;
 import cn.lysoy.jingu3.engine.routing.IntentRouter;
 import cn.lysoy.jingu3.engine.routing.RoutingDecision;
+import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
 import cn.lysoy.jingu3.stream.SseStreamEventSink;
 import cn.lysoy.jingu3.stream.StreamEventSink;
@@ -118,8 +119,9 @@ public class ChatStreamService {
                 streamModePlan(request, sink);
                 return;
             }
-            RoutingDecision decision = intentRouter.resolve(request.getMessage(), request.getMode());
-            chatRequestValidator.requireWorkflowIdIfWorkflowMode(decision.getMode(), request);
+            RoutingDecision decision =
+                    RoutingFallbacks.askIfWorkflowWithoutWorkflowId(
+                            intentRouter.resolve(request.getMessage(), request.getMode()), request.getWorkflowId());
 
             sink.meta(
                     decision.getMode().name(),
@@ -154,7 +156,8 @@ public class ChatStreamService {
         String chainPayload = null;
         int stepNum = 0;
         for (String token : raw) {
-            ActionMode mode = parsePlanToken(token);
+            ActionMode mode =
+                    RoutingFallbacks.modePlanStepOrAskIfWorkflowWithoutId(parsePlanToken(token), request.getWorkflowId());
             stepNum++;
             sink.stepBegin(stepNum, mode.name());
             String workflowId = mode == ActionMode.WORKFLOW ? request.getWorkflowId() : null;

@@ -41,7 +41,7 @@ public class ReActModeHandler implements ActionModeHandler {
         StringBuilder trace = new StringBuilder();
         for (int step = 1; step <= maxSteps; step++) {
             String prior = trace.toString();
-            String stepPrompt = prompts.buildReactLoopStepPrompt(userMessage, prior, step, maxSteps);
+            String stepPrompt = prompts.buildReactLoopStepPrompt(context, userMessage, prior, step, maxSteps);
             String out = chat.generate(stepPrompt);
             trace.append("\n---\n第").append(step).append("步---\n").append(out);
             if (out != null && out.contains(TASK_COMPLETE)) {
@@ -60,7 +60,7 @@ public class ReActModeHandler implements ActionModeHandler {
         for (int step = 1; step <= maxSteps; step++) {
             sink.stepBegin(step, "react_step_" + step);
             String prior = trace.toString();
-            String stepPrompt = prompts.buildReactLoopStepPrompt(userMessage, prior, step, maxSteps);
+            String stepPrompt = prompts.buildReactLoopStepPrompt(context, userMessage, prior, step, maxSteps);
             String out = chat.generate(stepPrompt);
             trace.append("\n---\n第").append(step).append("步---\n").append(out);
             sink.block(out == null ? "" : out);

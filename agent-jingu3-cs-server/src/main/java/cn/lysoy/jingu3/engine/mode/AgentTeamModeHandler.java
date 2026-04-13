@@ -32,9 +32,8 @@ public class AgentTeamModeHandler implements ActionModeHandler {
      */
     @Override
     public String execute(ExecutionContext context) {
-        String in = context.llmInput();
-        String subtask = chat.generate(prompts.buildAgentTeamLeadPrompt(in));
-        String specialist = chat.generate(prompts.buildAgentTeamSubPrompt(subtask));
+        String subtask = chat.generate(prompts.buildAgentTeamLeadPrompt(context));
+        String specialist = chat.generate(prompts.buildAgentTeamSubPrompt(context, subtask));
         AgentTeamResult result = new AgentTeamResult(subtask, specialist);
         log.info("agentTeam userId={} conv={} leaderChars={} specialistChars={}",
                 context.getUserId(),
@@ -48,13 +47,12 @@ public class AgentTeamModeHandler implements ActionModeHandler {
      * 流式：两步各发 BLOCK，步标签为 {@code leader} / {@code specialist}。
      */
     public void stream(ExecutionContext context, StreamEventSink sink) {
-        String in = context.llmInput();
         sink.stepBegin(1, "leader");
-        String subtask = chat.generate(prompts.buildAgentTeamLeadPrompt(in));
+        String subtask = chat.generate(prompts.buildAgentTeamLeadPrompt(context));
         sink.block(subtask == null ? "" : subtask);
         sink.stepEnd(1);
         sink.stepBegin(2, "specialist");
-        String specialist = chat.generate(prompts.buildAgentTeamSubPrompt(subtask));
+        String specialist = chat.generate(prompts.buildAgentTeamSubPrompt(context, subtask));
         sink.block(specialist == null ? "" : specialist);
         sink.stepEnd(2);
         log.info("agentTeam stream userId={} conv={} leaderChars={} specialistChars={}",

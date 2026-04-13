@@ -62,6 +62,20 @@ public final class PromptTemplates {
     public static final String AGENT_TEAM_SUB_PREFIX =
             "你是子 Agent。请完成下列子任务并直接给出结果（中文简洁）。子任务：\n";
 
+    /**
+     * 供 {@link cn.lysoy.jingu3.prompt.ModeRoutingPreamble} 注入：对话层可选模式的自然语言释义，
+     * 便于模型判断「是否应建议用户切换模式」。
+     */
+    public static final String MODE_CATALOG_FOR_LLM =
+            "- ASK：单轮问答，直接回答，不强调多步推理或工具链。\n"
+                    + "- REACT：多步「思考—行动—观察」，适合需逐步推理、澄清或未来接入工具调用的任务。\n"
+                    + "- PLAN_AND_EXECUTE：先产出编号计划再逐步执行，适合步骤结构清晰的复杂任务。\n"
+                    + "- WORKFLOW：按预置节点顺序执行，适合固定流水线或审批类流程。\n"
+                    + "- AGENT_TEAM：主 Agent 拆分子任务并由子 Agent 执行，适合多角色分工。\n"
+                    + "- CRON：定时/周期执行意图（对话侧常为说明占位，完整调度见路线图 Cron 模块）。\n"
+                    + "- STATE_TRACKING：在多轮中维护显式状态、计数或进度。\n"
+                    + "- HUMAN_IN_LOOP：需人工审批或确认后再继续的场景。\n";
+
     private PromptTemplates() {
     }
 }

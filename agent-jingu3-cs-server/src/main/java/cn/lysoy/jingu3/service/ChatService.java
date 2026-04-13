@@ -10,6 +10,7 @@ import cn.lysoy.jingu3.engine.ModeRegistry;
 import cn.lysoy.jingu3.engine.orchestration.ModePlanExecutor;
 import cn.lysoy.jingu3.engine.routing.IntentRouter;
 import cn.lysoy.jingu3.engine.routing.RoutingDecision;
+import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -63,8 +64,9 @@ public class ChatService {
             return vo;
         }
 
-        RoutingDecision decision = intentRouter.resolve(request.getMessage(), request.getMode());
-        chatRequestValidator.requireWorkflowIdIfWorkflowMode(decision.getMode(), request);
+        RoutingDecision decision =
+                RoutingFallbacks.askIfWorkflowWithoutWorkflowId(
+                        intentRouter.resolve(request.getMessage(), request.getMode()), request.getWorkflowId());
 
         log.info("routing userId={} source={} mode={} note={} conv={}",
                 userConstants.getId(),

@@ -43,27 +43,26 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
 
     @Override
     public String execute(ExecutionContext context) {
-        String in = context.llmInput();
-        String plan = chat.generate(prompts.buildPlanAndExecutePlanPrompt(in));
-        return executeWithPlan(plan, context.getUserMessage(), false);
+        String plan = chat.generate(prompts.buildPlanAndExecutePlanPrompt(context));
+        return executeWithPlan(context, plan, context.getUserMessage(), false);
     }
 
     /**
      * 流式：第 1 步为计划全文；后续每子任务一步；若触发重规划则插入 {@code replan} 步再递归执行新计划。
      */
     public void stream(ExecutionContext context, StreamEventSink sink) {
-        String in = context.llmInput();
         sink.stepBegin(1, "plan");
-        String plan = chat.generate(prompts.buildPlanAndExecutePlanPrompt(in));
+        String plan = chat.generate(prompts.buildPlanAndExecutePlanPrompt(context));
         sink.block(plan == null ? "" : plan);
         sink.stepEnd(1);
-        streamWithPlan(plan, context.getUserMessage(), false, sink, 2);
+        streamWithPlan(context, plan, context.getUserMessage(), false, sink, 2);
     }
 
     /**
      * 从某份计划文本开始执行子任务流式推送；{@code nextStepIndex} 为下一步全局步号（与同步版逻辑对齐）。
      */
     private void streamWithPlan(
+            ExecutionContext ctx,
             String plan,
             String originalUserMessage,
             boolean afterReplan,
@@ -78,7 +77,8 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
             for (int i = 0; i < subtasks.size(); i++) {
                 sink.stepBegin(stepIdx, "subtask_" + (i + 1));
                 String r = chat.generate(
-                        prompts.buildSubtaskExecutePrompt(subtasks.get(i), originalUserMessage, i + 1));
+                        prompts.buildSubtaskExecutePrompt(
+                                ctx, subtasks.get(i), originalUserMessage, i + 1));
                 sink.block(r == null ? "" : r);
                 sink.stepEnd(stepIdx);
                 stepIdx++;
@@ -88,11 +88,11 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
             if (replanEnabled && !afterReplan) {
                 sink.stepBegin(stepIdx, "replan");
                 String newPlan = chat.generate(
-                        prompts.buildReplannerPrompt(plan, ex.getMessage(), originalUserMessage));
+                        prompts.buildReplannerPrompt(ctx, plan, ex.getMessage(), originalUserMessage));
                 sink.block(newPlan == null ? "" : newPlan);
                 sink.stepEnd(stepIdx);
                 // 仅允许一次重规划：afterReplan=true 时子任务失败将直接 error
-                streamWithPlan(newPlan, originalUserMessage, true, sink, stepIdx + 1);
+                streamWithPlan(ctx, newPlan, originalUserMessage, true, sink, stepIdx + 1);
                 return;
             }
             sink.error(ex.getMessage() != null ? ex.getMessage() : ex.toString());
@@ -101,7 +101,7 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
         sink.done();
     }
 
-    private String executeWithPlan(String plan, String originalUserMessage, boolean afterReplan) {
+    private String executeWithPlan(ExecutionContext ctx, String plan, String originalUserMessage, boolean afterReplan) {
         List<String> subtasks = PlanTextParser.parseSubtasks(plan);
         if (subtasks.size() > maxSubtasks) {
             subtasks = subtasks.subList(0, maxSubtasks);
@@ -110,15 +110,15 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
         try {
             for (int i = 0; i < subtasks.size(); i++) {
                 String r = chat.generate(
-                        prompts.buildSubtaskExecutePrompt(subtasks.get(i), originalUserMessage, i + 1));
+                        prompts.buildSubtaskExecutePrompt(ctx, subtasks.get(i), originalUserMessage, i + 1));
                 stepOutputs.add(r);
             }
         } catch (RuntimeException ex) {
             log.warn("plan step failed: {}", ex.toString());
             if (replanEnabled && !afterReplan) {
                 String newPlan = chat.generate(
-                        prompts.buildReplannerPrompt(plan, ex.getMessage(), originalUserMessage));
-                return executeWithPlan(newPlan, originalUserMessage, true);
+                        prompts.buildReplannerPrompt(ctx, plan, ex.getMessage(), originalUserMessage));
+                return executeWithPlan(ctx, newPlan, originalUserMessage, true);
             }
             throw ex;
         }

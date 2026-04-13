@@ -48,9 +48,9 @@ class IntentRouterTest {
     }
 
     @Test
-    void invalidExplicitMode_fallsBackToReact() {
+    void invalidExplicitMode_fallsBackToAsk() {
         RoutingDecision d = router.resolve("x", "NOT_A_REAL_MODE");
-        assertThat(d.getMode()).isEqualTo(ActionMode.REACT);
+        assertThat(d.getMode()).isEqualTo(ActionMode.ASK);
         assertThat(d.getSource()).isEqualTo(RoutingSource.FALLBACK);
         Mockito.verifyNoInteractions(classifier);
     }
