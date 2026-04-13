@@ -25,6 +25,19 @@
       "result": { "type": "text", "analyzer": "ik_smart_analyzer" },
       "actors": { "type": "keyword" },
       "assertion": { "type": "keyword" },
+      "event_subject": {
+        "type": "text",
+        "analyzer": "ik_smart_analyzer",
+        "fields": { "keyword": { "type": "keyword", "ignore_above": 512 } }
+      },
+      "event_location": {
+        "type": "text",
+        "analyzer": "ik_smart_analyzer",
+        "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
+      },
+      "trigger_terms": { "type": "keyword" },
+      "modality": { "type": "keyword" },
+      "temporal_semantic": { "type": "keyword" },
       "metadata": {
         "type": "object",
         "properties": {
