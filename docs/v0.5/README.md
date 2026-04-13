@@ -37,5 +37,5 @@
 - [x] 详细设计.md
 - [x] 接口文档.md + [openapi.yaml](./openapi.yaml)（摘要，可与 Springdoc 生成结果后续对齐）
 - [x] [验收清单.md](./验收清单.md)（PRD AC 手工步骤）
-- [x] 单测与集成测（仓储层 `@DataJpaTest` + 既有引擎单测；全量 `mvn test` 建议在 CI/本地执行）
+- [x] 单测与集成测（持久化层 **MyBatis-Plus** + `@SpringBootTest`；全量 `mvn test` / `mvn verify` 见 CI）
 - [x] 部署文档.md

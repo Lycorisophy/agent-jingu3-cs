@@ -11,6 +11,7 @@ import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.engine.ModeRegistry;
 import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
+import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +33,11 @@ public class ModePlanExecutor {
 
     private final ModeRegistry modeRegistry;
 
-    public ModePlanExecutor(ModeRegistry modeRegistry) {
+    private final MemoryAugmentationService memoryAugmentationService;
+
+    public ModePlanExecutor(ModeRegistry modeRegistry, MemoryAugmentationService memoryAugmentationService) {
         this.modeRegistry = modeRegistry;
+        this.memoryAugmentationService = memoryAugmentationService;
     }
 
     /**
@@ -54,6 +58,8 @@ public class ModePlanExecutor {
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
                 ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();
+        String effectiveMessage =
+                memoryAugmentationService.augmentUserMessageIfEnabled(request.getMessage(), users.getId());
         List<PlanStepVo> steps = new ArrayList<>();
         String chainPayload = null;
         ActionMode lastMode = ActionMode.ASK;
@@ -66,7 +72,7 @@ public class ModePlanExecutor {
                     users.getId(),
                     users.getUsername(),
                     conv,
-                    request.getMessage(),
+                    effectiveMessage,
                     mode,
                     RoutingSource.CLIENT_EXPLICIT,
                     List.of(),
@@ -75,7 +81,7 @@ public class ModePlanExecutor {
             );
             String reply = modeRegistry.get(mode).execute(ctx);
             steps.add(new PlanStepVo(mode.name(), reply));
-            chainPayload = request.getMessage() + PromptFragments.PLAN_CHAIN_SEPARATOR + reply;
+            chainPayload = effectiveMessage + PromptFragments.PLAN_CHAIN_SEPARATOR + reply;
         }
         String finalReply = steps.isEmpty() ? "" : steps.get(steps.size() - 1).getReply();
         ChatVo vo = new ChatVo();

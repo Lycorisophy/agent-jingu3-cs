@@ -13,11 +13,19 @@
 ### M1 已实现（代码）
 
 - **Flyway**：`V4__memory_m1.sql` — `memory_entry`、`fact_metadata`。
-- **包**：`cn.lysoy.jingu3.memory`（实体、仓库、`MemoryService` / `DefaultMemoryService`）。
+- **包**：`cn.lysoy.jingu3.memory`（实体、Mapper、`MemoryService` / `DefaultMemoryService`）。
 - **配置**：`jingu3.memory.api-enabled`（默认 `true`）、`jingu3.memory.max-list-size`（默认 `100`）。
-- **实验 API**（未接 `ChatService`；生产可关 `api-enabled`）：
+- **实验 API**（生产可关 `api-enabled`；**对话注入**见下节 M4）：
   - `POST /api/v1/memory/entries` — 请求体 JSON：`userId`、`kind`（`FACT`|`EVENT`）、可选 `summary`、`body`；`FACT` 时可带 `factTag` 写入 `fact_metadata.tag`。
-  - `GET /api/v1/memory/entries?userId=...` — 按用户倒序列表（受 `max-list-size` 限制）。
+  - `GET /api/v1/memory/entries?userId=...` — 按用户倒序列表（受 `max-list-size` 限制）；可选 **Redis** 缓存（`jingu3.redis.enabled=true`）。
+
+### M3 / M4 已实现（增量）
+
+- **Redis**：`jingu3.redis.enabled`（默认 `false`）；启用后注册 `StringRedisTemplate`，记忆列表带 TTL 缓存。
+- **Milvus + Ollama 嵌入**：`jingu3.milvus.enabled`（默认 `false`）；`OllamaEmbeddingClient` 调用 `jingu3.ollama.base-url` + `/api/embeddings`；`jingu3.memory.embedding-model`（默认 `qwen3-embedding:8b`）。
+- **Flyway `V5__memory_embedding.sql`**：标记已写入向量的 `memory_entry_id`。
+- **对话注入**：`jingu3.memory.injection-enabled`（默认 `false`）；为 `true` 且 Milvus 启用时，`ChatService` / `ChatStreamService` / `ModePlanExecutor` 在构造 `ExecutionContext` 前拼接参考记忆（意图路由仍用用户原文）。
+- **本地联调**：[`application-local.yml.example`](../../agent-jingu3-cs-server/src/main/resources/application-local.yml.example)。
 
 ## 工序清单（发布前勾选）
 

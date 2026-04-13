@@ -4,6 +4,7 @@ info:
   version: "0.5.0"
   description: |
     与 [接口文档.md](./接口文档.md) 配套；对话主链路及 v0.5 横切 REST。
+    记忆实验 API（v0.6 M1）见 `/api/v1/memory/entries`，详述见 [docs/v0.6/接口文档.md](../v0.6/接口文档.md)（若存在）或代码 `MemoryController`。
 servers:
   - url: http://localhost:8080
 paths:
@@ -178,6 +179,42 @@ paths:
       responses:
         "200":
           description: ApiResult DialogueStateVo
+  /api/v1/memory/entries:
+    get:
+      summary: 按用户列出记忆条目（v0.6 M1 实验）
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ApiResult list MemoryEntryVo
+    post:
+      summary: 创建记忆条目
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, kind]
+              properties:
+                userId:
+                  type: string
+                kind:
+                  type: string
+                  enum: [FACT, EVENT]
+                summary:
+                  type: string
+                body:
+                  type: string
+                factTag:
+                  type: string
+      responses:
+        "200":
+          description: ApiResult MemoryEntryVo
 components:
   schemas:
     ChatRequest:

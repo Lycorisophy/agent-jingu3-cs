@@ -22,6 +22,7 @@ import cn.lysoy.jingu3.engine.routing.IntentRouter;
 import cn.lysoy.jingu3.engine.routing.RoutingDecision;
 import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
+import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
 import cn.lysoy.jingu3.stream.SseStreamEventSink;
 import cn.lysoy.jingu3.stream.StreamEventSink;
 import cn.lysoy.jingu3.stream.WebSocketStreamEventSink;
@@ -64,6 +65,8 @@ public class ChatStreamService {
     private final TaskExecutor chatStreamExecutor;
     private final ObjectMapper objectMapper;
 
+    private final MemoryAugmentationService memoryAugmentationService;
+
     public ChatStreamService(
             ChatRequestValidator chatRequestValidator,
             IntentRouter intentRouter,
@@ -78,7 +81,8 @@ public class ChatStreamService {
             StateTrackingModeHandler stateTrackingModeHandler,
             HumanInLoopModeHandler humanInLoopModeHandler,
             @Qualifier("chatStreamExecutor") TaskExecutor chatStreamExecutor,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            MemoryAugmentationService memoryAugmentationService) {
         this.chatRequestValidator = chatRequestValidator;
         this.intentRouter = intentRouter;
         this.modeRegistry = modeRegistry;
@@ -93,6 +97,7 @@ public class ChatStreamService {
         this.humanInLoopModeHandler = humanInLoopModeHandler;
         this.chatStreamExecutor = chatStreamExecutor;
         this.objectMapper = objectMapper;
+        this.memoryAugmentationService = memoryAugmentationService;
     }
 
     /**
@@ -121,6 +126,8 @@ public class ChatStreamService {
                 streamModePlan(request, sink);
                 return;
             }
+            String forLlm = memoryAugmentationService.augmentUserMessageIfEnabled(
+                    request.getMessage(), userConstants.getId());
             RoutingDecision decision =
                     RoutingFallbacks.askIfWorkflowWithoutWorkflowId(
                             intentRouter.resolve(request.getMessage(), request.getMode()), request.getWorkflowId());
@@ -135,7 +142,7 @@ public class ChatStreamService {
                 sink.block(decision.getGuardUserNotice());
             }
 
-            ExecutionContext ctx = buildContext(request, decision);
+            ExecutionContext ctx = buildContext(request, decision, forLlm);
             streamByMode(decision.getMode(), ctx, sink);
         } catch (Exception e) {
             log.warn("stream pipeline failed: {}", e.toString());
@@ -151,6 +158,8 @@ public class ChatStreamService {
         if (raw.size() > ModePlanExecutor.MAX_STEPS) {
             raw = raw.subList(0, ModePlanExecutor.MAX_STEPS);
         }
+        String effectiveMessage =
+                memoryAugmentationService.augmentUserMessageIfEnabled(request.getMessage(), userConstants.getId());
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
                 ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();
@@ -171,7 +180,7 @@ public class ChatStreamService {
                     userConstants.getId(),
                     userConstants.getUsername(),
                     conv,
-                    request.getMessage(),
+                    effectiveMessage,
                     mode,
                     RoutingSource.CLIENT_EXPLICIT,
                     List.of(),
@@ -181,7 +190,7 @@ public class ChatStreamService {
             sink.block(reply == null ? "" : reply);
             sink.stepEnd(stepNum);
             // 与 ModePlanExecutor 相同：把「用户消息 + 上步答复」交给下一步作为 taskPayload
-            chainPayload = request.getMessage() + PromptFragments.PLAN_CHAIN_SEPARATOR + reply;
+            chainPayload = effectiveMessage + PromptFragments.PLAN_CHAIN_SEPARATOR + reply;
         }
         sink.done();
     }
@@ -197,7 +206,7 @@ public class ChatStreamService {
         }
     }
 
-    private ExecutionContext buildContext(ChatRequest request, RoutingDecision decision) {
+    private ExecutionContext buildContext(ChatRequest request, RoutingDecision decision, String messageForLlm) {
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
                 ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();
@@ -205,7 +214,7 @@ public class ChatStreamService {
                 userConstants.getId(),
                 userConstants.getUsername(),
                 conv,
-                request.getMessage(),
+                messageForLlm,
                 decision.getMode(),
                 decision.getSource(),
                 List.of(),

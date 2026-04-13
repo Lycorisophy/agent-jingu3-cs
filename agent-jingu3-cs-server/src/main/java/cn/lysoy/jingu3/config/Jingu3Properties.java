@@ -32,6 +32,16 @@ public class Jingu3Properties {
     /** 本地/自建 Milvus（向量库）；未接向量检索前仅作配置占位，默认 gRPC 19530 */
     private Milvus milvus = new Milvus();
 
+    private Ollama ollama = new Ollama();
+
+    @Data
+    public static class Ollama {
+
+        private String baseUrl = "http://localhost:11434";
+
+        private String chatModel = "gnremy/qwen3.5-abliterated:35b-a3b";
+    }
+
     @Data
     public static class Memory {
 
@@ -42,6 +52,22 @@ public class Jingu3Properties {
 
         /** {@link cn.lysoy.jingu3.memory.DefaultMemoryService#listByUserId} 单次最大条数 */
         private int maxListSize = 100;
+
+        /**
+         * 是否在对话主链路注入检索到的记忆片段（关闭时与未接向量前行为一致）。
+         */
+        private boolean injectionEnabled = false;
+
+        /** Ollama 嵌入模型名，与路线图默认一致 */
+        private String embeddingModel = "qwen3-embedding:8b";
+
+        /**
+         * 向量维度；0 表示首次嵌入时按 Ollama 返回长度自动建 Milvus 集合（需 Milvus 已启用）。
+         */
+        private int embeddingDimension = 0;
+
+        /** 对话前向量检索条数上限 */
+        private int retrievalTopK = 5;
     }
 
     @Data
@@ -120,16 +146,31 @@ public class Jingu3Properties {
     @Data
     public static class Redis {
 
+        /** 为 true 时注册 Redis 连接与记忆列表缓存；默认 false 不连 Redis */
+        private boolean enabled = false;
+
         private String host = "127.0.0.1";
 
         private int port = 6379;
 
         /** 无密码时留空 */
         private String password = "";
+
+        /** 逻辑库索引，与 spring.data.redis.database 一致 */
+        private int database = 0;
+
+        /** GET /memory/entries 列表缓存 TTL（秒） */
+        private int listTtlSeconds = 60;
     }
 
     @Data
     public static class Milvus {
+
+        /** 为 true 时写入/检索向量；需 Milvus 可达 */
+        private boolean enabled = false;
+
+        /** 集合名（单 collection MVP） */
+        private String collectionName = "jingu3_memory";
 
         private String host = "127.0.0.1";
 

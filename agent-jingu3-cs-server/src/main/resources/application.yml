@@ -3,7 +3,7 @@ spring:
     name: agent-jingu3-cs-server
   profiles:
     # 本地 MySQL（如库 jingu_agent）与 Redis/Milvus：复制 application-local.yml.example 为 application-local.yml，使用 --spring.profiles.active=dev,local
-    active: local
+    active: dev
   datasource:
     url: jdbc:h2:mem:jingu3;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     driver-class-name: org.h2.Driver
@@ -64,6 +64,25 @@ jingu3:
     # v0.6 M1：实验性记忆 API；关闭后不注册 MemoryController
     api-enabled: true
     max-list-size: 100
+    # 是否在对话中注入检索到的记忆（需 Milvus + Ollama 嵌入；默认 false）
+    injection-enabled: false
+    embedding-model: qwen3-embedding:8b
+    embedding-dimension: 0
+    retrieval-top-k: 5
+  redis:
+    enabled: false
+    host: 127.0.0.1
+    port: 6379
+    password: ""
+    database: 0
+    list-ttl-seconds: 60
+  milvus:
+    enabled: false
+    collection-name: jingu3_memory
+    host: 127.0.0.1
+    port: 19530
+    user: ""
+    password: ""
   cron:
     demo-schedule: "0 0 9 * * MON-FRI"
     # 是否启用定时轮询执行到期任务（MVP：到点调用 ChatService 一问一答）

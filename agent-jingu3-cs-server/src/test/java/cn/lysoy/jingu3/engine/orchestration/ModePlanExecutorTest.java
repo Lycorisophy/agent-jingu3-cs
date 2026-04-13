@@ -14,6 +14,7 @@ import cn.lysoy.jingu3.engine.mode.StateTrackingModeHandler;
 import cn.lysoy.jingu3.engine.mode.WorkflowModeHandler;
 import cn.lysoy.jingu3.engine.support.ToolStepService;
 import cn.lysoy.jingu3.engine.workflow.WorkflowDefinitionRegistry;
+import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
 import cn.lysoy.jingu3.prompt.PromptAssembly;
 import cn.lysoy.jingu3.tool.CalculatorTool;
 import cn.lysoy.jingu3.tool.ToolRegistry;
@@ -27,6 +28,7 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +61,9 @@ class ModePlanExecutorTest {
         when(chat.generate(anyString())).thenReturn("gen");
         StreamingChatLanguageModel streaming = Mockito.mock(StreamingChatLanguageModel.class);
         ModeRegistry registry = buildRegistry(chat, streaming);
-        var executor = new ModePlanExecutor(registry);
+        MemoryAugmentationService memAug = Mockito.mock(MemoryAugmentationService.class);
+        when(memAug.augmentUserMessageIfEnabled(anyString(), any())).thenAnswer(inv -> inv.getArgument(0));
+        var executor = new ModePlanExecutor(registry, memAug);
         UserConstants users = Mockito.mock(UserConstants.class);
         when(users.getId()).thenReturn("001");
         when(users.getUsername()).thenReturn("user");
@@ -83,7 +87,9 @@ class ModePlanExecutorTest {
         when(chat.generate(anyString())).thenReturn("gen");
         StreamingChatLanguageModel streaming = Mockito.mock(StreamingChatLanguageModel.class);
         ModeRegistry registry = buildRegistry(chat, streaming);
-        var executor = new ModePlanExecutor(registry);
+        MemoryAugmentationService memAug = Mockito.mock(MemoryAugmentationService.class);
+        when(memAug.augmentUserMessageIfEnabled(anyString(), any())).thenAnswer(inv -> inv.getArgument(0));
+        var executor = new ModePlanExecutor(registry, memAug);
         UserConstants users = Mockito.mock(UserConstants.class);
         when(users.getId()).thenReturn("001");
         when(users.getUsername()).thenReturn("user");

@@ -26,6 +26,9 @@ public final class PromptFragments {
      */
     public static final String PLAN_CHAIN_SEPARATOR = "\n---\n上一步输出：\n";
 
+    /** 对话前向量检索注入时的段落标题（与 {@code jingu3.memory.injection-enabled} 配合）。 */
+    public static final String MEMORY_REFERENCE_HEADER = "【参考记忆】\n";
+
     private PromptFragments() {
     }
 }

@@ -13,4 +13,12 @@ public interface MemoryEntryMapper extends BaseMapper<MemoryEntryEntity> {
             "SELECT * FROM memory_entry WHERE user_id = #{userId} ORDER BY created_at DESC LIMIT #{limit}")
     List<MemoryEntryEntity> selectByUserIdOrderByCreatedAtDesc(
             @Param("userId") String userId, @Param("limit") int limit);
+
+    @Select({
+        "<script>",
+        "SELECT * FROM memory_entry WHERE id IN",
+        "<foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach>",
+        "</script>"
+    })
+    List<MemoryEntryEntity> selectByIds(@Param("ids") List<Long> ids);
 }

@@ -8,7 +8,9 @@ import cn.lysoy.jingu3.common.vo.MemoryEntryVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.memory.entity.FactMetadataEntity;
 import cn.lysoy.jingu3.memory.entity.MemoryEntryEntity;
+import cn.lysoy.jingu3.memory.cache.MemoryEntryListCache;
 import cn.lysoy.jingu3.memory.mapper.FactMetadataMapper;
+import cn.lysoy.jingu3.memory.vector.MemoryVectorIndexer;
 import cn.lysoy.jingu3.memory.mapper.MemoryEntryMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +31,21 @@ public class DefaultMemoryService implements MemoryService {
 
     private final Jingu3Properties properties;
 
+    private final MemoryEntryListCache memoryEntryListCache;
+
+    private final MemoryVectorIndexer memoryVectorIndexer;
+
     public DefaultMemoryService(
             MemoryEntryMapper memoryEntryMapper,
             FactMetadataMapper factMetadataMapper,
-            Jingu3Properties properties) {
+            Jingu3Properties properties,
+            MemoryEntryListCache memoryEntryListCache,
+            MemoryVectorIndexer memoryVectorIndexer) {
         this.memoryEntryMapper = memoryEntryMapper;
         this.factMetadataMapper = factMetadataMapper;
         this.properties = properties;
+        this.memoryEntryListCache = memoryEntryListCache;
+        this.memoryVectorIndexer = memoryVectorIndexer;
     }
 
     @Override
@@ -59,6 +69,8 @@ public class DefaultMemoryService implements MemoryService {
             meta.setTag(factTagOut);
             factMetadataMapper.insert(meta);
         }
+        memoryEntryListCache.evictListForUser(e.getUserId());
+        memoryVectorIndexer.afterMemoryCreated(e);
         return toVo(e, factTagOut);
     }
 
@@ -69,9 +81,15 @@ public class DefaultMemoryService implements MemoryService {
             throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 不能为空");
         }
         int max = Math.max(1, properties.getMemory().getMaxListSize());
-        List<MemoryEntryEntity> rows =
-                memoryEntryMapper.selectByUserIdOrderByCreatedAtDesc(userId.trim(), max);
-        return rows.stream().map(this::toVoWithOptionalFactTag).collect(Collectors.toList());
+        String uid = userId.trim();
+        var cached = memoryEntryListCache.get(uid, max);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+        List<MemoryEntryEntity> rows = memoryEntryMapper.selectByUserIdOrderByCreatedAtDesc(uid, max);
+        List<MemoryEntryVo> out = rows.stream().map(this::toVoWithOptionalFactTag).collect(Collectors.toList());
+        memoryEntryListCache.put(uid, max, out);
+        return out;
     }
 
     private MemoryEntryVo toVoWithOptionalFactTag(MemoryEntryEntity e) {

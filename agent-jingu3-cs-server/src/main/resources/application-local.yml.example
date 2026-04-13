@@ -38,15 +38,23 @@ mybatis-plus:
 #      database: ${REDIS_DB:0}
 
 jingu3:
+  # 需要 Redis 时置为 true（并确保本机 Redis 可连）
   redis:
+    enabled: false
     host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:}
+    list-ttl-seconds: 60
+  # 需要 Milvus + Ollama 嵌入时置为 true；并确保 Ollama 已拉取 embedding 模型
   milvus:
+    enabled: false
+    collection-name: jingu3_memory
     host: ${MILVUS_HOST:127.0.0.1}
     port: ${MILVUS_PORT:19530}
     user: ${MILVUS_USER:}
     password: ${MILVUS_PASSWORD:}
+  memory:
+    injection-enabled: false
 
 logging:
   level:

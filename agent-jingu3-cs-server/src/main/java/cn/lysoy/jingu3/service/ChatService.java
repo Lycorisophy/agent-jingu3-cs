@@ -12,6 +12,7 @@ import cn.lysoy.jingu3.engine.orchestration.ModePlanExecutor;
 import cn.lysoy.jingu3.engine.routing.IntentRouter;
 import cn.lysoy.jingu3.engine.routing.RoutingDecision;
 import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
+import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -32,17 +33,21 @@ public class ChatService {
     private final ModePlanExecutor modePlanExecutor;
     private final ChatRequestValidator chatRequestValidator;
 
+    private final MemoryAugmentationService memoryAugmentationService;
+
     public ChatService(
             IntentRouter intentRouter,
             ModeRegistry modeRegistry,
             UserConstants userConstants,
             ModePlanExecutor modePlanExecutor,
-            ChatRequestValidator chatRequestValidator) {
+            ChatRequestValidator chatRequestValidator,
+            MemoryAugmentationService memoryAugmentationService) {
         this.intentRouter = intentRouter;
         this.modeRegistry = modeRegistry;
         this.userConstants = userConstants;
         this.modePlanExecutor = modePlanExecutor;
         this.chatRequestValidator = chatRequestValidator;
+        this.memoryAugmentationService = memoryAugmentationService;
     }
 
     /**
@@ -65,6 +70,8 @@ public class ChatService {
             return vo;
         }
 
+        String forLlm =
+                memoryAugmentationService.augmentUserMessageIfEnabled(request.getMessage(), userConstants.getId());
         RoutingDecision decision =
                 RoutingFallbacks.askIfWorkflowWithoutWorkflowId(
                         intentRouter.resolve(request.getMessage(), request.getMode()), request.getWorkflowId());
@@ -82,7 +89,7 @@ public class ChatService {
                 request.getConversationId() == null || request.getConversationId().isBlank()
                         ? ConversationConstants.DEFAULT_CONVERSATION_ID
                         : request.getConversationId(),
-                request.getMessage(),
+                forLlm,
                 decision.getMode(),
                 decision.getSource(),
                 List.of(),
