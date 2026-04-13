@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "analysis": {
+      "analyzer": {
+        "ik_smart_analyzer": {
+          "type": "custom",
+          "tokenizer": "ik_smart"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "message_id": { "type": "keyword" },
+      "conversation_id": { "type": "keyword" },
+      "user_id": { "type": "keyword" },
+      "role": { "type": "keyword" },
+      "content": { "type": "text", "analyzer": "ik_smart_analyzer" },
+      "created_at": { "type": "date" },
+      "embedding_ref": { "type": "keyword" }
+    }
+  }
+}
