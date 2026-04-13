@@ -12,4 +12,14 @@ public class NoOpMemoryVectorIndexer implements MemoryVectorIndexer {
     public void afterMemoryCreated(MemoryEntryEntity entity) {
         // no-op
     }
+
+    @Override
+    public void afterMemoryUpdated(MemoryEntryEntity entity) {
+        // no-op
+    }
+
+    @Override
+    public void onMemoryDeleted(long memoryEntryId) {
+        // no-op
+    }
 }

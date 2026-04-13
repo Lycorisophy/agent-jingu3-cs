@@ -215,6 +215,55 @@ paths:
       responses:
         "200":
           description: ApiResult MemoryEntryVo
+  /api/v1/memory/entries/{id}:
+    put:
+      summary: 更新记忆条目（v0.6-B；至少改一项）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                summary:
+                  type: string
+                body:
+                  type: string
+                kind:
+                  type: string
+                  enum: [FACT, EVENT]
+                factTag:
+                  type: string
+      responses:
+        "200":
+          description: ApiResult MemoryEntryVo
+    delete:
+      summary: 删除记忆条目
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ApiResult void
 components:
   schemas:
     ChatRequest:

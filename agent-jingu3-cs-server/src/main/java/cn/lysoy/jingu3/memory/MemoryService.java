@@ -1,6 +1,7 @@
 package cn.lysoy.jingu3.memory;
 
 import cn.lysoy.jingu3.common.dto.CreateMemoryEntryRequest;
+import cn.lysoy.jingu3.common.dto.UpdateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.vo.MemoryEntryVo;
 
 import java.util.List;
@@ -13,4 +14,8 @@ public interface MemoryService {
     MemoryEntryVo create(CreateMemoryEntryRequest request);
 
     List<MemoryEntryVo> listByUserId(String userId);
+
+    MemoryEntryVo update(long id, UpdateMemoryEntryRequest request);
+
+    void delete(long id, String userId);
 }

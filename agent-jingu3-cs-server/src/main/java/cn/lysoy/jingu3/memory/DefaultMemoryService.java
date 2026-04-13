@@ -1,6 +1,7 @@
 package cn.lysoy.jingu3.memory;
 
 import cn.lysoy.jingu3.common.dto.CreateMemoryEntryRequest;
+import cn.lysoy.jingu3.common.dto.UpdateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
 import cn.lysoy.jingu3.common.util.UtcTime;
@@ -90,6 +91,86 @@ public class DefaultMemoryService implements MemoryService {
         List<MemoryEntryVo> out = rows.stream().map(this::toVoWithOptionalFactTag).collect(Collectors.toList());
         memoryEntryListCache.put(uid, max, out);
         return out;
+    }
+
+    @Override
+    @Transactional
+    public MemoryEntryVo update(long id, UpdateMemoryEntryRequest request) {
+        if (request.getSummary() == null
+                && request.getBody() == null
+                && request.getKind() == null
+                && request.getFactTag() == null) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "至少提供 summary、body、kind、factTag 之一");
+        }
+        MemoryEntryEntity e = memoryEntryMapper.selectById(id);
+        if (e == null) {
+            throw new ServiceException(ErrorCode.NOT_FOUND, "记忆条目不存在");
+        }
+        String uid = request.getUserId().trim();
+        if (!e.getUserId().equals(uid)) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 与条目不符");
+        }
+        var now = UtcTime.nowLocalDateTime();
+        if (request.getSummary() != null) {
+            e.setSummary(request.getSummary());
+        }
+        if (request.getBody() != null) {
+            e.setBody(request.getBody());
+        }
+        MemoryEntryKind finalKind = e.getKind();
+        if (request.getKind() != null && !request.getKind().isBlank()) {
+            finalKind = parseKind(request.getKind());
+            e.setKind(finalKind);
+        }
+        e.setUpdatedAt(now);
+        memoryEntryMapper.updateById(e);
+        syncFactMetadataOnUpdate(id, request, finalKind);
+        memoryEntryListCache.evictListForUser(uid);
+        memoryVectorIndexer.afterMemoryUpdated(e);
+        return toVoWithOptionalFactTag(e);
+    }
+
+    @Override
+    @Transactional
+    public void delete(long id, String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 不能为空");
+        }
+        MemoryEntryEntity e = memoryEntryMapper.selectById(id);
+        if (e == null) {
+            throw new ServiceException(ErrorCode.NOT_FOUND, "记忆条目不存在");
+        }
+        if (!e.getUserId().equals(userId.trim())) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 与条目不符");
+        }
+        memoryVectorIndexer.onMemoryDeleted(id);
+        memoryEntryMapper.deleteById(id);
+        memoryEntryListCache.evictListForUser(e.getUserId());
+    }
+
+    private void syncFactMetadataOnUpdate(long id, UpdateMemoryEntryRequest request, MemoryEntryKind finalKind) {
+        if (finalKind == MemoryEntryKind.EVENT) {
+            factMetadataMapper.deleteById(id);
+            return;
+        }
+        if (request.getFactTag() == null) {
+            return;
+        }
+        String trimmed = request.getFactTag().trim();
+        if (trimmed.isEmpty()) {
+            factMetadataMapper.deleteById(id);
+            return;
+        }
+        FactMetadataEntity existing = factMetadataMapper.selectById(id);
+        if (existing == null) {
+            FactMetadataEntity meta = new FactMetadataEntity();
+            meta.setMemoryEntryId(id);
+            meta.setTag(trimmed);
+            factMetadataMapper.insert(meta);
+        } else {
+            existing.setTag(trimmed);
+            factMetadataMapper.updateById(existing);
+        }
     }
 
     private MemoryEntryVo toVoWithOptionalFactTag(MemoryEntryEntity e) {

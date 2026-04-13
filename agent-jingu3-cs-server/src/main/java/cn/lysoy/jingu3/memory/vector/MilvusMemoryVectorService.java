@@ -10,6 +10,7 @@ import io.milvus.param.collection.FieldType;
 import io.milvus.param.collection.FlushParam;
 import io.milvus.param.collection.HasCollectionParam;
 import io.milvus.param.collection.LoadCollectionParam;
+import io.milvus.param.dml.DeleteParam;
 import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.SearchParam;
 import io.milvus.param.index.CreateIndexParam;
@@ -199,5 +200,22 @@ public class MilvusMemoryVectorService {
             log.warn("Milvus parse search results", ex);
         }
         return ids;
+    }
+
+    /**
+     * 按主键删除向量行；集合或数据不存在时忽略失败日志。
+     */
+    public void deleteByMemoryEntryId(long memoryEntryId) {
+        String name = collectionName();
+        String expr = F_MEMORY_ENTRY_ID + " == " + memoryEntryId;
+        DeleteParam deleteParam = DeleteParam.newBuilder().withCollectionName(name).withExpr(expr).build();
+        R<?> r = client.delete(deleteParam);
+        if (r.getStatus() != R.Status.Success.getCode()) {
+            log.warn("Milvus delete entryId={}: {} {}", memoryEntryId, r.getStatus(), r.getMessage());
+        }
+        R<?> flush = client.flush(FlushParam.newBuilder().addCollectionName(name).build());
+        if (flush.getStatus() != R.Status.Success.getCode()) {
+            log.warn("Milvus flush after delete: {}", flush.getMessage());
+        }
     }
 }

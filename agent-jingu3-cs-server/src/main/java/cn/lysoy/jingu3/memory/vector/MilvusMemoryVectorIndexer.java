@@ -50,6 +50,30 @@ public class MilvusMemoryVectorIndexer implements MemoryVectorIndexer {
         }
     }
 
+    @Override
+    public void afterMemoryUpdated(MemoryEntryEntity entity) {
+        removeIndexedVectors(entity.getId());
+        afterMemoryCreated(entity);
+    }
+
+    @Override
+    public void onMemoryDeleted(long memoryEntryId) {
+        try {
+            milvusMemoryVectorService.deleteByMemoryEntryId(memoryEntryId);
+        } catch (Exception ex) {
+            log.warn("Milvus 删除向量失败 entryId={}", memoryEntryId, ex);
+        }
+    }
+
+    private void removeIndexedVectors(long memoryEntryId) {
+        try {
+            milvusMemoryVectorService.deleteByMemoryEntryId(memoryEntryId);
+        } catch (Exception ex) {
+            log.warn("Milvus 删除旧向量失败 entryId={}", memoryEntryId, ex);
+        }
+        memoryEmbeddingMapper.deleteById(memoryEntryId);
+    }
+
     private static String nullToEmpty(String s) {
         return s == null ? "" : s;
     }
