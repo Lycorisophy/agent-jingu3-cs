@@ -1,5 +1,7 @@
 package cn.lysoy.jingu3.service;
 
+import cn.lysoy.jingu3.common.constant.ChatApiConstants;
+import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.component.ChatRequestValidator;
@@ -146,10 +148,10 @@ public class ChatStreamService {
             raw = raw.subList(0, ModePlanExecutor.MAX_STEPS);
         }
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
-                ? "default"
+                ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();
         sink.meta(
-                "MODE_PLAN",
+                ChatApiConstants.STREAM_META_ACTION_MODE_MODE_PLAN,
                 RoutingSource.CLIENT_EXPLICIT.name(),
                 userConstants.getId(),
                 userConstants.getUsername());
@@ -193,7 +195,7 @@ public class ChatStreamService {
 
     private ExecutionContext buildContext(ChatRequest request, RoutingDecision decision) {
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
-                ? "default"
+                ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();
         return new ExecutionContext(
                 userConstants.getId(),

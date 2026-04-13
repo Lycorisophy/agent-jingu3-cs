@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.engine;
 
+import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
 import lombok.Getter;
 
@@ -75,7 +76,7 @@ public class ExecutionContext {
             ActionMode mode,
             RoutingSource source) {
         return new ExecutionContext(
-                userId, username, "default", userMessage, mode, source,
+                userId, username, ConversationConstants.DEFAULT_CONVERSATION_ID, userMessage, mode, source,
                 Collections.emptyList(), null, null);
     }
 }

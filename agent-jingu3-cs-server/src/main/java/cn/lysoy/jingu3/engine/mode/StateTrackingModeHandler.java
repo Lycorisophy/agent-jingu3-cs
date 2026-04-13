@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.engine.mode;
 
+import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.EngineMessages;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
@@ -23,7 +24,7 @@ public class StateTrackingModeHandler implements ActionModeHandler {
     @Override
     public String execute(ExecutionContext context) {
         String conv = context.getConversationId() == null || context.getConversationId().isBlank()
-                ? "default"
+                ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : context.getConversationId();
         long n = interactionCount.computeIfAbsent(conv, k -> new AtomicLong()).incrementAndGet();
         return String.format(EngineMessages.STATE_TRACKING_REPLY, conv, n);

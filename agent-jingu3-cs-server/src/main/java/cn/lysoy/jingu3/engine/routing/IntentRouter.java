@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.engine.routing;
 
+import cn.lysoy.jingu3.common.constant.RoutingNotes;
 import cn.lysoy.jingu3.engine.ActionMode;
 import cn.lysoy.jingu3.engine.ActionModePolicy;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class IntentRouter {
                 return new RoutingDecision(mode, RoutingSource.CLIENT_EXPLICIT, "payload.mode");
             } catch (IllegalArgumentException ex) {
                 log.warn("invalid explicit mode [{}], fallback ASK", modeFromClient);
-                return new RoutingDecision(ActionMode.ASK, RoutingSource.FALLBACK, "invalid_explicit_mode");
+                return new RoutingDecision(ActionMode.ASK, RoutingSource.FALLBACK, RoutingNotes.INVALID_EXPLICIT_MODE);
             }
         }
         return rules.route(msg)

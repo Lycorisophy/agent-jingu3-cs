@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 聊天请求体（REST）。
  * <p>若 {@code modePlan} 非空，优先于单字段 {@code mode}，按序编排执行。</p>
- * <p>选用 {@link cn.lysoy.jingu3.engine.ActionMode#WORKFLOW} 或编排中含 WORKFLOW 时须传 {@code workflowId}。</p>
+ * <p>选用 {@link cn.lysoy.jingu3.engine.ActionMode#WORKFLOW} 时建议传 {@code workflowId}；未传则回落 ASK（见规范）。</p>
  */
 @Getter
 @Setter
@@ -31,4 +31,14 @@ public class ChatRequest {
     private List<String> modePlan;
     /** WORKFLOW 模式或编排含 WORKFLOW 时必填 */
     private String workflowId;
+
+    /**
+     * 可选：请求 ID；与请求头 {@code X-Request-Id} 二选一或同时提供，体中非空时覆盖 MDC 中的值。
+     */
+    private String requestId;
+
+    /**
+     * 可选：追踪 ID；与请求头 {@code X-Trace-Id} 二选一或同时提供，体中非空时覆盖 MDC 中的值。
+     */
+    private String traceId;
 }

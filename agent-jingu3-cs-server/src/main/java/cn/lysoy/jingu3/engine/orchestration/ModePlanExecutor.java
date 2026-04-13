@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.engine.orchestration;
 
+import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.common.vo.ChatVo;
@@ -51,7 +52,7 @@ public class ModePlanExecutor {
             raw = raw.subList(0, MAX_STEPS);
         }
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
-                ? "default"
+                ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();
         List<PlanStepVo> steps = new ArrayList<>();
         String chainPayload = null;

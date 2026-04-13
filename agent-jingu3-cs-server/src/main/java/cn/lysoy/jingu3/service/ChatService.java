@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.service;
 
+import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.component.ChatRequestValidator;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
@@ -78,7 +79,9 @@ public class ChatService {
         ExecutionContext ctx = new ExecutionContext(
                 userConstants.getId(),
                 userConstants.getUsername(),
-                request.getConversationId() == null ? "default" : request.getConversationId(),
+                request.getConversationId() == null || request.getConversationId().isBlank()
+                        ? ConversationConstants.DEFAULT_CONVERSATION_ID
+                        : request.getConversationId(),
                 request.getMessage(),
                 decision.getMode(),
                 decision.getSource(),

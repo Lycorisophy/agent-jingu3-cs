@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <!-- 企业常用：时间 | 级别 | 线程 | 类简名 | 请求ID | 追踪ID | 消息与异常 -->
+        <Property name="CONSOLE_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %c{1.} [%X{requestId}] [%X{traceId}] - %msg%n%throwable
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${CONSOLE_PATTERN}" charset="UTF-8"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

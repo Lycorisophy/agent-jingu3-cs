@@ -12,6 +12,8 @@ public enum ErrorCode {
     BAD_REQUEST("AG_40001", "请求参数错误", HttpStatus.BAD_REQUEST),
     VALIDATION_ERROR("AG_40002", "参数校验失败", HttpStatus.BAD_REQUEST),
 
+    TOO_MANY_REQUESTS("AG_42901", "请求过于频繁，请稍后再试", HttpStatus.TOO_MANY_REQUESTS),
+
     INTERNAL_ERROR("AG_50001", "服务内部错误", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;

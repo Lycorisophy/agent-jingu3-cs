@@ -36,6 +36,9 @@ public final class EngineMessages {
     public static final String STATE_TRACKING_REPLY =
             "[状态追踪 MVP] 会话=%s，本模式累计交互次数=%d（进程内演示，重启清零）。";
 
+    /** 聊天接口触发限流时，可附加到 {@link cn.lysoy.jingu3.common.exception.ServiceException} */
+    public static final String CHAT_RATE_LIMITED = "请求过于频繁，请稍后再试";
+
     private EngineMessages() {
     }
 }

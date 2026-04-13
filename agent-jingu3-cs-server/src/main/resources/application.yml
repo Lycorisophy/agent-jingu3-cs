@@ -4,6 +4,9 @@ spring:
   profiles:
     active: dev
 
+logging:
+  config: classpath:log4j2-spring.xml
+
 management:
   endpoints:
     web:
@@ -14,6 +17,14 @@ management:
       show-details: when_authorized
 
 jingu3:
+  snowflake:
+    worker-id: 1
+    datacenter-id: 1
+  http:
+    sse-emitter-timeout-ms: 600000
+  rate-limit:
+    enabled: true
+    chat-permits-per-minute: 120
   engine:
     react:
       max-steps: 4

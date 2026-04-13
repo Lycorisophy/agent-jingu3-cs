@@ -1,5 +1,7 @@
 package cn.lysoy.jingu3.engine.routing;
 
+import cn.lysoy.jingu3.common.constant.LogMessagePatterns;
+import cn.lysoy.jingu3.common.constant.RoutingNotes;
 import cn.lysoy.jingu3.engine.ActionMode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +24,7 @@ public final class RoutingFallbacks {
         if (workflowId != null && !workflowId.isBlank()) {
             return parsed;
         }
-        log.warn("modePlan step WORKFLOW without workflowId, fallback ASK");
+        log.warn(LogMessagePatterns.MODE_PLAN_WORKFLOW_WITHOUT_ID_FALLBACK_ASK);
         return ActionMode.ASK;
     }
 
@@ -40,9 +42,11 @@ public final class RoutingFallbacks {
         if (workflowId != null && !workflowId.isBlank()) {
             return decision;
         }
-        return new RoutingDecision(
-                ActionMode.ASK,
-                decision.getSource(),
-                decision.getNote() + ";workflow_id_missing_fallback_ask");
+        String base = decision.getNote();
+        String note =
+                (base == null || base.isBlank())
+                        ? RoutingNotes.WORKFLOW_ID_MISSING_FALLBACK_ASK_SUFFIX
+                        : base + ";" + RoutingNotes.WORKFLOW_ID_MISSING_FALLBACK_ASK_SUFFIX;
+        return new RoutingDecision(ActionMode.ASK, decision.getSource(), note);
     }
 }

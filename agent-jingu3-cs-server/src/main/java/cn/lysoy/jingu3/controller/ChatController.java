@@ -1,8 +1,10 @@
 package cn.lysoy.jingu3.controller;
 
+import cn.lysoy.jingu3.common.annotation.ChatInboundApi;
 import cn.lysoy.jingu3.common.api.ApiResult;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.common.vo.ChatVo;
+import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.service.ChatService;
 import cn.lysoy.jingu3.service.ChatStreamService;
 import jakarta.validation.Valid;
@@ -19,14 +21,18 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  */
 @RestController
 @RequestMapping("/api/v1")
+@ChatInboundApi
 public class ChatController {
 
     private final ChatService chatService;
     private final ChatStreamService chatStreamService;
+    private final Jingu3Properties jingu3Properties;
 
-    public ChatController(ChatService chatService, ChatStreamService chatStreamService) {
+    public ChatController(
+            ChatService chatService, ChatStreamService chatStreamService, Jingu3Properties jingu3Properties) {
         this.chatService = chatService;
         this.chatStreamService = chatStreamService;
+        this.jingu3Properties = jingu3Properties;
     }
 
     /**
@@ -42,7 +48,7 @@ public class ChatController {
      */
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatStream(@Valid @RequestBody ChatRequest request) {
-        SseEmitter emitter = new SseEmitter(600_000L);
+        SseEmitter emitter = new SseEmitter(jingu3Properties.getHttp().getSseEmitterTimeoutMs());
         chatStreamService.startSseStream(request, emitter);
         return emitter;
     }

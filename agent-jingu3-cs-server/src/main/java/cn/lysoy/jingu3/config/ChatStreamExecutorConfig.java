@@ -22,6 +22,7 @@ public class ChatStreamExecutorConfig {
         executor.setMaxPoolSize(16);
         executor.setQueueCapacity(200);
         executor.setThreadNamePrefix("chat-stream-");
+        executor.setTaskDecorator(new MdcTaskDecorator());
         executor.initialize();
         return executor;
     }
