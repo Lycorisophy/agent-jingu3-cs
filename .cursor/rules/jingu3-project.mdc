@@ -41,6 +41,7 @@ alwaysApply: true
 
 - 遵守 [docs/规范/Agent 辅助开发标准作业程序（SOP）.md](docs/规范/Agent%20辅助开发标准作业程序（SOP）.md) 与 [企业使用AI代理进行代码开发的规范_2026Q1_v1_简略版.md](docs/规范/企业使用AI代理进行代码开发的规范_2026Q1_v1_简略版.md) 中的数据与流程红线。
 - 回复用户时使用**简体中文**（若用户未指定其他语言）。
+- **按计划完成可交付工作时**：在收尾输出 **Conventional Commits 风格** 的 Git 提交说明摘要，规则全文见 [plan-delivery-git-message.mdc](plan-delivery-git-message.mdc)（用户若需全局生效，可将该文件「格式要求」同步到 Cursor **User Rules**）。
 
 ## Java 服务端（`agent-jingu3-cs-server`）编码
 

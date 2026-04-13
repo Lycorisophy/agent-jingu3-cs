@@ -60,6 +60,12 @@ public class SseStreamEventSink implements StreamEventSink {
     }
 
     @Override
+    public void toolResult(String toolId, String toolOutput) {
+        emit(StreamEvent.toolResult(
+                toolId == null ? "" : toolId, toolOutput == null ? "" : toolOutput));
+    }
+
+    @Override
     public void done() {
         emit(StreamEvent.done());
         emitter.complete();

@@ -2,7 +2,9 @@ package cn.lysoy.jingu3.prompt;
 
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.common.constant.PromptTemplates;
+import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.engine.ExecutionContext;
+import cn.lysoy.jingu3.tool.ToolRegistry;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,6 +14,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PromptAssembly {
+
+    private final ToolRegistry toolRegistry;
+    private final Jingu3Properties properties;
+
+    public PromptAssembly(ToolRegistry toolRegistry, Jingu3Properties properties) {
+        this.toolRegistry = toolRegistry;
+        this.properties = properties;
+    }
 
     /**
      * Ask 系统提示原文（不含路由前缀；一般应使用 {@link #buildAskCombinedPrompt(ExecutionContext)}）。
@@ -41,6 +51,49 @@ public class PromptAssembly {
                         + PromptFragments.PARAGRAPH_BREAK
                         + PromptFragments.USER_LABEL_WITH_NEWLINE
                         + ctx.llmInput());
+    }
+
+    /** Ask：首轮工具路由（仅输出一行 JSON） */
+    public String buildAskToolRouterPrompt(ExecutionContext ctx) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.ASK_TOOL_ROUTER_INSTRUCTION
+                        + toolRegistry.buildCatalogMarkdown()
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptFragments.USER_LABEL_WITH_NEWLINE
+                        + ctx.llmInput());
+    }
+
+    /** Ask：工具成功后汇总 */
+    public String buildAskAfterToolPrompt(ExecutionContext ctx, String toolId, String toolOutput) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.ASK_SYSTEM
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "用户问题：\n"
+                        + ctx.llmInput()
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "工具 `"
+                        + toolId
+                        + "` 输出：\n"
+                        + toolOutput
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "请基于上述工具输出（若与常识冲突以工具为准）用中文简洁作答。");
+    }
+
+    /** Ask：工具失败时仍给模型一次解释机会 */
+    public String buildAskToolFailurePrompt(ExecutionContext ctx, String errorMessage) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.ASK_SYSTEM
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "用户问题：\n"
+                        + ctx.llmInput()
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "工具调用失败："
+                        + errorMessage
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "请用中文说明失败原因并尽量给出可操作的替代建议（如改写表达式）。");
     }
 
     /**
@@ -115,9 +168,19 @@ public class PromptAssembly {
      */
     public String buildReactLoopStepPrompt(
             ExecutionContext ctx, String userMessage, String priorTrace, int stepIndex, int maxSteps) {
+        String toolBlock = "";
+        if (properties.getTool().isEnabled()) {
+            toolBlock =
+                    PromptFragments.PARAGRAPH_BREAK
+                            + "可用工具列表：\n"
+                            + toolRegistry.buildCatalogMarkdown()
+                            + PromptFragments.PARAGRAPH_BREAK
+                            + PromptTemplates.REACT_JSON_FOOTER_RULE;
+        }
         return withModePreamble(
                 ctx,
                 PromptTemplates.REACT_LOOP_INSTRUCTION
+                        + toolBlock
                         + PromptFragments.PARAGRAPH_BREAK
                         + "当前第 "
                         + stepIndex
@@ -174,5 +237,77 @@ public class PromptAssembly {
                         + PromptFragments.PARAGRAPH_BREAK
                         + PromptFragments.USER_LABEL_WITH_NEWLINE
                         + originalUserMessage);
+    }
+
+    /** Plan 子任务：工具路由（仅一行 JSON） */
+    public String buildPlanSubtaskToolRouterPrompt(
+            ExecutionContext ctx, String subtask, String originalUserMessage, int stepNumber) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.PLAN_SUBTASK_TOOL_ROUTER_INSTRUCTION
+                        + toolRegistry.buildCatalogMarkdown()
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "子任务（第 "
+                        + stepNumber
+                        + " 步）：\n"
+                        + subtask
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptFragments.USER_LABEL_WITH_NEWLINE
+                        + originalUserMessage);
+    }
+
+    /** Plan 子任务：工具成功后汇总为该步结果 */
+    public String buildPlanSubtaskAfterToolPrompt(
+            ExecutionContext ctx,
+            String subtask,
+            String originalUserMessage,
+            int stepNumber,
+            String toolId,
+            String toolOutput) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.ASK_SYSTEM
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.SUBTASK_EXECUTE_HEADER
+                        + "（第 "
+                        + stepNumber
+                        + " 步）\n"
+                        + subtask
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptFragments.USER_LABEL_WITH_NEWLINE
+                        + originalUserMessage
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "工具 `"
+                        + toolId
+                        + "` 输出：\n"
+                        + toolOutput
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "请基于工具输出完成该子任务，用中文简洁给出本步结果。");
+    }
+
+    /** Plan 子任务：工具失败时说明并完成该步 */
+    public String buildPlanSubtaskToolFailurePrompt(
+            ExecutionContext ctx,
+            String subtask,
+            String originalUserMessage,
+            int stepNumber,
+            String errorMessage) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.ASK_SYSTEM
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.SUBTASK_EXECUTE_HEADER
+                        + "（第 "
+                        + stepNumber
+                        + " 步）\n"
+                        + subtask
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptFragments.USER_LABEL_WITH_NEWLINE
+                        + originalUserMessage
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "工具调用失败："
+                        + errorMessage
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "请用中文说明失败原因并尽量给出本步可交付的替代结果。");
     }
 }

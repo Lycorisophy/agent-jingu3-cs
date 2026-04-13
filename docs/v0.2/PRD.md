@@ -10,7 +10,7 @@
 | ID | 角色 | 故事 | 价值 |
 |----|------|------|------|
 | US-1 | 调用方 | 我能在请求中携带 `modePlan`（多步模式名数组），按序执行并得到最终回复与各步轨迹 | 组合编排 |
-| US-2 | 调用方 | 当仅指定单 `mode` 且拼写不合法时，系统仍能返回 200 并采用 `REACT` 执行，而非直接 400 | 健壮性 |
+| US-2 | 调用方 | 当仅指定单 `mode` 且拼写不合法时，系统仍能返回 200 并采用 `ASK` 执行（`FALLBACK`），而非直接 400 | 健壮性 |
 | US-3 | 开发者 | 我能看到 `PLAN_AND_EXECUTE`、`WORKFLOW` 等模式有可运行最小闭环（含 LLM 或约定文案） | 演示与联调 |
 | US-4 | 运维 | 路由决策与（若存在）编排步骤仍写入日志，便于排障 | 驾驭工程 |
 
@@ -20,7 +20,7 @@
 |------|------------------------------|
 | AC-1 | Given 请求体含非空 `modePlan`（如 `["ASK","REACT"]`），When 调用 `/api/v1/chat`，Then 按序执行且响应 `data.planSteps` 含每步模式与回复 |
 | AC-2 | Given 同时提供 `mode` 与 `modePlan`，When 调用聊天 API，Then **以 `modePlan` 为准**（忽略单 `mode` 做编排） |
-| AC-3 | Given 请求仅含非法 `mode`（非空且无法解析为枚举），When 调用聊天 API，Then HTTP 200、`actionMode` 为 `REACT`、`routingSource` 为 `FALLBACK`（或文档约定等价字段） |
+| AC-3 | Given 请求仅含非法 `mode`（非空且无法解析为枚举），When 调用聊天 API，Then HTTP 200、`actionMode` 为 `ASK`、`routingSource` 为 `FALLBACK`（与 [接口文档](./接口文档.md) 示例一致） |
 | AC-4 | Given 八种枚举名各请求一次（单模式或编排中），When 执行完成，Then 均不抛出未处理异常且返回非空说明性 `reply`（Stub 文案不得再用于已实现的六种扩展模式） |
 | AC-5 | Given `modePlan` 中某步模式名非法，When 执行，Then 该步降级为 `REACT` 并继续后续步骤（若存在） |
 | AC-6 | Given 任意一次成功处理，When 查看日志，Then 含用户 ID、路由来源、选用模式或编排信息 |

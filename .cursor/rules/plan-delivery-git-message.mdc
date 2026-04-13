@@ -1,0 +1,31 @@
+---
+description: 按计划完成工作后，用标准 Git 提交说明格式做收尾总结
+globs:
+alwaysApply: true
+---
+
+# 计划交付收尾（Git Message）
+
+当本次对话**按用户或仓库计划完成一批可交付工作**（如某版本工序、某里程碑 PR）时，在回复末尾追加一段 **标准 Git 提交说明**，便于用户直接用于 `git commit`。
+
+## 格式要求
+
+- 采用 **Conventional Commits**：`type(scope): subject`（英文 subject 可接受；若用户全程中文，subject 可用中文）。
+- **type** 常用：`feat`、`fix`、`docs`、`test`、`chore`、`ci`、`refactor`。
+- **subject**：祈使句、50 字符内为佳，无句号。
+- **正文**（可选）：`-` 条目列出主要变更；跨模块时分组或按重要性排序。
+- 若有破坏性变更，正文或 footer 写明 `BREAKING CHANGE:`。
+
+## 示例
+
+```
+feat(server): v0.3 Tool Registry 与 Ask/ReAct 工具闭环
+
+- 新增 tool 包与内置 calculator / utc_time
+- StreamEvent TOOL_RESULT；jingu3.tool.enabled 开关
+- docs/v0.3 文档与部署说明；CI verify
+```
+
+## 用户级规则（可选）
+
+若需在**所有项目**生效：将本节「格式要求」复制到 Cursor **Settings → Rules → User Rules**。本仓库已用本文件固定项目级行为。

@@ -1,0 +1,21 @@
+{
+  "id": "demo-wf-tool",
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "LLM",
+      "instruction": "用一句话概括用户问题，不要计算。"
+    },
+    {
+      "id": "n2",
+      "type": "TOOL",
+      "toolId": "calculator",
+      "instruction": "2+3"
+    },
+    {
+      "id": "n3",
+      "type": "LLM",
+      "instruction": "根据上文中的工具输出，用中文确认数值结果并收束回复。"
+    }
+  ]
+}

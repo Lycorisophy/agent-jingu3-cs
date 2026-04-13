@@ -18,12 +18,37 @@ public final class PromptTemplates {
             + "若无需工具，直接输出最终答案。使用中文。";
 
     /**
-     * ReAct 多步循环：要求每步含思考/行动/观察；完成时单独一行输出 {@code [TASK_COMPLETE]}。
+     * ReAct 多步循环：思考/行动/观察；工具开启时由 PromptAssembly 追加 JSON 页脚规则。
      */
     public static final String REACT_LOOP_INSTRUCTION =
             "你是 ReAct 智能体。每一步请用中文，尽量包含「思考」「行动」「观察」三段；"
-                    + "若无外部环境反馈，观察可写「（无新观察）」。"
-                    + "当你认为用户任务已充分完成时，在回复最后一行单独输出一行：[TASK_COMPLETE]";
+                    + "若「已有过程」中出现「系统观察」，该段为工具真实输出，须以其为准撰写观察。"
+                    + "若无外部反馈且本步未调用工具，观察可写「（无新观察）」。"
+                    + "任务可结束时在正文末行输出 [TASK_COMPLETE]，或按下方 JSON 页脚规则输出 action 为 done。";
+
+    /** Ask：工具路由专用；后接 {@link cn.lysoy.jingu3.tool.ToolRegistry#buildCatalogMarkdown()} */
+    public static final String ASK_TOOL_ROUTER_INSTRUCTION =
+            "你是工具路由助手。根据用户问题与下列内置工具，只输出一行合法 JSON（不要 Markdown、不要解释）：\n"
+                    + "{\"route\":\"direct\"} 表示直接语言回答即可；\n"
+                    + "{\"route\":\"tool\",\"toolId\":\"<id>\",\"input\":\"<单字符串参数>\"} 表示应先执行工具再汇总。\n"
+                    + "工具列表：\n";
+
+    /**
+     * ReAct：工具开启时拼在循环指令后，约定 {@code <<<JINGU3_JSON>>>} 与 JSON 页脚（与 {@code ToolRoutingParser} 一致）。
+     */
+    public static final String REACT_JSON_FOOTER_RULE =
+            "需要调用工具时，在回复最后另起两行：第一行单独为 <<<JINGU3_JSON>>> ，第二行为 JSON："
+                    + "{\"action\":\"invoke\",\"toolId\":\"<id>\",\"input\":\"<参数>\"} ；"
+                    + "若本步不再需要工具且任务可结束，第二行 JSON 为 {\"action\":\"done\"} 。";
+
+    /**
+     * Plan 子任务：工具路由；后接 {@link cn.lysoy.jingu3.tool.ToolRegistry#buildCatalogMarkdown()} 与子任务正文。
+     */
+    public static final String PLAN_SUBTASK_TOOL_ROUTER_INSTRUCTION =
+            "你是工具路由助手。根据下列「计划子任务」与原始用户问题、内置工具列表，只输出一行合法 JSON（不要 Markdown、不要解释）：\n"
+                    + "{\"route\":\"direct\"} 表示直接完成该子任务即可；\n"
+                    + "{\"route\":\"tool\",\"toolId\":\"<id>\",\"input\":\"<单字符串参数>\"} 表示应先执行工具再基于结果完成子任务。\n"
+                    + "工具列表：\n";
 
     public static final String SUBTASK_EXECUTE_HEADER = "下面是计划中的一步子任务，请执行并给出该步结果（中文）：";
 
@@ -67,8 +92,8 @@ public final class PromptTemplates {
      * 便于模型判断「是否应建议用户切换模式」。
      */
     public static final String MODE_CATALOG_FOR_LLM =
-            "- ASK：单轮问答，直接回答，不强调多步推理或工具链。\n"
-                    + "- REACT：多步「思考—行动—观察」，适合需逐步推理、澄清或未来接入工具调用的任务。\n"
+            "- ASK：单轮问答为主；服务端可按需路由内置工具（计算、时间等）再汇总回答。\n"
+                    + "- REACT：多步「思考—行动—观察」，行动可对应真实工具执行与观察回流。\n"
                     + "- PLAN_AND_EXECUTE：先产出编号计划再逐步执行，适合步骤结构清晰的复杂任务。\n"
                     + "- WORKFLOW：按预置节点顺序执行，适合固定流水线或审批类流程。\n"
                     + "- AGENT_TEAM：主 Agent 拆分子任务并由子 Agent 执行，适合多角色分工。\n"

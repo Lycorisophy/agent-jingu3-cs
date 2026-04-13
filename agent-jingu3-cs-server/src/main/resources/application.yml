@@ -17,6 +17,8 @@ management:
       show-details: when_authorized
 
 jingu3:
+  tool:
+    enabled: true
   snowflake:
     worker-id: 1
     datacenter-id: 1

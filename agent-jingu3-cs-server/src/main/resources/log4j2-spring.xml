@@ -10,10 +10,24 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="${CONSOLE_PATTERN}" charset="UTF-8"/>
         </Console>
+        <SpringProfile name="prod">
+            <RollingFile name="RollingFile" fileName="logs/jingu3.log"
+                         filePattern="logs/jingu3-%d{yyyy-MM-dd}-%i.log.gz">
+                <PatternLayout pattern="${CONSOLE_PATTERN}" charset="UTF-8"/>
+                <Policies>
+                    <TimeBasedTriggeringPolicy interval="1"/>
+                    <SizeBasedTriggeringPolicy size="10 MB"/>
+                </Policies>
+                <DefaultRolloverStrategy max="14"/>
+            </RollingFile>
+        </SpringProfile>
     </Appenders>
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
+            <SpringProfile name="prod">
+                <AppenderRef ref="RollingFile"/>
+            </SpringProfile>
         </Root>
     </Loggers>
 </Configuration>

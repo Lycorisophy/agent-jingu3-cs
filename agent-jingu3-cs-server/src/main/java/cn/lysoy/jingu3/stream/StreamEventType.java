@@ -14,6 +14,8 @@ public enum StreamEventType {
     STEP_END,
     /** 阻塞式一整段输出（多步内某次 generate 的完整结果） */
     BLOCK,
+    /** 工具执行完成（Ask/ReAct）；携带 {@link StreamEvent#getToolId()} 与 {@link StreamEvent#getToolOutput()} */
+    TOOL_RESULT,
     /** 正常结束，之后不应再有业务事件 */
     DONE,
     /** 失败，携带 {@link StreamEvent#getError()} */

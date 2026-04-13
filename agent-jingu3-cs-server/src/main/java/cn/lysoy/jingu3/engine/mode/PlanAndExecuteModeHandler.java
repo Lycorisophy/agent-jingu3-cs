@@ -3,6 +3,7 @@ package cn.lysoy.jingu3.engine.mode;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.engine.plan.PlanTextParser;
+import cn.lysoy.jingu3.engine.support.ToolStepService;
 import cn.lysoy.jingu3.prompt.PromptAssembly;
 import cn.lysoy.jingu3.stream.StreamEventSink;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -27,16 +28,19 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
 
     private final ChatLanguageModel chat;
     private final PromptAssembly prompts;
+    private final ToolStepService toolStepService;
     private final int maxSubtasks;
     private final boolean replanEnabled;
 
     public PlanAndExecuteModeHandler(
             ChatLanguageModel chat,
             PromptAssembly prompts,
+            ToolStepService toolStepService,
             @Value("${jingu3.engine.plan.max-subtasks:8}") int maxSubtasks,
             @Value("${jingu3.engine.plan.replan-enabled:true}") boolean replanEnabled) {
         this.chat = chat;
         this.prompts = prompts;
+        this.toolStepService = toolStepService;
         this.maxSubtasks = Math.max(1, maxSubtasks);
         this.replanEnabled = replanEnabled;
     }
@@ -76,9 +80,8 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
         try {
             for (int i = 0; i < subtasks.size(); i++) {
                 sink.stepBegin(stepIdx, "subtask_" + (i + 1));
-                String r = chat.generate(
-                        prompts.buildSubtaskExecutePrompt(
-                                ctx, subtasks.get(i), originalUserMessage, i + 1));
+                String r = toolStepService.runPlanSubtask(
+                        ctx, subtasks.get(i), originalUserMessage, i + 1, sink);
                 sink.block(r == null ? "" : r);
                 sink.stepEnd(stepIdx);
                 stepIdx++;
@@ -109,8 +112,8 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
         List<String> stepOutputs = new ArrayList<>();
         try {
             for (int i = 0; i < subtasks.size(); i++) {
-                String r = chat.generate(
-                        prompts.buildSubtaskExecutePrompt(ctx, subtasks.get(i), originalUserMessage, i + 1));
+                String r = toolStepService.runPlanSubtask(
+                        ctx, subtasks.get(i), originalUserMessage, i + 1, null);
                 stepOutputs.add(r);
             }
         } catch (RuntimeException ex) {

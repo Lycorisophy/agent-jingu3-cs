@@ -1,20 +1,22 @@
 package cn.lysoy.jingu3.engine.mode;
 
+import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.prompt.PromptAssembly;
 import cn.lysoy.jingu3.stream.StreamEventSink;
+import cn.lysoy.jingu3.tool.ToolExecutionException;
+import cn.lysoy.jingu3.tool.ToolRegistry;
+import cn.lysoy.jingu3.tool.ToolRoutingParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
- * 指南 §4 ReAct（Reasoning + Acting）：迭代式「思考 → 行动 → 观察」直至任务可结束。
- * 经典论文与 LangChain 等实现中，观察常来自工具；本仓库 MVP 将「观察」写进提示中的「已有过程」，
- * 以纯文本模拟回流，后续可替换为真实工具输出。
- * <p>
- * 终止：模型在任一步输出包含 {@link #TASK_COMPLETE} 时提前结束，或达到 {@code jingu3.engine.react.max-steps}。
- * </p>
+ * 指南 §4 ReAct：迭代式「思考 → 行动 → 观察」；v0.3 起行动可解析为真实工具调用，观察为工具输出写入「已有过程」。
  */
 @Component
 public class ReActModeHandler implements ActionModeHandler {
@@ -24,48 +26,111 @@ public class ReActModeHandler implements ActionModeHandler {
 
     private final ChatLanguageModel chat;
     private final PromptAssembly prompts;
+    private final Jingu3Properties properties;
+    private final ToolRegistry toolRegistry;
+    private final ObjectMapper objectMapper;
     private final int maxSteps;
 
     public ReActModeHandler(
             ChatLanguageModel chat,
             PromptAssembly prompts,
+            Jingu3Properties properties,
+            ToolRegistry toolRegistry,
+            ObjectMapper objectMapper,
             @Value("${jingu3.engine.react.max-steps:4}") int maxSteps) {
         this.chat = chat;
         this.prompts = prompts;
+        this.properties = properties;
+        this.toolRegistry = toolRegistry;
+        this.objectMapper = objectMapper;
         this.maxSteps = Math.max(1, maxSteps);
     }
 
     @Override
     public String execute(ExecutionContext context) {
         String userMessage = context.llmInput();
-        StringBuilder trace = new StringBuilder();
+        StringBuilder display = new StringBuilder();
+        StringBuilder prior = new StringBuilder();
         for (int step = 1; step <= maxSteps; step++) {
-            String prior = trace.toString();
-            String stepPrompt = prompts.buildReactLoopStepPrompt(context, userMessage, prior, step, maxSteps);
+            String stepPrompt =
+                    prompts.buildReactLoopStepPrompt(context, userMessage, prior.toString(), step, maxSteps);
             String out = chat.generate(stepPrompt);
-            trace.append("\n---\n第").append(step).append("步---\n").append(out);
-            if (out != null && out.contains(TASK_COMPLETE)) {
+            display.append("\n---\n第").append(step).append("步---\n").append(out);
+            if (reactStepAfterGenerate(out, prior, step, null)) {
                 break;
             }
         }
-        return "【ReAct 轨迹】\n" + trace;
+        return "【ReAct 轨迹】\n" + display;
     }
 
     /**
-     * 流式：每轮 LLM 仍阻塞 generate，将该步全文以 {@link StreamEventSink#block} 下发，并带 STEP 边界便于 UI 分节。
+     * 处理单步模型输出：更新 prior；返回是否结束整个 ReAct 循环。
+     *
+     * @param sink 非 null 时在工具成功时发送 {@link StreamEventSink#toolResult}
+     */
+    private boolean reactStepAfterGenerate(
+            String out, StringBuilder prior, int stepIndex, StreamEventSink sink) {
+        boolean taskComplete = out != null && out.contains(TASK_COMPLETE);
+        if (!properties.getTool().isEnabled()) {
+            appendPriorSimple(prior, stepIndex, out);
+            return taskComplete;
+        }
+        Optional<ToolRoutingParser.ReactFooterPayload> footer =
+                ToolRoutingParser.parseReactFooter(out, objectMapper);
+        if (footer.isEmpty()) {
+            appendPriorSimple(prior, stepIndex, out);
+            return taskComplete;
+        }
+        ToolRoutingParser.ReactFooterPayload f = footer.get();
+        if ("done".equalsIgnoreCase(f.action())) {
+            appendPriorSimple(prior, stepIndex, out);
+            return true;
+        }
+        if ("invoke".equalsIgnoreCase(f.action())) {
+            appendPriorSimple(prior, stepIndex, out);
+            try {
+                String obs = toolRegistry.execute(f.toolId(), f.input());
+                if (sink != null) {
+                    sink.toolResult(f.toolId(), obs);
+                }
+                prior.append("[系统观察] 工具 ")
+                        .append(f.toolId())
+                        .append(" 输出：\n")
+                        .append(obs)
+                        .append("\n");
+            } catch (ToolExecutionException e) {
+                prior.append("[系统观察] 工具错误：").append(e.getMessage()).append("\n");
+            }
+            return taskComplete;
+        }
+        appendPriorSimple(prior, stepIndex, out);
+        return taskComplete;
+    }
+
+    private static void appendPriorSimple(StringBuilder prior, int stepIndex, String blockText) {
+        prior.append("=== 第")
+                .append(stepIndex)
+                .append("步 ===\n")
+                .append(blockText == null ? "" : blockText)
+                .append("\n");
+    }
+
+    /**
+     * 流式：每轮 LLM 仍阻塞 generate，将该步全文以 {@link StreamEventSink#block} 下发；工具成功时发
+     * {@link StreamEventSink#toolResult}。
      */
     public void stream(ExecutionContext context, StreamEventSink sink) {
         String userMessage = context.llmInput();
-        StringBuilder trace = new StringBuilder();
+        StringBuilder prior = new StringBuilder();
         for (int step = 1; step <= maxSteps; step++) {
             sink.stepBegin(step, "react_step_" + step);
-            String prior = trace.toString();
-            String stepPrompt = prompts.buildReactLoopStepPrompt(context, userMessage, prior, step, maxSteps);
+            String stepPrompt =
+                    prompts.buildReactLoopStepPrompt(context, userMessage, prior.toString(), step, maxSteps);
             String out = chat.generate(stepPrompt);
-            trace.append("\n---\n第").append(step).append("步---\n").append(out);
             sink.block(out == null ? "" : out);
+            boolean stop = reactStepAfterGenerate(out, prior, step, sink);
             sink.stepEnd(step);
-            if (out != null && out.contains(TASK_COMPLETE)) {
+            if (stop) {
                 break;
             }
         }

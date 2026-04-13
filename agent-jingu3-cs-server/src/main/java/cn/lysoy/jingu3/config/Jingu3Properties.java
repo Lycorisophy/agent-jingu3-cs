@@ -16,6 +16,8 @@ public class Jingu3Properties {
 
     private Snowflake snowflake = new Snowflake();
 
+    private Tool tool = new Tool();
+
     @Data
     public static class Http {
 
@@ -41,5 +43,12 @@ public class Jingu3Properties {
 
         /** 数据中心 ID，0～31 */
         private long datacenterId = 1L;
+    }
+
+    @Data
+    public static class Tool {
+
+        /** 是否启用 Ask / ReAct 工具管线；关闭时行为与 v0.2 一致（无工具路由与执行） */
+        private boolean enabled = true;
     }
 }

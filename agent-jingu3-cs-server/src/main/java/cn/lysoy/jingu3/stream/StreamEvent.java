@@ -35,6 +35,10 @@ public class StreamEvent {
     private String block;
     /** ERROR */
     private String error;
+    /** TOOL_RESULT */
+    private String toolId;
+    /** TOOL_RESULT */
+    private String toolOutput;
 
     public static StreamEvent meta(
             String actionMode,
@@ -68,6 +72,14 @@ public class StreamEvent {
 
     public static StreamEvent block(String text) {
         return StreamEvent.builder().type(StreamEventType.BLOCK).block(text).build();
+    }
+
+    public static StreamEvent toolResult(String toolId, String toolOutput) {
+        return StreamEvent.builder()
+                .type(StreamEventType.TOOL_RESULT)
+                .toolId(toolId)
+                .toolOutput(toolOutput)
+                .build();
     }
 
     public static StreamEvent done() {

@@ -15,4 +15,14 @@ class StreamEventJsonTest {
         assertThat(json).contains("\"type\":\"META\"");
         assertThat(json).contains("\"actionMode\":\"ASK\"");
     }
+
+    @Test
+    void serializesToolResult() throws Exception {
+        ObjectMapper om = new ObjectMapper();
+        StreamEvent e = StreamEvent.toolResult("calculator", "42");
+        String json = om.writeValueAsString(e);
+        assertThat(json).contains("\"type\":\"TOOL_RESULT\"");
+        assertThat(json).contains("\"toolId\":\"calculator\"");
+        assertThat(json).contains("\"toolOutput\":\"42\"");
+    }
 }

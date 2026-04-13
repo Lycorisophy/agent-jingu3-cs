@@ -39,7 +39,7 @@ import java.util.List;
  * 流式对话编排：与 {@link ChatService} 共享「校验 + 路由 + 上下文构造」，但输出为
  * {@link cn.lysoy.jingu3.stream.StreamEvent} 序列而非单次 JSON。
  * <ul>
- *   <li>Ask：Ollama 流式 API → {@link StreamEventSink#token}；</li>
+ *   <li>Ask：Ollama 流式 API → {@link StreamEventSink#token}；若走工具路径可先 {@link StreamEventSink#toolResult}；</li>
  *   <li>多步模式：每轮 LLM 以 {@link StreamEventSink#stepBegin}/{@link StreamEventSink#block}/{@link StreamEventSink#stepEnd} 暴露；</li>
  *   <li>modePlan：与同步版一致逐步 {@link cn.lysoy.jingu3.engine.ActionModeHandler#execute}，仅块式推送，避免中途 DONE。</li>
  * </ul>

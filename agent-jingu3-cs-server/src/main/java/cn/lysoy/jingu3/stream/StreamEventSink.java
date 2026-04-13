@@ -42,6 +42,14 @@ public interface StreamEventSink {
     void block(String text);
 
     /**
+     * 内置工具执行完成（典型在 Ask 流式路径中，位于最终 TOKEN 流之前）。
+     *
+     * @param toolId    注册表中的工具 id
+     * @param toolOutput 工具返回文本（宜为短文本）
+     */
+    void toolResult(String toolId, String toolOutput);
+
+    /**
      * 本连接上的对话流正常结束；实现类通常会关闭 SSE 或 WebSocket。
      */
     void done();
