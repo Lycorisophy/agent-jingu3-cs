@@ -16,6 +16,7 @@ import cn.lysoy.jingu3.engine.support.ToolStepService;
 import cn.lysoy.jingu3.engine.workflow.WorkflowDefinitionRegistry;
 import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
 import cn.lysoy.jingu3.prompt.PromptAssembly;
+import cn.lysoy.jingu3.prompt.UserPromptPreparationService;
 import cn.lysoy.jingu3.tool.CalculatorTool;
 import cn.lysoy.jingu3.tool.ToolRegistry;
 import cn.lysoy.jingu3.tool.UtcTimeTool;
@@ -25,6 +26,7 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,7 +65,8 @@ class ModePlanExecutorTest {
         ModeRegistry registry = buildRegistry(chat, streaming);
         MemoryAugmentationService memAug = Mockito.mock(MemoryAugmentationService.class);
         when(memAug.augmentUserMessageIfEnabled(anyString(), any())).thenAnswer(inv -> inv.getArgument(0));
-        var executor = new ModePlanExecutor(registry, memAug);
+        UserPromptPreparationService prep = new UserPromptPreparationService(memAug);
+        var executor = new ModePlanExecutor(registry, prep);
         UserConstants users = Mockito.mock(UserConstants.class);
         when(users.getId()).thenReturn("001");
         when(users.getUsername()).thenReturn("user");
@@ -72,7 +75,7 @@ class ModePlanExecutorTest {
         req.setMessage("hello");
         req.setModePlan(List.of("ASK", "REACT"));
 
-        var vo = executor.execute(req, users);
+        var vo = executor.execute(req, users, Instant.parse("2026-01-01T00:00:00Z"));
 
         assertThat(vo.getPlanSteps()).hasSize(2);
         assertThat(vo.getPlanSteps().get(0).getMode()).isEqualTo("ASK");
@@ -89,7 +92,8 @@ class ModePlanExecutorTest {
         ModeRegistry registry = buildRegistry(chat, streaming);
         MemoryAugmentationService memAug = Mockito.mock(MemoryAugmentationService.class);
         when(memAug.augmentUserMessageIfEnabled(anyString(), any())).thenAnswer(inv -> inv.getArgument(0));
-        var executor = new ModePlanExecutor(registry, memAug);
+        UserPromptPreparationService prep = new UserPromptPreparationService(memAug);
+        var executor = new ModePlanExecutor(registry, prep);
         UserConstants users = Mockito.mock(UserConstants.class);
         when(users.getId()).thenReturn("001");
         when(users.getUsername()).thenReturn("user");
@@ -98,7 +102,7 @@ class ModePlanExecutorTest {
         req.setMessage("x");
         req.setModePlan(List.of("BAD_MODE_NAME"));
 
-        var vo = executor.execute(req, users);
+        var vo = executor.execute(req, users, Instant.parse("2026-01-01T00:00:00Z"));
 
         assertThat(vo.getPlanSteps()).hasSize(1);
         assertThat(vo.getPlanSteps().get(0).getMode()).isEqualTo("REACT");

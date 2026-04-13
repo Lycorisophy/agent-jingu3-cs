@@ -1,6 +1,8 @@
 package cn.lysoy.jingu3.service;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
+import cn.lysoy.jingu3.chat.UserPromptCipherPersistenceService;
+import cn.lysoy.jingu3.component.ChatInboundPlatformSupport;
 import cn.lysoy.jingu3.component.ChatRequestValidator;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
@@ -12,10 +14,11 @@ import cn.lysoy.jingu3.engine.orchestration.ModePlanExecutor;
 import cn.lysoy.jingu3.engine.routing.IntentRouter;
 import cn.lysoy.jingu3.engine.routing.RoutingDecision;
 import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
-import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
+import cn.lysoy.jingu3.prompt.UserPromptPreparationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -33,7 +36,9 @@ public class ChatService {
     private final ModePlanExecutor modePlanExecutor;
     private final ChatRequestValidator chatRequestValidator;
 
-    private final MemoryAugmentationService memoryAugmentationService;
+    private final UserPromptPreparationService userPromptPreparationService;
+
+    private final UserPromptCipherPersistenceService userPromptCipherPersistenceService;
 
     public ChatService(
             IntentRouter intentRouter,
@@ -41,13 +46,15 @@ public class ChatService {
             UserConstants userConstants,
             ModePlanExecutor modePlanExecutor,
             ChatRequestValidator chatRequestValidator,
-            MemoryAugmentationService memoryAugmentationService) {
+            UserPromptPreparationService userPromptPreparationService,
+            UserPromptCipherPersistenceService userPromptCipherPersistenceService) {
         this.intentRouter = intentRouter;
         this.modeRegistry = modeRegistry;
         this.userConstants = userConstants;
         this.modePlanExecutor = modePlanExecutor;
         this.chatRequestValidator = chatRequestValidator;
-        this.memoryAugmentationService = memoryAugmentationService;
+        this.userPromptPreparationService = userPromptPreparationService;
+        this.userPromptCipherPersistenceService = userPromptCipherPersistenceService;
     }
 
     /**
@@ -57,11 +64,15 @@ public class ChatService {
      * @return 聚合后的回复与路由元数据
      */
     public ChatVo chat(ChatRequest request) {
+        ChatInboundPlatformSupport.mergeIntoRequest(request, null);
         chatRequestValidator.validate(request);
+        Instant serverTime = Instant.now();
+        userPromptCipherPersistenceService.tryPersistRawUserMessage(
+                userConstants.getId(), request.getConversationId(), request.getMessage());
 
         // 指南 §11：客户端显式编排优先于单模式路由
         if (request.getModePlan() != null && !request.getModePlan().isEmpty()) {
-            ChatVo vo = modePlanExecutor.execute(request, userConstants);
+            ChatVo vo = modePlanExecutor.execute(request, userConstants, serverTime);
             log.info("modePlan userId={} steps={} lastMode={} conv={}",
                     userConstants.getId(),
                     vo.getPlanSteps() != null ? vo.getPlanSteps().size() : 0,
@@ -70,8 +81,7 @@ public class ChatService {
             return vo;
         }
 
-        String forLlm =
-                memoryAugmentationService.augmentUserMessageIfEnabled(request.getMessage(), userConstants.getId());
+        String forLlm = userPromptPreparationService.prepare(request, userConstants.getId(), serverTime);
         RoutingDecision decision =
                 RoutingFallbacks.askIfWorkflowWithoutWorkflowId(
                         intentRouter.resolve(request.getMessage(), request.getMode()), request.getWorkflowId());

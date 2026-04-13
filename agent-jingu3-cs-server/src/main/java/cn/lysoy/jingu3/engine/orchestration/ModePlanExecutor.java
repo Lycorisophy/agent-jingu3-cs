@@ -11,10 +11,11 @@ import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.engine.ModeRegistry;
 import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
-import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
+import cn.lysoy.jingu3.prompt.UserPromptPreparationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +34,11 @@ public class ModePlanExecutor {
 
     private final ModeRegistry modeRegistry;
 
-    private final MemoryAugmentationService memoryAugmentationService;
+    private final UserPromptPreparationService userPromptPreparationService;
 
-    public ModePlanExecutor(ModeRegistry modeRegistry, MemoryAugmentationService memoryAugmentationService) {
+    public ModePlanExecutor(ModeRegistry modeRegistry, UserPromptPreparationService userPromptPreparationService) {
         this.modeRegistry = modeRegistry;
-        this.memoryAugmentationService = memoryAugmentationService;
+        this.userPromptPreparationService = userPromptPreparationService;
     }
 
     /**
@@ -46,7 +47,7 @@ public class ModePlanExecutor {
      * @param request 须含非空 {@code modePlan}
      * @param users   当前用户信息（来自配置或鉴权）
      */
-    public ChatVo execute(ChatRequest request, UserConstants users) {
+    public ChatVo execute(ChatRequest request, UserConstants users, Instant serverTimeUtc) {
         List<String> raw = request.getModePlan();
         if (raw == null || raw.isEmpty()) {
             throw new IllegalStateException("modePlan required");
@@ -58,8 +59,7 @@ public class ModePlanExecutor {
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
                 ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();
-        String effectiveMessage =
-                memoryAugmentationService.augmentUserMessageIfEnabled(request.getMessage(), users.getId());
+        String effectiveMessage = userPromptPreparationService.prepare(request, users.getId(), serverTimeUtc);
         List<PlanStepVo> steps = new ArrayList<>();
         String chainPayload = null;
         ActionMode lastMode = ActionMode.ASK;

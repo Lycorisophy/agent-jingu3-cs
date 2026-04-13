@@ -4,6 +4,8 @@ import cn.lysoy.jingu3.common.constant.ChatApiConstants;
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
+import cn.lysoy.jingu3.chat.UserPromptCipherPersistenceService;
+import cn.lysoy.jingu3.component.ChatInboundPlatformSupport;
 import cn.lysoy.jingu3.component.ChatRequestValidator;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.engine.ActionMode;
@@ -22,7 +24,7 @@ import cn.lysoy.jingu3.engine.routing.IntentRouter;
 import cn.lysoy.jingu3.engine.routing.RoutingDecision;
 import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
-import cn.lysoy.jingu3.memory.injection.MemoryAugmentationService;
+import cn.lysoy.jingu3.prompt.UserPromptPreparationService;
 import cn.lysoy.jingu3.stream.SseStreamEventSink;
 import cn.lysoy.jingu3.stream.StreamEventSink;
 import cn.lysoy.jingu3.stream.WebSocketStreamEventSink;
@@ -34,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -65,7 +68,9 @@ public class ChatStreamService {
     private final TaskExecutor chatStreamExecutor;
     private final ObjectMapper objectMapper;
 
-    private final MemoryAugmentationService memoryAugmentationService;
+    private final UserPromptPreparationService userPromptPreparationService;
+
+    private final UserPromptCipherPersistenceService userPromptCipherPersistenceService;
 
     public ChatStreamService(
             ChatRequestValidator chatRequestValidator,
@@ -82,7 +87,8 @@ public class ChatStreamService {
             HumanInLoopModeHandler humanInLoopModeHandler,
             @Qualifier("chatStreamExecutor") TaskExecutor chatStreamExecutor,
             ObjectMapper objectMapper,
-            MemoryAugmentationService memoryAugmentationService) {
+            UserPromptPreparationService userPromptPreparationService,
+            UserPromptCipherPersistenceService userPromptCipherPersistenceService) {
         this.chatRequestValidator = chatRequestValidator;
         this.intentRouter = intentRouter;
         this.modeRegistry = modeRegistry;
@@ -97,7 +103,8 @@ public class ChatStreamService {
         this.humanInLoopModeHandler = humanInLoopModeHandler;
         this.chatStreamExecutor = chatStreamExecutor;
         this.objectMapper = objectMapper;
-        this.memoryAugmentationService = memoryAugmentationService;
+        this.userPromptPreparationService = userPromptPreparationService;
+        this.userPromptCipherPersistenceService = userPromptCipherPersistenceService;
     }
 
     /**
@@ -121,13 +128,16 @@ public class ChatStreamService {
      */
     void runStream(ChatRequest request, StreamEventSink sink) {
         try {
+            ChatInboundPlatformSupport.mergeIntoRequest(request, null);
             chatRequestValidator.validate(request);
+            Instant serverTime = Instant.now();
+            userPromptCipherPersistenceService.tryPersistRawUserMessage(
+                    userConstants.getId(), request.getConversationId(), request.getMessage());
             if (request.getModePlan() != null && !request.getModePlan().isEmpty()) {
-                streamModePlan(request, sink);
+                streamModePlan(request, sink, serverTime);
                 return;
             }
-            String forLlm = memoryAugmentationService.augmentUserMessageIfEnabled(
-                    request.getMessage(), userConstants.getId());
+            String forLlm = userPromptPreparationService.prepare(request, userConstants.getId(), serverTime);
             RoutingDecision decision =
                     RoutingFallbacks.askIfWorkflowWithoutWorkflowId(
                             intentRouter.resolve(request.getMessage(), request.getMode()), request.getWorkflowId());
@@ -153,13 +163,12 @@ public class ChatStreamService {
     /**
      * 与 {@link ModePlanExecutor} 对齐的顺序执行；每步用阻塞 execute，以 BLOCK 推送（不做 Ask 的 TOKEN 流，避免步间提前 DONE）。
      */
-    private void streamModePlan(ChatRequest request, StreamEventSink sink) {
+    private void streamModePlan(ChatRequest request, StreamEventSink sink, Instant serverTime) {
         List<String> raw = request.getModePlan();
         if (raw.size() > ModePlanExecutor.MAX_STEPS) {
             raw = raw.subList(0, ModePlanExecutor.MAX_STEPS);
         }
-        String effectiveMessage =
-                memoryAugmentationService.augmentUserMessageIfEnabled(request.getMessage(), userConstants.getId());
+        String effectiveMessage = userPromptPreparationService.prepare(request, userConstants.getId(), serverTime);
         String conv = request.getConversationId() == null || request.getConversationId().isBlank()
                 ? ConversationConstants.DEFAULT_CONVERSATION_ID
                 : request.getConversationId();

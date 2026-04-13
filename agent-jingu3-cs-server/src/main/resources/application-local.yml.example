@@ -38,6 +38,11 @@ mybatis-plus:
 #      database: ${REDIS_DB:0}
 
 jingu3:
+  # 用户提示词审计：对称密钥 Base64（32 字节），勿提交仓库；可用环境变量覆盖
+  # chat:
+  #   persist-user-prompt: true
+  # crypto:
+  #   user-prompt-aes-key-base64: ${USER_PROMPT_AES_KEY_B64:}
   # 需要 Redis 时置为 true（并确保本机 Redis 可连）
   redis:
     enabled: false

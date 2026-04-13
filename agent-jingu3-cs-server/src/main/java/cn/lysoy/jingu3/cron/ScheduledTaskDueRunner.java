@@ -72,6 +72,7 @@ public class ScheduledTaskDueRunner {
         req.setConversationId(
                 ScheduledTaskService.resolveConversationId(task, payload.getConversationId()));
         req.setRequestId(String.valueOf(snowflakeIdGenerator.nextId()));
+        req.setClientPlatform("cron");
 
         try {
             cronChatBridge.invoke(req);

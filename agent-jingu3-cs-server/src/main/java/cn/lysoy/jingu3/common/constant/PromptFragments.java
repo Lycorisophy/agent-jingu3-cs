@@ -29,6 +29,12 @@ public final class PromptFragments {
     /** 对话前向量检索注入时的段落标题（与 {@code jingu3.memory.injection-enabled} 配合）。 */
     public static final String MEMORY_REFERENCE_HEADER = "【参考记忆】\n";
 
+    /** 送入 LLM 的用户段前附加：标准时间（UTC，ISO-8601） */
+    public static final String USER_STANDARD_TIME_LABEL = "[标准时间] ";
+
+    /** 送入 LLM 的用户段前附加：客户端平台标识 */
+    public static final String USER_CLIENT_PLATFORM_LABEL = "[平台标识] ";
+
     private PromptFragments() {
     }
 }

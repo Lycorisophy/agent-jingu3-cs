@@ -37,6 +37,31 @@ public class Jingu3Properties {
 
     private Ollama ollama = new Ollama();
 
+    /** 对话侧行为（用户提示词落库等） */
+    private Chat chat = new Chat();
+
+    /** 对称加密密钥（用户提示词密文） */
+    private Crypto crypto = new Crypto();
+
+    @Data
+    public static class Chat {
+
+        /**
+         * 是否将原始用户输入以 AES-256-GCM 加密写入 {@code user_prompt_cipher}；需配置
+         * {@link Crypto#getUserPromptAesKeyBase64()}。
+         */
+        private boolean persistUserPrompt = false;
+    }
+
+    @Data
+    public static class Crypto {
+
+        /**
+         * AES-256 密钥的 Base64（解码后须为 32 字节）；未配置时即使开启 {@link Chat#persistUserPrompt} 也不落库。
+         */
+        private String userPromptAesKeyBase64 = "";
+    }
+
     @Data
     public static class Ollama {
 

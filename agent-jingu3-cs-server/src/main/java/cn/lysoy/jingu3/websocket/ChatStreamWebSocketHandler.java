@@ -1,6 +1,8 @@
 package cn.lysoy.jingu3.websocket;
 
+import cn.lysoy.jingu3.common.constant.ChatHttpHeaders;
 import cn.lysoy.jingu3.common.dto.ChatRequest;
+import cn.lysoy.jingu3.component.ChatInboundPlatformSupport;
 import cn.lysoy.jingu3.service.ChatStreamService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,8 @@ public class ChatStreamWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         try {
             ChatRequest request = objectMapper.readValue(message.getPayload(), ChatRequest.class);
+            String platformHeader = session.getHandshakeHeaders().getFirst(ChatHttpHeaders.CLIENT_PLATFORM);
+            ChatInboundPlatformSupport.mergeIntoRequest(request, platformHeader);
             chatStreamService.startWebSocketStream(request, session);
         } catch (Exception e) {
             log.warn("ws parse or stream failed: {}", e.toString());

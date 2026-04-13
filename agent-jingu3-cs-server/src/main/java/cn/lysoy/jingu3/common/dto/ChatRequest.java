@@ -41,4 +41,10 @@ public class ChatRequest {
      * 可选：追踪 ID；与请求头 {@code X-Trace-Id} 二选一或同时提供，体中非空时覆盖 MDC 中的值。
      */
     private String traceId;
+
+    /**
+     * 可选：客户端平台标识（如 web、ios）；HTTP 可与请求头 {@code X-Jingu3-Client-Platform} 二选一，握手头优先；
+     * 浏览器 WebSocket 无法自定义握手头时可仅传本字段。
+     */
+    private String clientPlatform;
 }
