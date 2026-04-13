@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.dst.dto;
 
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.dst.entity.DialogueStateEntity;
 import lombok.Builder;
 import lombok.Value;
@@ -22,7 +23,7 @@ public class DialogueStateVo {
                 .schemaVersion(e.getSchemaVersion())
                 .stateJson(e.getStateJson())
                 .revision(e.getRevision())
-                .updatedAt(e.getUpdatedAt())
+                .updatedAt(UtcTime.toInstant(e.getUpdatedAt()))
                 .build();
     }
 }

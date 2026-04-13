@@ -4,7 +4,7 @@ CREATE TABLE hitl_approval (
     conversation_id VARCHAR(128) NOT NULL,
     run_id VARCHAR(128),
     status VARCHAR(32) NOT NULL,
-    payload_json CLOB NOT NULL,
+    payload_json LONGTEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     resolved_at TIMESTAMP,
     resolver_user_id VARCHAR(64)

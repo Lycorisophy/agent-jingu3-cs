@@ -1,37 +1,37 @@
-package cn.lysoy.jingu3.memory.repo;
+package cn.lysoy.jingu3.memory.mapper;
 
+import cn.lysoy.jingu3.Jingu3Application;
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.memory.MemoryEntryKind;
 import cn.lysoy.jingu3.memory.entity.MemoryEntryEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest(
-        properties = {
-            "spring.jpa.hibernate.ddl-auto=validate",
-            "spring.flyway.enabled=true"
-        })
-class MemoryEntryRepositoryTest {
+@SpringBootTest(
+        classes = Jingu3Application.class,
+        properties = {"jingu3.cron.scheduler-enabled=false"})
+@Transactional
+class MemoryEntryMapperTest {
 
     @Autowired
-    private MemoryEntryRepository repository;
+    private MemoryEntryMapper memoryEntryMapper;
 
     @Test
     void findByUserIdOrder() {
         MemoryEntryEntity a = entry("001", MemoryEntryKind.EVENT, "a");
         MemoryEntryEntity b = entry("001", MemoryEntryKind.FACT, "b");
         MemoryEntryEntity c = entry("002", MemoryEntryKind.FACT, "c");
-        repository.save(a);
-        repository.save(b);
-        repository.save(c);
+        memoryEntryMapper.insert(a);
+        memoryEntryMapper.insert(b);
+        memoryEntryMapper.insert(c);
 
-        List<MemoryEntryEntity> list = repository.findByUserIdOrderByCreatedAtDesc("001", PageRequest.of(0, 10));
+        List<MemoryEntryEntity> list = memoryEntryMapper.selectByUserIdOrderByCreatedAtDesc("001", 10);
         assertThat(list).hasSize(2);
         assertThat(list.get(0).getSummary()).isEqualTo("b");
         assertThat(list.get(1).getSummary()).isEqualTo("a");
@@ -43,7 +43,7 @@ class MemoryEntryRepositoryTest {
         e.setKind(kind);
         e.setSummary(summary);
         e.setBody("x");
-        Instant n = Instant.now();
+        var n = UtcTime.nowLocalDateTime();
         e.setCreatedAt(n);
         e.setUpdatedAt(n);
         return e;

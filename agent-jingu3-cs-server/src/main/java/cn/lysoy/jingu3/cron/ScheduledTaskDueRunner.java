@@ -4,14 +4,15 @@ import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.common.trace.SnowflakeIdGenerator;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.cron.dto.CronTaskPayloadDto;
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.cron.entity.ScheduledTaskEntity;
-import cn.lysoy.jingu3.cron.repo.ScheduledTaskRepository;
+import cn.lysoy.jingu3.cron.mapper.ScheduledTaskMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * 单条到期任务：独立事务内更新状态；对话通过 {@link CronChatBridge} 与本事务隔离。
@@ -20,19 +21,19 @@ import java.time.Instant;
 @Service
 public class ScheduledTaskDueRunner {
 
-    private final ScheduledTaskRepository repository;
+    private final ScheduledTaskMapper scheduledTaskMapper;
     private final UserConstants userConstants;
     private final ObjectMapper objectMapper;
     private final CronChatBridge cronChatBridge;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     public ScheduledTaskDueRunner(
-            ScheduledTaskRepository repository,
+            ScheduledTaskMapper scheduledTaskMapper,
             UserConstants userConstants,
             ObjectMapper objectMapper,
             CronChatBridge cronChatBridge,
             SnowflakeIdGenerator snowflakeIdGenerator) {
-        this.repository = repository;
+        this.scheduledTaskMapper = scheduledTaskMapper;
         this.userConstants = userConstants;
         this.objectMapper = objectMapper;
         this.cronChatBridge = cronChatBridge;
@@ -41,12 +42,12 @@ public class ScheduledTaskDueRunner {
 
     @Transactional(rollbackFor = Exception.class)
     public void runDue(long taskId) {
-        ScheduledTaskEntity task = repository.findById(taskId).orElse(null);
+        ScheduledTaskEntity task = scheduledTaskMapper.selectById(taskId);
         if (task == null) {
             return;
         }
-        Instant now = Instant.now();
-        if (!task.isEnabled() || task.getNextRunAt().isAfter(now)) {
+        LocalDateTime nowLdt = UtcTime.nowLocalDateTime();
+        if (!task.isEnabled() || task.getNextRunAt() == null || task.getNextRunAt().isAfter(nowLdt)) {
             return;
         }
         if (!userConstants.getId().equals(task.getOwnerUserId())) {
@@ -59,7 +60,7 @@ public class ScheduledTaskDueRunner {
             payload = objectMapper.readValue(task.getPayloadJson(), CronTaskPayloadDto.class);
         } catch (Exception ex) {
             log.error("定时任务 payload 解析失败 taskId={}", taskId, ex);
-            finish(task, now, "FAILED", ScheduledTaskService.truncateError("payload 解析失败: " + ex.getMessage()));
+            finish(task, nowLdt, "FAILED", ScheduledTaskService.truncateError("payload 解析失败: " + ex.getMessage()));
             return;
         }
 
@@ -74,20 +75,20 @@ public class ScheduledTaskDueRunner {
 
         try {
             cronChatBridge.invoke(req);
-            finish(task, now, "SUCCESS", null);
+            finish(task, nowLdt, "SUCCESS", null);
             log.info("定时任务执行成功 taskId={} conv={}", taskId, req.getConversationId());
         } catch (Exception ex) {
             log.warn("定时任务执行失败 taskId={}", taskId, ex);
-            finish(task, now, "FAILED", ScheduledTaskService.truncateError(ex.getMessage()));
+            finish(task, nowLdt, "FAILED", ScheduledTaskService.truncateError(ex.getMessage()));
         }
     }
 
-    private void finish(ScheduledTaskEntity task, Instant now, String status, String lastError) {
+    private void finish(ScheduledTaskEntity task, LocalDateTime now, String status, String lastError) {
         task.setLastRunAt(now);
         task.setLastStatus(status);
         task.setLastError(lastError);
         task.setEnabled(false);
         task.setUpdatedAt(now);
-        repository.save(task);
+        scheduledTaskMapper.updateById(task);
     }
 }

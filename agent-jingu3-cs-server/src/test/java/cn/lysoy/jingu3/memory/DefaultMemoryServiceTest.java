@@ -1,39 +1,35 @@
 package cn.lysoy.jingu3.memory;
 
+import cn.lysoy.jingu3.Jingu3Application;
 import cn.lysoy.jingu3.common.dto.CreateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.vo.MemoryEntryVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
-import cn.lysoy.jingu3.memory.entity.FactMetadataEntity;
-import cn.lysoy.jingu3.memory.repo.FactMetadataRepository;
-import cn.lysoy.jingu3.memory.repo.MemoryEntryRepository;
+import cn.lysoy.jingu3.memory.entity.MemoryEntryEntity;
+import cn.lysoy.jingu3.memory.mapper.FactMetadataMapper;
+import cn.lysoy.jingu3.memory.mapper.MemoryEntryMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest(
-        properties = {
-            "spring.jpa.hibernate.ddl-auto=validate",
-            "spring.flyway.enabled=true"
-        })
-@Import(DefaultMemoryService.class)
-@EnableConfigurationProperties(Jingu3Properties.class)
+@SpringBootTest(
+        classes = Jingu3Application.class,
+        properties = {"jingu3.cron.scheduler-enabled=false"})
+@Transactional
 class DefaultMemoryServiceTest {
 
     @Autowired
     private MemoryService memoryService;
 
     @Autowired
-    private MemoryEntryRepository memoryEntryRepository;
+    private MemoryEntryMapper memoryEntryMapper;
 
     @Autowired
-    private FactMetadataRepository factMetadataRepository;
+    private FactMetadataMapper factMetadataMapper;
 
     @Autowired
     private Jingu3Properties jingu3Properties;
@@ -52,11 +48,10 @@ class DefaultMemoryServiceTest {
         assertThat(vo.getKind()).isEqualTo("FACT");
         assertThat(vo.getFactTag()).isEqualTo("prefs");
 
-        assertThat(factMetadataRepository.findById(vo.getId())).isPresent();
+        assertThat(factMetadataMapper.selectById(vo.getId())).isNotNull();
 
-        List<MemoryEntryVo> list = memoryService.listByUserId("001");
-        assertThat(list).hasSize(1);
-        assertThat(list.get(0).getFactTag()).isEqualTo("prefs");
+        assertThat(memoryService.listByUserId("001")).hasSize(1);
+        assertThat(memoryService.listByUserId("001").get(0).getFactTag()).isEqualTo("prefs");
     }
 
     @Test
@@ -70,6 +65,6 @@ class DefaultMemoryServiceTest {
             memoryService.create(req);
         }
         assertThat(memoryService.listByUserId("u2")).hasSize(2);
-        assertThat(memoryEntryRepository.count()).isEqualTo(5);
+        assertThat(memoryEntryMapper.selectCount(new QueryWrapper<MemoryEntryEntity>())).isEqualTo(5);
     }
 }

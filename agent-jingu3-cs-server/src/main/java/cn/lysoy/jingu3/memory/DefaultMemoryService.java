@@ -3,17 +3,16 @@ package cn.lysoy.jingu3.memory;
 import cn.lysoy.jingu3.common.dto.CreateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.common.vo.MemoryEntryVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.memory.entity.FactMetadataEntity;
 import cn.lysoy.jingu3.memory.entity.MemoryEntryEntity;
-import cn.lysoy.jingu3.memory.repo.FactMetadataRepository;
-import cn.lysoy.jingu3.memory.repo.MemoryEntryRepository;
-import org.springframework.data.domain.PageRequest;
+import cn.lysoy.jingu3.memory.mapper.FactMetadataMapper;
+import cn.lysoy.jingu3.memory.mapper.MemoryEntryMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -24,18 +23,18 @@ public class DefaultMemoryService implements MemoryService {
 
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_INSTANT;
 
-    private final MemoryEntryRepository memoryEntryRepository;
+    private final MemoryEntryMapper memoryEntryMapper;
 
-    private final FactMetadataRepository factMetadataRepository;
+    private final FactMetadataMapper factMetadataMapper;
 
     private final Jingu3Properties properties;
 
     public DefaultMemoryService(
-            MemoryEntryRepository memoryEntryRepository,
-            FactMetadataRepository factMetadataRepository,
+            MemoryEntryMapper memoryEntryMapper,
+            FactMetadataMapper factMetadataMapper,
             Jingu3Properties properties) {
-        this.memoryEntryRepository = memoryEntryRepository;
-        this.factMetadataRepository = factMetadataRepository;
+        this.memoryEntryMapper = memoryEntryMapper;
+        this.factMetadataMapper = factMetadataMapper;
         this.properties = properties;
     }
 
@@ -43,7 +42,7 @@ public class DefaultMemoryService implements MemoryService {
     @Transactional
     public MemoryEntryVo create(CreateMemoryEntryRequest request) {
         MemoryEntryKind kind = parseKind(request.getKind());
-        Instant now = Instant.now();
+        var now = UtcTime.nowLocalDateTime();
         MemoryEntryEntity e = new MemoryEntryEntity();
         e.setUserId(request.getUserId().trim());
         e.setKind(kind);
@@ -51,16 +50,16 @@ public class DefaultMemoryService implements MemoryService {
         e.setBody(request.getBody());
         e.setCreatedAt(now);
         e.setUpdatedAt(now);
-        MemoryEntryEntity saved = memoryEntryRepository.save(e);
+        memoryEntryMapper.insert(e);
         String factTagOut = null;
         if (kind == MemoryEntryKind.FACT && request.getFactTag() != null && !request.getFactTag().isBlank()) {
             factTagOut = request.getFactTag().trim();
             FactMetadataEntity meta = new FactMetadataEntity();
-            meta.setMemoryEntryId(saved.getId());
+            meta.setMemoryEntryId(e.getId());
             meta.setTag(factTagOut);
-            factMetadataRepository.save(meta);
+            factMetadataMapper.insert(meta);
         }
-        return toVo(saved, factTagOut);
+        return toVo(e, factTagOut);
     }
 
     @Override
@@ -71,14 +70,15 @@ public class DefaultMemoryService implements MemoryService {
         }
         int max = Math.max(1, properties.getMemory().getMaxListSize());
         List<MemoryEntryEntity> rows =
-                memoryEntryRepository.findByUserIdOrderByCreatedAtDesc(userId.trim(), PageRequest.of(0, max));
+                memoryEntryMapper.selectByUserIdOrderByCreatedAtDesc(userId.trim(), max);
         return rows.stream().map(this::toVoWithOptionalFactTag).collect(Collectors.toList());
     }
 
     private MemoryEntryVo toVoWithOptionalFactTag(MemoryEntryEntity e) {
         String tag = null;
         if (e.getKind() == MemoryEntryKind.FACT) {
-            tag = factMetadataRepository.findById(e.getId()).map(FactMetadataEntity::getTag).orElse(null);
+            FactMetadataEntity meta = factMetadataMapper.selectById(e.getId());
+            tag = meta != null ? meta.getTag() : null;
         }
         return toVo(e, tag);
     }
@@ -102,8 +102,8 @@ public class DefaultMemoryService implements MemoryService {
         vo.setSummary(e.getSummary());
         vo.setBody(e.getBody());
         vo.setFactTag(factTag);
-        vo.setCreatedAt(ISO.format(e.getCreatedAt()));
-        vo.setUpdatedAt(ISO.format(e.getUpdatedAt()));
+        vo.setCreatedAt(ISO.format(UtcTime.toInstant(e.getCreatedAt())));
+        vo.setUpdatedAt(ISO.format(UtcTime.toInstant(e.getUpdatedAt())));
         return vo;
     }
 }

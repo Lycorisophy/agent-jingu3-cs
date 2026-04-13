@@ -4,7 +4,7 @@ CREATE TABLE memory_entry (
     user_id VARCHAR(64) NOT NULL,
     kind VARCHAR(32) NOT NULL,
     summary VARCHAR(512),
-    body CLOB,
+    body LONGTEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

@@ -6,11 +6,11 @@ CREATE TABLE scheduled_task (
     conversation_id VARCHAR(128),
     cron_expression VARCHAR(256),
     next_run_at TIMESTAMP NOT NULL,
-    payload_json CLOB NOT NULL,
+    payload_json LONGTEXT NOT NULL,
     enabled BOOLEAN NOT NULL DEFAULT TRUE,
     last_run_at TIMESTAMP,
     last_status VARCHAR(64),
-    last_error CLOB,
+    last_error LONGTEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

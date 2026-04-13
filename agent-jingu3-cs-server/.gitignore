@@ -35,5 +35,8 @@ build/
 ### VS Code ###
 .vscode/
 
+### 本地覆盖（含数据库密码，勿提交） ###
+application-local.yml
+
 ### Mac OS ###
 .DS_Store

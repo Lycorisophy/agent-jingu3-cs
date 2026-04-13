@@ -1,0 +1,53 @@
+# 本地联调 MySQL / Redis / Milvus：复制本文件为 application-local.yml（已加入 .gitignore），再填写密码或设置环境变量。
+# 启动示例：
+#   java -jar app.jar --spring.profiles.active=local
+# 或与默认配置叠加：
+#   --spring.profiles.active=dev,local
+#
+# 推荐环境变量（避免明文进仓库）：
+#   MYSQL_PASSWORD、REDIS_PASSWORD、MILVUS_PASSWORD（按需）
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/jingu_agent?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: cn.lysoy.jingu3
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+
+# 引入 spring-boot-starter-data-redis 后可取消注释，与下方 jingu3.redis 指向同一实例即可
+#spring:
+#  data:
+#    redis:
+#      host: ${REDIS_HOST:127.0.0.1}
+#      port: ${REDIS_PORT:6379}
+#      password: ${REDIS_PASSWORD:}
+#      database: ${REDIS_DB:0}
+
+jingu3:
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+  milvus:
+    host: ${MILVUS_HOST:127.0.0.1}
+    port: ${MILVUS_PORT:19530}
+    user: ${MILVUS_USER:}
+    password: ${MILVUS_PASSWORD:}
+
+logging:
+  level:
+    cn.lysoy.jingu3: INFO

@@ -26,6 +26,12 @@ public class Jingu3Properties {
 
     private Memory memory = new Memory();
 
+    /** 本地/自建 Redis（缓存）；未接业务 Bean 前仅作配置占位，默认本机 6379 */
+    private Redis redis = new Redis();
+
+    /** 本地/自建 Milvus（向量库）；未接向量检索前仅作配置占位，默认 gRPC 19530 */
+    private Milvus milvus = new Milvus();
+
     @Data
     public static class Memory {
 
@@ -109,5 +115,30 @@ public class Jingu3Properties {
 
         /** 是否启用 Ask / ReAct 工具管线；关闭时行为与 v0.2 一致（无工具路由与执行） */
         private boolean enabled = true;
+    }
+
+    @Data
+    public static class Redis {
+
+        private String host = "127.0.0.1";
+
+        private int port = 6379;
+
+        /** 无密码时留空 */
+        private String password = "";
+    }
+
+    @Data
+    public static class Milvus {
+
+        private String host = "127.0.0.1";
+
+        /** Milvus 2.x 默认 gRPC 端口 */
+        private int port = 19530;
+
+        /** 未启用鉴权时留空 */
+        private String user = "";
+
+        private String password = "";
     }
 }

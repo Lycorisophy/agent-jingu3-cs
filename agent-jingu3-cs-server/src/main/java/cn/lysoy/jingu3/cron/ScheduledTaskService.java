@@ -2,10 +2,11 @@ package cn.lysoy.jingu3.cron;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.component.UserConstants;
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.cron.dto.CreateScheduledTaskRequest;
 import cn.lysoy.jingu3.cron.dto.ScheduledTaskVo;
 import cn.lysoy.jingu3.cron.entity.ScheduledTaskEntity;
-import cn.lysoy.jingu3.cron.repo.ScheduledTaskRepository;
+import cn.lysoy.jingu3.cron.mapper.ScheduledTaskMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -21,13 +21,13 @@ public class ScheduledTaskService {
 
     private static final int LAST_ERROR_MAX = 4000;
 
-    private final ScheduledTaskRepository repository;
+    private final ScheduledTaskMapper scheduledTaskMapper;
     private final UserConstants userConstants;
     private final ObjectMapper objectMapper;
 
     public ScheduledTaskService(
-            ScheduledTaskRepository repository, UserConstants userConstants, ObjectMapper objectMapper) {
-        this.repository = repository;
+            ScheduledTaskMapper scheduledTaskMapper, UserConstants userConstants, ObjectMapper objectMapper) {
+        this.scheduledTaskMapper = scheduledTaskMapper;
         this.userConstants = userConstants;
         this.objectMapper = objectMapper;
     }
@@ -47,24 +47,25 @@ public class ScheduledTaskService {
         } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "payload 序列化失败");
         }
-        Instant now = Instant.now();
+        var now = UtcTime.nowLocalDateTime();
         ScheduledTaskEntity e = new ScheduledTaskEntity();
         e.setOwnerUserId(userConstants.getId());
         e.setScope(request.getScope());
         e.setConversationId(
                 request.getScope() == ScheduledTaskScope.CONVERSATION ? request.getConversationId().trim() : null);
         e.setCronExpression(request.getCronExpression());
-        e.setNextRunAt(request.getNextRunAt());
+        e.setNextRunAt(UtcTime.fromInstant(request.getNextRunAt()));
         e.setPayloadJson(payloadJson);
         e.setEnabled(true);
         e.setCreatedAt(now);
         e.setUpdatedAt(now);
-        return toVo(repository.save(e));
+        scheduledTaskMapper.insert(e);
+        return toVo(e);
     }
 
     @Transactional(readOnly = true)
     public List<ScheduledTaskVo> listMine() {
-        return repository.findByOwnerUserIdOrderByNextRunAtAsc(userConstants.getId()).stream()
+        return scheduledTaskMapper.selectByOwnerUserIdOrderByNextRunAtAsc(userConstants.getId()).stream()
                 .map(ScheduledTaskService::toVo)
                 .toList();
     }
@@ -83,14 +84,14 @@ public class ScheduledTaskService {
                 .scope(e.getScope())
                 .conversationId(e.getConversationId())
                 .cronExpression(e.getCronExpression())
-                .nextRunAt(e.getNextRunAt())
+                .nextRunAt(UtcTime.toInstant(e.getNextRunAt()))
                 .payloadJson(e.getPayloadJson())
                 .enabled(e.isEnabled())
-                .lastRunAt(e.getLastRunAt())
+                .lastRunAt(UtcTime.toInstant(e.getLastRunAt()))
                 .lastStatus(e.getLastStatus())
                 .lastError(e.getLastError())
-                .createdAt(e.getCreatedAt())
-                .updatedAt(e.getUpdatedAt())
+                .createdAt(UtcTime.toInstant(e.getCreatedAt()))
+                .updatedAt(UtcTime.toInstant(e.getUpdatedAt()))
                 .build();
     }
 

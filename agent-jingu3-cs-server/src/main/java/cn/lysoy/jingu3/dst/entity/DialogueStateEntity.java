@@ -1,40 +1,33 @@
 package cn.lysoy.jingu3.dst.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "dialogue_state")
+@TableName("dialogue_state")
 @Getter
 @Setter
 public class DialogueStateEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
-    @Column(name = "conversation_id", nullable = false, unique = true, length = 128)
+    @TableField("conversation_id")
     private String conversationId;
 
-    @Column(name = "schema_version", nullable = false, length = 32)
+    @TableField("schema_version")
     private String schemaVersion = "1";
 
-    @Lob
-    @Column(name = "state_json", nullable = false)
+    @TableField("state_json")
     private String stateJson;
 
-    @Column(name = "revision", nullable = false)
-    private long revision = 0L;
+    private Long revision = 0L;
 
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt = Instant.now();
+    @TableField("updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

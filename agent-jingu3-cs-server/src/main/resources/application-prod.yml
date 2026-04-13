@@ -1,0 +1,26 @@
+# 生产/联调 MySQL 示例（显式激活：--spring.profiles.active=prod）
+# 请先创建库，并保证 Flyway 迁移与 MyBatis-Plus 实体一致。
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://localhost:3306/jingu3?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USER:jingu3}
+    password: ${MYSQL_PASSWORD:changeme}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: cn.lysoy.jingu3
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+
+logging:
+  level:
+    cn.lysoy.jingu3: INFO

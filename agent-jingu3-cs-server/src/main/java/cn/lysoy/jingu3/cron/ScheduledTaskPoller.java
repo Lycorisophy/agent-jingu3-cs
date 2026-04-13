@@ -1,13 +1,12 @@
 package cn.lysoy.jingu3.cron;
 
-import cn.lysoy.jingu3.cron.repo.ScheduledTaskRepository;
+import cn.lysoy.jingu3.common.util.UtcTime;
+import cn.lysoy.jingu3.cron.mapper.ScheduledTaskMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -24,17 +23,17 @@ public class ScheduledTaskPoller {
 
     private static final int BATCH = 32;
 
-    private final ScheduledTaskRepository repository;
+    private final ScheduledTaskMapper scheduledTaskMapper;
     private final ScheduledTaskDueRunner dueRunner;
 
-    public ScheduledTaskPoller(ScheduledTaskRepository repository, ScheduledTaskDueRunner dueRunner) {
-        this.repository = repository;
+    public ScheduledTaskPoller(ScheduledTaskMapper scheduledTaskMapper, ScheduledTaskDueRunner dueRunner) {
+        this.scheduledTaskMapper = scheduledTaskMapper;
         this.dueRunner = dueRunner;
     }
 
     @Scheduled(fixedDelayString = "${jingu3.cron.poll-interval-ms:30000}")
     public void poll() {
-        List<Long> ids = repository.findDueIds(Instant.now(), PageRequest.of(0, BATCH));
+        List<Long> ids = scheduledTaskMapper.selectDueIds(UtcTime.nowLocalDateTime(), BATCH);
         for (Long id : ids) {
             try {
                 dueRunner.runDue(id);

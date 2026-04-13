@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.hitl.dto;
 
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.hitl.HitlApprovalStatus;
 import lombok.Builder;
 import lombok.Value;
@@ -26,8 +27,8 @@ public class HitlApprovalVo {
                 .runId(e.getRunId())
                 .status(e.getStatus())
                 .payloadJson(e.getPayloadJson())
-                .createdAt(e.getCreatedAt())
-                .resolvedAt(e.getResolvedAt())
+                .createdAt(UtcTime.toInstant(e.getCreatedAt()))
+                .resolvedAt(UtcTime.toInstant(e.getResolvedAt()))
                 .resolverUserId(e.getResolverUserId())
                 .build();
     }

@@ -1,39 +1,40 @@
 package cn.lysoy.jingu3.hitl;
 
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.hitl.dto.CreateHitlApprovalRequest;
 import cn.lysoy.jingu3.hitl.dto.HitlApprovalVo;
 import cn.lysoy.jingu3.hitl.entity.HitlApprovalEntity;
-import cn.lysoy.jingu3.hitl.repo.HitlApprovalRepository;
+import cn.lysoy.jingu3.hitl.mapper.HitlApprovalMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
 public class HitlApprovalService {
 
-    private final HitlApprovalRepository repository;
+    private final HitlApprovalMapper hitlApprovalMapper;
     private final UserConstants userConstants;
 
-    public HitlApprovalService(HitlApprovalRepository repository, UserConstants userConstants) {
-        this.repository = repository;
+    public HitlApprovalService(HitlApprovalMapper hitlApprovalMapper, UserConstants userConstants) {
+        this.hitlApprovalMapper = hitlApprovalMapper;
         this.userConstants = userConstants;
     }
 
     @Transactional
     public HitlApprovalVo create(CreateHitlApprovalRequest request) {
-        Instant now = Instant.now();
+        var now = UtcTime.nowLocalDateTime();
         HitlApprovalEntity e = new HitlApprovalEntity();
         e.setConversationId(request.getConversationId().trim());
         e.setRunId(request.getRunId() != null && !request.getRunId().isBlank() ? request.getRunId().trim() : null);
         e.setStatus(HitlApprovalStatus.PENDING);
         e.setPayloadJson(request.getPayloadJson());
         e.setCreatedAt(now);
-        return HitlApprovalVo.from(repository.save(e));
+        hitlApprovalMapper.insert(e);
+        return HitlApprovalVo.from(e);
     }
 
     @Transactional(readOnly = true)
@@ -41,8 +42,8 @@ public class HitlApprovalService {
         if (conversationId == null || conversationId.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "conversationId 必填");
         }
-        return repository
-                .findByStatusAndConversationIdOrderByCreatedAtAsc(
+        return hitlApprovalMapper
+                .selectByStatusAndConversationIdOrderByCreatedAtAsc(
                         HitlApprovalStatus.PENDING, conversationId.trim())
                 .stream()
                 .map(HitlApprovalVo::from)
@@ -60,16 +61,18 @@ public class HitlApprovalService {
     }
 
     private HitlApprovalVo resolve(long id, HitlApprovalStatus target) {
-        HitlApprovalEntity e = repository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "审批单不存在"));
+        HitlApprovalEntity e = hitlApprovalMapper.selectById(id);
+        if (e == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "审批单不存在");
+        }
         if (e.getStatus() != HitlApprovalStatus.PENDING) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "审批单已处理");
         }
-        Instant now = Instant.now();
+        var now = UtcTime.nowLocalDateTime();
         e.setStatus(target);
         e.setResolvedAt(now);
         e.setResolverUserId(userConstants.getId());
-        return HitlApprovalVo.from(repository.save(e));
+        hitlApprovalMapper.updateById(e);
+        return HitlApprovalVo.from(e);
     }
 }

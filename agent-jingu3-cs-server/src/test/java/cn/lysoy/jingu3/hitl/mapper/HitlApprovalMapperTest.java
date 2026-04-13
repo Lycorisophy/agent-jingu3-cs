@@ -1,35 +1,37 @@
-package cn.lysoy.jingu3.hitl.repo;
+package cn.lysoy.jingu3.hitl.mapper;
 
+import cn.lysoy.jingu3.Jingu3Application;
+import cn.lysoy.jingu3.common.util.UtcTime;
 import cn.lysoy.jingu3.hitl.HitlApprovalStatus;
 import cn.lysoy.jingu3.hitl.entity.HitlApprovalEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest(
-        properties = {
-            "spring.jpa.hibernate.ddl-auto=validate",
-            "spring.flyway.enabled=true"
-        })
-class HitlApprovalRepositoryTest {
+@SpringBootTest(
+        classes = Jingu3Application.class,
+        properties = {"jingu3.cron.scheduler-enabled=false"})
+@Transactional
+class HitlApprovalMapperTest {
 
     @Autowired
-    private HitlApprovalRepository repository;
+    private HitlApprovalMapper hitlApprovalMapper;
 
     @Test
     void findPendingByConversation() {
         HitlApprovalEntity a = newEntity("c1", HitlApprovalStatus.PENDING);
         HitlApprovalEntity b = newEntity("c1", HitlApprovalStatus.APPROVED);
-        repository.save(a);
-        repository.save(b);
+        hitlApprovalMapper.insert(a);
+        hitlApprovalMapper.insert(b);
 
         List<HitlApprovalEntity> pending =
-                repository.findByStatusAndConversationIdOrderByCreatedAtAsc(HitlApprovalStatus.PENDING, "c1");
+                hitlApprovalMapper.selectByStatusAndConversationIdOrderByCreatedAtAsc(
+                        HitlApprovalStatus.PENDING, "c1");
         assertThat(pending).hasSize(1);
         assertThat(pending.get(0).getId()).isEqualTo(a.getId());
     }
@@ -39,7 +41,7 @@ class HitlApprovalRepositoryTest {
         e.setConversationId(conv);
         e.setStatus(status);
         e.setPayloadJson("{}");
-        e.setCreatedAt(Instant.now());
+        e.setCreatedAt(UtcTime.nowLocalDateTime());
         return e;
     }
 }
