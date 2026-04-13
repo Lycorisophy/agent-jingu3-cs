@@ -10,6 +10,15 @@
 | [里程碑切片.md](./里程碑切片.md) | 从选型报告拆出的分阶段交付与**首个可合并增量**建议 |
 | （后续）可行性分析 / 概要设计 / 详细设计 / 接口文档 / 部署文档 | 按[全局工序](../计划/开发路线图.md#全局--文档工序每个-v0x-发布前完成)补齐 |
 
+### M1 已实现（代码）
+
+- **Flyway**：`V4__memory_m1.sql` — `memory_entry`、`fact_metadata`。
+- **包**：`cn.lysoy.jingu3.memory`（实体、仓库、`MemoryService` / `DefaultMemoryService`）。
+- **配置**：`jingu3.memory.api-enabled`（默认 `true`）、`jingu3.memory.max-list-size`（默认 `100`）。
+- **实验 API**（未接 `ChatService`；生产可关 `api-enabled`）：
+  - `POST /api/v1/memory/entries` — 请求体 JSON：`userId`、`kind`（`FACT`|`EVENT`）、可选 `summary`、`body`；`FACT` 时可带 `factTag` 写入 `fact_metadata.tag`。
+  - `GET /api/v1/memory/entries?userId=...` — 按用户倒序列表（受 `max-list-size` 限制）。
+
 ## 工序清单（发布前勾选）
 
 - [x] README.md（本目录入口）
@@ -19,6 +28,6 @@
 - [ ] 概要设计.md
 - [ ] 详细设计.md
 - [ ] 接口文档.md / openapi
-- [ ] 服务端实现（`agent-jingu3-cs-server`）
-- [ ] 单测与集成测
+- [ ] 服务端实现（`agent-jingu3-cs-server`）（**M1 子集已合入**：见上节）
+- [ ] 单测与集成测（**M1**：`memory` 包仓库/服务单测已加；全量与集成测随后续里程碑补充）
 - [ ] 部署文档.md

@@ -66,6 +66,10 @@ jingu3:
     root-dir: ${user.home}/.jingu3/workspaces
     max-file-size-mb: 10
     default-quota-mb: 1024
+  memory:
+    # v0.6 M1：实验性记忆 API；关闭后不注册 MemoryController
+    api-enabled: true
+    max-list-size: 100
   cron:
     demo-schedule: "0 0 9 * * MON-FRI"
     # 是否启用定时轮询执行到期任务（MVP：到点调用 ChatService 一问一答）

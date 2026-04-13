@@ -15,7 +15,7 @@
 以下已合入 `agent-jingu3-cs-server`（可与路线图「未开始」并存，以代码为准迭代文档）：
 
 - `jingu3.workspace.*`：`WorkspaceManager` + `DefaultWorkspaceManager`、`Workspace` / `WorkspaceStats`，`WorkspaceFileService` + `DefaultWorkspaceFileService` + `PathValidator`
-- 配置：`jingu3.workspace.enabled`、`root-dir`、`max-file-size-mb`
+- 配置：`jingu3.workspace.enabled`、`root-dir`、`max-file-size-mb`、`default-quota-mb`
 - **ToolRegistry** 工具：`workspace_read_file`、`workspace_list_files`、`workspace_write_file`（关闭 `jingu3.workspace.enabled=false` 则不注册）
 
 ## 工序清单（发布前勾选）

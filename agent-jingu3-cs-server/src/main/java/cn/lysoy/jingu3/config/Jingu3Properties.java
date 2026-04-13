@@ -24,6 +24,20 @@ public class Jingu3Properties {
 
     private Workspace workspace = new Workspace();
 
+    private Memory memory = new Memory();
+
+    @Data
+    public static class Memory {
+
+        /**
+         * 是否暴露 v0.6 M1 记忆实验 API（{@code /api/v1/memory/**}）；生产可关闭至详细设计定稿。
+         */
+        private boolean apiEnabled = true;
+
+        /** {@link cn.lysoy.jingu3.memory.DefaultMemoryService#listByUserId} 单次最大条数 */
+        private int maxListSize = 100;
+    }
+
     @Data
     public static class Workspace {
 
