@@ -65,6 +65,7 @@ jingu3:
     # 每用户目录：{root-dir}/{jingu3.user.id}/
     root-dir: ${user.home}/.jingu3/workspaces
     max-file-size-mb: 10
+    default-quota-mb: 1024
   cron:
     demo-schedule: "0 0 9 * * MON-FRI"
     # 是否启用定时轮询执行到期任务（MVP：到点调用 ChatService 一问一答）

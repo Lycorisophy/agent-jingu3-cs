@@ -16,7 +16,8 @@ class DefaultWorkspaceFileServiceTest {
         Jingu3Properties p = new Jingu3Properties();
         p.getWorkspace().setRootDir(tmp.toString());
         p.getWorkspace().setMaxFileSizeMb(1);
-        DefaultWorkspaceFileService svc = new DefaultWorkspaceFileService(p);
+        DefaultWorkspaceManager mgr = new DefaultWorkspaceManager(p);
+        DefaultWorkspaceFileService svc = new DefaultWorkspaceFileService(mgr, p);
 
         svc.writeFile("u1", "a/b.txt", "hello");
         assertThat(svc.readFile("u1", "a/b.txt")).isEqualTo("hello");
@@ -28,7 +29,8 @@ class DefaultWorkspaceFileServiceTest {
     void rejectsTraversal(@TempDir Path tmp) {
         Jingu3Properties p = new Jingu3Properties();
         p.getWorkspace().setRootDir(tmp.toString());
-        DefaultWorkspaceFileService svc = new DefaultWorkspaceFileService(p);
+        DefaultWorkspaceManager mgr = new DefaultWorkspaceManager(p);
+        DefaultWorkspaceFileService svc = new DefaultWorkspaceFileService(mgr, p);
 
         assertThatThrownBy(() -> svc.readFile("u1", "../outside.txt")).isInstanceOf(SecurityException.class);
     }

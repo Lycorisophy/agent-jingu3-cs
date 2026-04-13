@@ -27,7 +27,7 @@
 ## 关闭本版本后的下一立项
 
 - **v0.6**：记忆系统（事件/事实/检索），见路线图与 [记忆知识系统数据库选型分析.md](../设计/记忆知识系统数据库选型分析.md)。
-- **v0.7**：技能工具扩展 + [工作空间系统设计](../workspace/workspace-design.md)（Workspace Phase 1～3），见路线图 v0.7 节。
+- **v0.7**：技能工具扩展 + [工作空间系统设计](../workspace/workspace-design.md) + [技能系统设计](../workspace/skill-system-design.md)（Workspace / Skill Phase 分阶段），见路线图 v0.7 节。
 
 ## 工序清单（发布前勾选）
 

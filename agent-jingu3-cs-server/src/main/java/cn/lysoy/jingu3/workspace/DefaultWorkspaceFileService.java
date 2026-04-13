@@ -2,6 +2,7 @@ package cn.lysoy.jingu3.workspace;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.workspace.security.PathValidator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,11 +14,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@ConditionalOnProperty(prefix = "jingu3.workspace", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class DefaultWorkspaceFileService implements WorkspaceFileService {
+
+    private final WorkspaceManager workspaceManager;
 
     private final Jingu3Properties properties;
 
-    public DefaultWorkspaceFileService(Jingu3Properties properties) {
+    public DefaultWorkspaceFileService(WorkspaceManager workspaceManager, Jingu3Properties properties) {
+        this.workspaceManager = workspaceManager;
         this.properties = properties;
     }
 
@@ -59,16 +64,6 @@ public class DefaultWorkspaceFileService implements WorkspaceFileService {
     }
 
     private Path userRoot(String userId) throws IOException {
-        if (userId == null || userId.isBlank()) {
-            throw new IOException("userId 不能为空");
-        }
-        String base = properties.getWorkspace().getRootDir();
-        Path root = Path.of(base).toAbsolutePath().normalize();
-        Path u = root.resolve(userId.trim()).normalize();
-        if (!u.startsWith(root)) {
-            throw new SecurityException("非法 userId");
-        }
-        Files.createDirectories(u);
-        return u;
+        return workspaceManager.resolveUserRoot(userId);
     }
 }

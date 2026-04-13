@@ -35,6 +35,9 @@ public class Jingu3Properties {
 
         /** 单文件读取/写入上限（MB） */
         private long maxFileSizeMb = 10L;
+
+        /** 配额展示与后续强校验占位（MB），Phase 3 可落库 enforcement */
+        private long defaultQuotaMb = 1024L;
     }
 
     @Data

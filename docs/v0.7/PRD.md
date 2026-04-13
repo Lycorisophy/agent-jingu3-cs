@@ -2,7 +2,7 @@
 
 ## 1. 背景
 
-路线图将 **技能工具系统扩展** 与 **工作空间** 合入 v0.7：在 v0.3 工具 MVP 上增强发现、Schema、客户端工具与安全分级；按 [workspace-design.md](../workspace/workspace-design.md) 交付隔离文件与沙箱执行能力。
+路线图将 **技能工具系统扩展** 与 **工作空间** 合入 v0.7：在 v0.3 工具 MVP 上增强发现、Schema、客户端工具与安全分级；工作空间按 [workspace-design.md](../workspace/workspace-design.md) 交付隔离文件与沙箱执行能力；技能市场与客户端执行见 [skill-system-design.md](../workspace/skill-system-design.md)。
 
 ## 2. 与 HITL 的协同（Phase 2 安全评审结论）
 
