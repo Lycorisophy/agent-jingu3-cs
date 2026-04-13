@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,6 +23,8 @@ class IntentRouterTest {
     void setUp() {
         classifier = Mockito.mock(ModelIntentClassifier.class);
         Mockito.when(classifier.classify(Mockito.anyString())).thenReturn(ActionMode.REACT);
+        Mockito.when(classifier.classifyOptional(Mockito.anyString()))
+                .thenReturn(Optional.of(ActionMode.PLAN_AND_EXECUTE));
         router = new IntentRouter(new RuleBasedModeRouter(), classifier);
     }
 
@@ -60,5 +64,33 @@ class IntentRouterTest {
         assertThatThrownBy(() -> router.resolve("x", "CRON"))
                 .isInstanceOf(ServiceException.class);
         Mockito.verifyNoInteractions(classifier);
+    }
+
+    @Test
+    void explicitPlanAndExecute_classifierInfersAsk_downgradesToAskWithGuard() {
+        Mockito.when(classifier.classifyOptional("你好")).thenReturn(Optional.of(ActionMode.ASK));
+        RoutingDecision d = router.resolve("你好", "PLAN_AND_EXECUTE");
+        assertThat(d.getMode()).isEqualTo(ActionMode.ASK);
+        assertThat(d.getSource()).isEqualTo(RoutingSource.EXPLICIT_GUARD);
+        assertThat(d.getGuardUserNotice()).isNotNull().contains("计划执行");
+        Mockito.verify(classifier).classifyOptional("你好");
+    }
+
+    @Test
+    void explicitPlanAndExecute_classifierFails_honorsExplicit() {
+        Mockito.when(classifier.classifyOptional("长任务说明")).thenReturn(Optional.empty());
+        RoutingDecision d = router.resolve("长任务说明", "PLAN_AND_EXECUTE");
+        assertThat(d.getMode()).isEqualTo(ActionMode.PLAN_AND_EXECUTE);
+        assertThat(d.getSource()).isEqualTo(RoutingSource.CLIENT_EXPLICIT);
+        assertThat(d.getGuardUserNotice()).isNull();
+    }
+
+    @Test
+    void explicitAgentTeam_classifierInfersReact_downgradesToAskWithGuard() {
+        Mockito.when(classifier.classifyOptional("嗯")).thenReturn(Optional.of(ActionMode.REACT));
+        RoutingDecision d = router.resolve("嗯", "AGENT_TEAM");
+        assertThat(d.getMode()).isEqualTo(ActionMode.ASK);
+        assertThat(d.getSource()).isEqualTo(RoutingSource.EXPLICIT_GUARD);
+        assertThat(d.getGuardUserNotice()).contains("智能体团队");
     }
 }

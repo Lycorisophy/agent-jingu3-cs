@@ -131,6 +131,10 @@ public class ChatStreamService {
                     userConstants.getId(),
                     userConstants.getUsername());
 
+            if (decision.getGuardUserNotice() != null && !decision.getGuardUserNotice().isBlank()) {
+                sink.block(decision.getGuardUserNotice());
+            }
+
             ExecutionContext ctx = buildContext(request, decision);
             streamByMode(decision.getMode(), ctx, sink);
         } catch (Exception e) {

@@ -39,6 +39,13 @@ public final class EngineMessages {
     /** 聊天接口触发限流时，可附加到 {@link cn.lysoy.jingu3.common.exception.ServiceException} */
     public static final String CHAT_RATE_LIMITED = "请求过于频繁，请稍后再试";
 
+    /**
+     * 显式模式守门：参数为「计划执行」或「智能体团队」等展示名。后缀含换行，便于与正文分隔。
+     */
+    public static final String EXPLICIT_MODE_GUARD_NOTICE =
+            "[模式提示] 您选择了「%s」，但根据当前语句判断更适合直接回答，已切换为 Ask 模式。"
+                    + "若确需该模式，请补充更具体的复杂任务或多角色协作场景。\n\n";
+
     private EngineMessages() {
     }
 }

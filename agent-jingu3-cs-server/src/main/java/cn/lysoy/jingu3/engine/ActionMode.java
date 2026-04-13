@@ -11,7 +11,7 @@ import cn.lysoy.jingu3.common.constant.EngineMessages;
  * </p>
  */
 public enum ActionMode {
-    /** 指南 §3 Ask：以单次（或带历史）生成回答为主；本仓库同步路径无 Tool Registry，流式为 TOKEN。 */
+    /** 指南 §3 Ask：以单次（或带历史）生成回答为主；可与 Tool Registry 结合做工具选择与调用，流式语义见引擎配置。 */
     ASK,
     /**
      * 指南 §4 ReAct：推理与行动交织；经典表述为 Thought → Action → Observation 直至结束。
@@ -32,7 +32,7 @@ public enum ActionMode {
     AGENT_TEAM,
     /** 指南 §8 Cron：定时意图说明；当前为演示文案，真实调度见路线图独立模块。 */
     CRON,
-    /** 指南 §9 State Tracking：会话级状态；当前为进程内计数，持久化见 v0.3+。 */
+    /** 指南 §9 State Tracking：目标为跨轮次 DST；当前 Handler 仅为进程内计数占位，规范形态见指南 §9.0 与路线图。 */
     STATE_TRACKING,
     /** 指南 §10 Human-in-the-Loop：人在环待审批说明；队列与 API 见设计草案。 */
     HUMAN_IN_LOOP;

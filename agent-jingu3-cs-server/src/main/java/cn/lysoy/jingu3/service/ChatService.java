@@ -90,6 +90,9 @@ public class ChatService {
                 decision.getMode() == ActionMode.WORKFLOW ? request.getWorkflowId() : null
         );
         String reply = modeRegistry.get(decision.getMode()).execute(ctx);
+        if (decision.getGuardUserNotice() != null && !decision.getGuardUserNotice().isBlank()) {
+            reply = decision.getGuardUserNotice() + reply;
+        }
         ChatVo vo = new ChatVo();
         vo.setUserId(userConstants.getId());
         vo.setUsername(userConstants.getUsername());

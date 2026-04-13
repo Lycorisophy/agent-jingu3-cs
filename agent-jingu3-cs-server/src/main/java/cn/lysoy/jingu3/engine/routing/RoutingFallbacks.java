@@ -47,6 +47,7 @@ public final class RoutingFallbacks {
                 (base == null || base.isBlank())
                         ? RoutingNotes.WORKFLOW_ID_MISSING_FALLBACK_ASK_SUFFIX
                         : base + ";" + RoutingNotes.WORKFLOW_ID_MISSING_FALLBACK_ASK_SUFFIX;
-        return new RoutingDecision(ActionMode.ASK, decision.getSource(), note);
+        return new RoutingDecision(
+                ActionMode.ASK, decision.getSource(), note, decision.getGuardUserNotice());
     }
 }

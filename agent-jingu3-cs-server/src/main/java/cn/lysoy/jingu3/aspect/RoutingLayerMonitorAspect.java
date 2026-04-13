@@ -27,6 +27,11 @@ public class RoutingLayerMonitorAspect {
         return monitor("ModelIntentClassifier.classify", pjp);
     }
 
+    @Around("execution(* cn.lysoy.jingu3.engine.routing.ModelIntentClassifier.classifyOptional(..))")
+    public Object aroundClassifierOptional(ProceedingJoinPoint pjp) throws Throwable {
+        return monitor("ModelIntentClassifier.classifyOptional", pjp);
+    }
+
     private static Object monitor(String label, ProceedingJoinPoint pjp) throws Throwable {
         long t0 = System.nanoTime();
         try {

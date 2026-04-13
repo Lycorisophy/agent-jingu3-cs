@@ -11,6 +11,9 @@ public final class RoutingNotes {
     /** 路由备注后缀：WORKFLOW 无 workflowId 时已回落 ASK */
     public static final String WORKFLOW_ID_MISSING_FALLBACK_ASK_SUFFIX = "workflow_id_missing_fallback_ask";
 
+    /** 显式 Plan/Agent Team 经守门降为 Ask */
+    public static final String EXPLICIT_MODE_GUARD = "explicit_mode_guard";
+
     private RoutingNotes() {
     }
 }

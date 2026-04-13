@@ -8,5 +8,9 @@ public enum RoutingSource {
     RULE,
     MODEL,
     /** 客户端显式 mode 无法解析时降级为 REACT */
-    FALLBACK
+    FALLBACK,
+    /**
+     * 客户端显式选择 Plan-and-Execute 或 Agent Team，经意图分类判定更适合 Ask/ReAct 时，实际执行降为 Ask。
+     */
+    EXPLICIT_GUARD
 }
