@@ -1,5 +1,7 @@
 package cn.lysoy.jingu3.engine;
 
+import cn.lysoy.jingu3.stream.StreamEventSink;
+
 /**
  * 单一「行动模式」的执行契约，对应《AI智能体行动模式设计指南》中的八种模式之一。
  * <p>
@@ -11,7 +13,6 @@ package cn.lysoy.jingu3.engine;
  * @see ActionMode
  * @see ModeRegistry
  */
-@FunctionalInterface
 public interface ActionModeHandler {
 
     /**
@@ -22,4 +23,6 @@ public interface ActionModeHandler {
      * @return 助手回复正文，由上层封装为 {@link cn.lysoy.jingu3.common.vo.ChatVo#getReply()} 等
      */
     String execute(ExecutionContext context);
+
+    void stream(ExecutionContext context, StreamEventSink sink);
 }

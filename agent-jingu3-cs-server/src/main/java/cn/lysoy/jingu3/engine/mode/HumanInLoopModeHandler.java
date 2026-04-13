@@ -4,6 +4,7 @@ import cn.lysoy.jingu3.common.constant.EngineMessages;
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
+import cn.lysoy.jingu3.stream.StreamEventSink;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,5 +23,13 @@ public class HumanInLoopModeHandler implements ActionModeHandler {
                 + PromptFragments.PARAGRAPH_BREAK
                 + "用户原话摘要："
                 + context.llmInput();
+    }
+
+    @Override
+    public void stream(ExecutionContext context, StreamEventSink sink) {
+        sink.stepBegin(1, "human_in_loop");
+        sink.block(execute(context));
+        sink.stepEnd(1);
+        sink.done();
     }
 }

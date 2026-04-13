@@ -223,24 +223,9 @@ public class ChatStreamService {
             case PLAN_AND_EXECUTE -> planAndExecuteModeHandler.stream(ctx, sink);
             case WORKFLOW -> workflowModeHandler.stream(ctx, sink);
             case AGENT_TEAM -> agentTeamModeHandler.stream(ctx, sink);
-            case CRON -> {
-                sink.stepBegin(1, "cron");
-                sink.block(cronModeHandler.execute(ctx));
-                sink.stepEnd(1);
-                sink.done();
-            }
-            case STATE_TRACKING -> {
-                sink.stepBegin(1, "state_tracking");
-                sink.block(stateTrackingModeHandler.execute(ctx));
-                sink.stepEnd(1);
-                sink.done();
-            }
-            case HUMAN_IN_LOOP -> {
-                sink.stepBegin(1, "human_in_loop");
-                sink.block(humanInLoopModeHandler.execute(ctx));
-                sink.stepEnd(1);
-                sink.done();
-            }
+            case CRON -> cronModeHandler.stream(ctx, sink);
+            case STATE_TRACKING -> stateTrackingModeHandler.stream(ctx, sink);
+            case HUMAN_IN_LOOP -> humanInLoopModeHandler.stream(ctx, sink);
         }
     }
 }

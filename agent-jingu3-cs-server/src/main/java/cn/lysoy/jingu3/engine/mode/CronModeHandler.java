@@ -3,6 +3,7 @@ package cn.lysoy.jingu3.engine.mode;
 import cn.lysoy.jingu3.common.constant.EngineMessages;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
+import cn.lysoy.jingu3.stream.StreamEventSink;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,5 +27,13 @@ public class CronModeHandler implements ActionModeHandler {
     @Override
     public String execute(ExecutionContext context) {
         return String.format(EngineMessages.CRON_DEMO_REPLY, demoSchedule, context.llmInput());
+    }
+
+    @Override
+    public void stream(ExecutionContext context, StreamEventSink sink) {
+        sink.stepBegin(1, "cron");
+        sink.block(execute(context));
+        sink.stepEnd(1);
+        sink.done();
     }
 }

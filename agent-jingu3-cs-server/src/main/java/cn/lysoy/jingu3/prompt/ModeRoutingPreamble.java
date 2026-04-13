@@ -33,6 +33,11 @@ public final class ModeRoutingPreamble {
             case FALLBACK ->
                     "【模式路由】模式解析失败已降级，当前使用「" + modeDisplayZh(ctx.getSelectedMode()) + "」模式（"
                             + ctx.getSelectedMode().name() + "）。";
+            case EXPLICIT_GUARD ->
+                    "【模式路由】用户曾显式选择较重模式，经意图识别后已自动切换为「"
+                            + modeDisplayZh(ctx.getSelectedMode()) + "」模式（"
+                            + ctx.getSelectedMode().name()
+                            + "）；回复开头已说明切换原因。";
         };
         return headLine
                 + "\n若用户所需任务明显更适合其他模式，可礼貌说明原因并建议其切换到对应模式（勿编造不存在的功能）。\n"

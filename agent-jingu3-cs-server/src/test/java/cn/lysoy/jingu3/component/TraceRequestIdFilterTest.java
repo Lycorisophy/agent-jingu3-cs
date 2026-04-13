@@ -6,8 +6,8 @@ import cn.lysoy.jingu3.common.trace.SnowflakeIdGenerator;
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
@@ -35,7 +35,7 @@ class TraceRequestIdFilterTest {
         MockHttpServletResponse res = new MockHttpServletResponse();
         AtomicReference<String> rid = new AtomicReference<>();
         FilterChain chain =
-                (HttpServletRequest request, HttpServletResponse response) -> {
+                (ServletRequest request, ServletResponse response) -> {
                     rid.set(MDC.get(MdcKeys.REQUEST_ID));
                     assertThat(MDC.get(MdcKeys.TRACE_ID)).isNotNull();
                 };
@@ -57,7 +57,7 @@ class TraceRequestIdFilterTest {
         AtomicReference<String> rid = new AtomicReference<>();
         AtomicReference<String> trace = new AtomicReference<>();
         FilterChain chain =
-                (HttpServletRequest request, HttpServletResponse response) -> {
+                (ServletRequest request, ServletResponse response) -> {
                     rid.set(MDC.get(MdcKeys.REQUEST_ID));
                     trace.set(MDC.get(MdcKeys.TRACE_ID));
                 };

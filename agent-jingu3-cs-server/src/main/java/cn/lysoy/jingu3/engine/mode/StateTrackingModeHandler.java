@@ -4,6 +4,7 @@ import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.EngineMessages;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
+import cn.lysoy.jingu3.stream.StreamEventSink;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,5 +29,13 @@ public class StateTrackingModeHandler implements ActionModeHandler {
                 : context.getConversationId();
         long n = interactionCount.computeIfAbsent(conv, k -> new AtomicLong()).incrementAndGet();
         return String.format(EngineMessages.STATE_TRACKING_REPLY, conv, n);
+    }
+
+    @Override
+    public void stream(ExecutionContext context, StreamEventSink sink) {
+        sink.stepBegin(1, "state_tracking");
+        sink.block(execute(context));
+        sink.stepEnd(1);
+        sink.done();
     }
 }
