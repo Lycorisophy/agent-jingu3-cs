@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: jingu3 CS v0.5 API 摘要
+  version: "0.5.0"
+  description: |
+    与 [接口文档.md](./接口文档.md) 配套；对话主链路及 v0.5 横切 REST。
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/chat:
+    post:
+      summary: 同步对话
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: ApiResult ChatVo
+  /api/v1/chat/stream:
+    post:
+      summary: SSE 流式对话
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: text/event-stream
+  /api/v1/cron/tasks:
+    get:
+      summary: 列出定时任务
+      responses:
+        "200":
+          description: ApiResult list ScheduledTaskVo
+    post:
+      summary: 创建定时任务
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scope, nextRunAt, payload]
+              properties:
+                scope:
+                  type: string
+                  enum: [GLOBAL, CONVERSATION]
+                conversationId:
+                  type: string
+                nextRunAt:
+                  type: string
+                  format: date-time
+                cronExpression:
+                  type: string
+                payload:
+                  type: object
+                  required: [message]
+                  properties:
+                    message:
+                      type: string
+                    mode:
+                      type: string
+                    conversationId:
+                      type: string
+      responses:
+        "200":
+          description: ApiResult ScheduledTaskVo
+  /api/v1/hitl/approvals:
+    post:
+      summary: 创建待审批
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [conversationId, payloadJson]
+              properties:
+                conversationId:
+                  type: string
+                runId:
+                  type: string
+                payloadJson:
+                  type: string
+      responses:
+        "200":
+          description: ApiResult HitlApprovalVo
+  /api/v1/hitl/pending:
+    get:
+      summary: 待审批列表
+      parameters:
+        - name: conversationId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ApiResult list HitlApprovalVo
+  /api/v1/hitl/{id}/approve:
+    post:
+      summary: 批准
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: ApiResult HitlApprovalVo
+  /api/v1/hitl/{id}/reject:
+    post:
+      summary: 拒绝
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: ApiResult HitlApprovalVo
+  /api/v1/dst/{conversationId}:
+    get:
+      summary: 读取对话状态
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ApiResult DialogueStateVo
+        "404":
+          description: 无记录
+    patch:
+      summary: 更新对话状态
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stateJson]
+              properties:
+                stateJson:
+                  type: string
+                expectedRevision:
+                  type: integer
+                  format: int64
+      responses:
+        "200":
+          description: ApiResult DialogueStateVo
+  /api/v1/dst/{conversationId}/confirm:
+    post:
+      summary: 用户定稿（revision+1）
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ApiResult DialogueStateVo
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        mode:
+          type: string
+        conversationId:
+          type: string
+        modePlan:
+          type: array
+          items:
+            type: string
+        workflowId:
+          type: string
+        requestId:
+          type: string
+        traceId:
+          type: string

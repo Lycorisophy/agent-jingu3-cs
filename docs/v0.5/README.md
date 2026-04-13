@@ -2,6 +2,10 @@
 
 本目录按[全局文档工序](../计划/开发路线图.md#全局--文档工序每个-v0x-发布前完成)补齐 PRD → 部署文档；与 [开发路线图 v0.5 节](../计划/开发路线图.md#v05--cron--hitl--state-持久化--agent-team-增强边界差距整改--横切) 对齐。
 
+## 后续增强（Backlog）
+
+- [BACKLOG-横切增强.md](./BACKLOG-横切增强.md)（HITL 工具/续跑、DST 与 Handler、Cron 周期）
+
 ## 关联设计
 
 | 文档 | 说明 |
@@ -31,6 +35,7 @@
 - [x] 可行性分析.md
 - [x] 概要设计.md
 - [x] 详细设计.md
-- [x] 接口文档.md（**OpenAPI 规范文件**可后续另补 `openapi.yaml`，非本批次阻塞项）
+- [x] 接口文档.md + [openapi.yaml](./openapi.yaml)（摘要，可与 Springdoc 生成结果后续对齐）
+- [x] [验收清单.md](./验收清单.md)（PRD AC 手工步骤）
 - [x] 单测与集成测（仓储层 `@DataJpaTest` + 既有引擎单测；全量 `mvn test` 建议在 CI/本地执行）
 - [x] 部署文档.md

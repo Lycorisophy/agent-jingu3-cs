@@ -22,6 +22,21 @@ public class Jingu3Properties {
 
     private Cron cron = new Cron();
 
+    private Workspace workspace = new Workspace();
+
+    @Data
+    public static class Workspace {
+
+        /** 是否注册工作空间类内置工具（read/list/write） */
+        private boolean enabled = true;
+
+        /** 工作空间物理根目录；其下按 userId 分子目录 */
+        private String rootDir = System.getProperty("user.home") + "/.jingu3/workspaces";
+
+        /** 单文件读取/写入上限（MB） */
+        private long maxFileSizeMb = 10L;
+    }
+
     @Data
     public static class Cron {
 
