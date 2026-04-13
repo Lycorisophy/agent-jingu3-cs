@@ -163,6 +163,27 @@ public class PromptAssembly {
         return withModePreamble(ctx, PromptTemplates.AGENT_TEAM_SUB_PREFIX + subtask);
     }
 
+    public String buildAgentTeamSubFollowUpPrompt(ExecutionContext ctx, String subtask, String priorRoundsText) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.AGENT_TEAM_SUB_FOLLOWUP
+                        + subtask
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "此前各轮输出：\n"
+                        + priorRoundsText);
+    }
+
+    public String buildAgentTeamSynthesizePrompt(ExecutionContext ctx, String leaderSubtask, String trajectoryText) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.AGENT_TEAM_SYNTHESIZE
+                        + "子任务：\n"
+                        + leaderSubtask
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "子 Agent 输出：\n"
+                        + trajectoryText);
+    }
+
     /**
      * ReAct 多步循环中单步提示（指南 §4：思考→行动→观察）。
      */

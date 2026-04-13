@@ -8,8 +8,8 @@ import cn.lysoy.jingu3.stream.StreamEventSink;
 import org.springframework.stereotype.Component;
 
 /**
- * 指南 §10 Human-in-the-Loop：人在环审批、待办队列与决策回流。当前实现为静态说明 + 用户输入摘要，
- * 不写入持久化队列；审批 API 与回调会话见独立设计文档。
+ * 指南 §10 Human-in-the-Loop：人在环审批、待办队列与决策回流。对话模式仍为静态说明 + 用户输入摘要；
+ * 持久化审批队列见 {@code hitl_approval} 与 {@code HitlController}（{@code /api/v1/hitl}）。
  */
 @Component
 public class HumanInLoopModeHandler implements ActionModeHandler {

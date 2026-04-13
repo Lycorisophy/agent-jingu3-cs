@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.engine.routing;
 
+import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.engine.ActionMode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ class IntentRouterTest {
         Mockito.when(classifier.classify(Mockito.anyString())).thenReturn(ActionMode.REACT);
         Mockito.when(classifier.classifyOptional(Mockito.anyString()))
                 .thenReturn(Optional.of(ActionMode.PLAN_AND_EXECUTE));
-        router = new IntentRouter(new RuleBasedModeRouter(), classifier);
+        router = new IntentRouter(new RuleBasedModeRouter(), classifier, new Jingu3Properties());
     }
 
     @Test
@@ -92,5 +93,18 @@ class IntentRouterTest {
         assertThat(d.getMode()).isEqualTo(ActionMode.ASK);
         assertThat(d.getSource()).isEqualTo(RoutingSource.EXPLICIT_GUARD);
         assertThat(d.getGuardUserNotice()).contains("智能体团队");
+    }
+
+    @Test
+    void explicitModeGuardDisabled_skipsClassifierAndHonorsExplicitPlan() {
+        Jingu3Properties props = new Jingu3Properties();
+        props.getRouting().setExplicitModeGuardEnabled(false);
+        IntentRouter r = new IntentRouter(new RuleBasedModeRouter(), classifier, props);
+        Mockito.when(classifier.classifyOptional("你好")).thenReturn(Optional.of(ActionMode.ASK));
+        RoutingDecision d = r.resolve("你好", "PLAN_AND_EXECUTE");
+        assertThat(d.getMode()).isEqualTo(ActionMode.PLAN_AND_EXECUTE);
+        assertThat(d.getSource()).isEqualTo(RoutingSource.CLIENT_EXPLICIT);
+        assertThat(d.getGuardUserNotice()).isNull();
+        Mockito.verify(classifier, Mockito.never()).classifyOptional(Mockito.anyString());
     }
 }

@@ -87,6 +87,16 @@ public final class PromptTemplates {
     public static final String AGENT_TEAM_SUB_PREFIX =
             "你是子 Agent。请完成下列子任务并直接给出结果（中文简洁）。子任务：\n";
 
+    /** Agent Team：第 2 轮及以后子 Agent，承接前文。 */
+    public static final String AGENT_TEAM_SUB_FOLLOWUP =
+            "你是子 Agent。主协调给出的子任务与此前各轮输出如下。请在本轮继续补充、修正或深化，直接给出本轮结果（中文简洁）。"
+                    + "\n\n子任务：\n";
+
+    /** Agent Team：合成用户可见答复（后接主任务与各轮子 Agent 全文）。 */
+    public static final String AGENT_TEAM_SYNTHESIZE =
+            "你是主协调 Agent。根据下列「子任务」与「子 Agent 各轮输出」，生成一段面向用户的最终答复（中文、结构清晰、可直接作为回复正文）。"
+                    + "不要重复内部角色标签，不要添加「作为 AI」之类套话。\n\n";
+
     /**
      * 供 {@link cn.lysoy.jingu3.prompt.ModeRoutingPreamble} 注入：对话层可选模式的自然语言释义，
      * 便于模型判断「是否应建议用户切换模式」。

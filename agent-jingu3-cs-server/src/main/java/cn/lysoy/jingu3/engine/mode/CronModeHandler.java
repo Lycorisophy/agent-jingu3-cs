@@ -1,10 +1,10 @@
 package cn.lysoy.jingu3.engine.mode;
 
 import cn.lysoy.jingu3.common.constant.EngineMessages;
+import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.stream.StreamEventSink;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,9 +16,8 @@ public class CronModeHandler implements ActionModeHandler {
 
     private final String demoSchedule;
 
-    public CronModeHandler(
-            @Value("${jingu3.cron.demo-schedule:0 0 9 * * MON-FRI}") String demoSchedule) {
-        this.demoSchedule = demoSchedule;
+    public CronModeHandler(Jingu3Properties properties) {
+        this.demoSchedule = properties.getCron().getDemoSchedule();
     }
 
     /**

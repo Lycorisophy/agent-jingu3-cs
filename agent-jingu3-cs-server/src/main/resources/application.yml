@@ -3,6 +3,21 @@ spring:
     name: agent-jingu3-cs-server
   profiles:
     active: dev
+  datasource:
+    url: jdbc:h2:mem:jingu3;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
 logging:
   config: classpath:log4j2-spring.xml
@@ -17,6 +32,9 @@ management:
       show-details: when_authorized
 
 jingu3:
+  routing:
+    # 显式 Plan/Agent Team 时是否做意图守门（见 IntentRouter）
+    explicit-mode-guard-enabled: true
   tool:
     enabled: true
   snowflake:
@@ -33,6 +51,9 @@ jingu3:
     plan:
       max-subtasks: 8
       replan-enabled: true
+    agent-team:
+      # 子 Agent 轮数（每轮一次 LLM）；之后还有一次合成答复调用
+      max-specialist-rounds: 2
   ollama:
     base-url: http://localhost:11434
     chat-model: gnremy/qwen3.5-abliterated:35b-a3b
@@ -41,3 +62,7 @@ jingu3:
     name: user
   cron:
     demo-schedule: "0 0 9 * * MON-FRI"
+    # 是否启用定时轮询执行到期任务（MVP：到点调用 ChatService 一问一答）
+    scheduler-enabled: true
+    # 轮询间隔（毫秒）
+    poll-interval-ms: 30000

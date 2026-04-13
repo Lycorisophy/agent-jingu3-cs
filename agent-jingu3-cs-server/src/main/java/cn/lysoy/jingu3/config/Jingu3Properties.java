@@ -18,6 +18,33 @@ public class Jingu3Properties {
 
     private Tool tool = new Tool();
 
+    private Routing routing = new Routing();
+
+    private Cron cron = new Cron();
+
+    @Data
+    public static class Cron {
+
+        /** 与 {@code CronModeHandler} 演示文案一致 */
+        private String demoSchedule = "0 0 9 * * MON-FRI";
+
+        /** 是否轮询 {@code scheduled_task} 并在到期时触发对话 */
+        private boolean schedulerEnabled = true;
+
+        /** 轮询间隔（毫秒） */
+        private long pollIntervalMs = 30_000L;
+    }
+
+    @Data
+    public static class Routing {
+
+        /**
+         * 显式选择 Plan-and-Execute / Agent Team 时，是否启用意图守门（分类为 ASK/REACT 则降为 Ask）。
+         * 关闭后与 v0.4 行为一致：显式 mode 直通 Handler。
+         */
+        private boolean explicitModeGuardEnabled = true;
+    }
+
     @Data
     public static class Http {
 

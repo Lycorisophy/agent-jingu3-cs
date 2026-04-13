@@ -2,6 +2,7 @@ package cn.lysoy.jingu3.engine.routing;
 
 import cn.lysoy.jingu3.common.constant.EngineMessages;
 import cn.lysoy.jingu3.common.constant.RoutingNotes;
+import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.engine.ActionMode;
 import cn.lysoy.jingu3.engine.ActionModePolicy;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.Optional;
  * <p>显式 mode 解析成功但非对话可选时抛 {@link cn.lysoy.jingu3.common.exception.ServiceException}。</p>
  * <p>显式 {@link ActionMode#PLAN_AND_EXECUTE} / {@link ActionMode#AGENT_TEAM} 时追加守门：模型分类为 ASK/REACT 则降为 ASK，
  * 来源 {@link RoutingSource#EXPLICIT_GUARD}；分类器调用失败（{@link ModelIntentClassifier#classifyOptional} empty）时尊重显式选择。</p>
+ * <p>可通过 {@code jingu3.routing.explicit-mode-guard-enabled=false} 关闭守门。</p>
  */
 @Slf4j
 @Component
@@ -23,10 +25,13 @@ public class IntentRouter {
 
     private final RuleBasedModeRouter rules;
     private final ModelIntentClassifier classifier;
+    private final Jingu3Properties properties;
 
-    public IntentRouter(RuleBasedModeRouter rules, ModelIntentClassifier classifier) {
+    public IntentRouter(
+            RuleBasedModeRouter rules, ModelIntentClassifier classifier, Jingu3Properties properties) {
         this.rules = rules;
         this.classifier = classifier;
+        this.properties = properties;
     }
 
     /**
@@ -42,7 +47,8 @@ public class IntentRouter {
             try {
                 ActionMode mode = ActionMode.fromFlexibleName(modeFromClient);
                 ActionModePolicy.assertConversationSelectable(mode);
-                if (mode == ActionMode.PLAN_AND_EXECUTE || mode == ActionMode.AGENT_TEAM) {
+                if (properties.getRouting().isExplicitModeGuardEnabled()
+                        && (mode == ActionMode.PLAN_AND_EXECUTE || mode == ActionMode.AGENT_TEAM)) {
                     Optional<ActionMode> inferredOpt = classifier.classifyOptional(msg);
                     if (inferredOpt.isPresent()) {
                         ActionMode inferred = inferredOpt.get();

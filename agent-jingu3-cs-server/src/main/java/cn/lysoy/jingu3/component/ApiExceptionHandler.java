@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * 全局异常：统一转为 {@link ApiResult}，业务码见 {@link ErrorCode}。
@@ -31,6 +32,14 @@ public class ApiExceptionHandler {
         return ResponseEntity
                 .status(ErrorCode.BAD_REQUEST.getHttpStatus())
                 .body(ApiResult.fail(ErrorCode.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiResult<Void>> responseStatus(ResponseStatusException ex) {
+        String reason = ex.getReason() != null ? ex.getReason() : ex.getStatusCode().toString();
+        log.warn("ResponseStatus: {}", reason);
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(ApiResult.fail(ErrorCode.BAD_REQUEST, reason));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

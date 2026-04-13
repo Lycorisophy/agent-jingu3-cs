@@ -20,17 +20,18 @@
 
 ### 3.2 HITL
 
-- `pending_approval` 存储结构 + REST：列表、批准、拒绝。
-- 与 `conversationId` / `taskId` 关联（字段以详细设计为准）。
+- 表 **`hitl_approval`**（见 [v0.5-横切能力极简设计.md §3](../设计/v0.5-横切能力极简设计.md)）+ REST：**`/api/v1/hitl`**（创建、`pending` 列表、approve/reject）。
+- 与 `conversationId`、`run_id` 关联；`resolver_user_id` 使用当前种子用户。
 
-### 3.3 State
+### 3.3 State / DST（占位）
 
-- 关系库或等价存储中的 **task_states** 最小表；与 conversation 关联。
-- 替换或增强现有进程内 `StateTrackingModeHandler` 读路径（写路径同步更新）。
+- 表 **`dialogue_state`**：按 `conversation_id` 唯一存储侧栏 JSON 状态（`state_json`、`revision`）。
+- REST：**`/api/v1/dst/{conversationId}`**（GET/PATCH）与 **`POST .../confirm`**。
+- **本版本不强制**改写 `StateTrackingModeHandler` 为读写该表；模型门控与 `state_digest` 卡片可后续迭代。
 
 ### 3.4 Agent Team（增强边界）
 
-- **本版本交付**：显式多步消息结构（如 `List<AgentMessage>`）+ 合成一步；或 1 Leader + N 轮 Specialist 串行，**N 上限配置化**。
+- **本版本交付**：1 Leader + **N 轮** Specialist 串行（`jingu3.engine.agent-team.max-specialist-rounds`）+ **一次合成** LLM 生成用户可见答复；同步/流式均多一步可观测轨迹（含 `synthesize`）。
 - **不交付**：去中心化多 Agent 运行时、跨机消息总线。
 
 ## 4. 验收标准
@@ -47,3 +48,4 @@
 | 日期 | 版本 | 说明 |
 |------|------|------|
 | 2026-04-12 | 0.1 | 初稿 |
+| 2026-04-12 | 0.2 | 对齐已实现 API：`hitl_approval`、`dialogue_state`、Agent Team 多轮+合成 |

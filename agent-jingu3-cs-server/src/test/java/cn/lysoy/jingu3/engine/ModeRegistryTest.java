@@ -41,6 +41,7 @@ class ModeRegistryTest {
         ToolRegistry toolRegistry = new ToolRegistry(List.of(new CalculatorTool(), new UtcTimeTool()));
         Jingu3Properties props = new Jingu3Properties();
         props.getTool().setEnabled(false);
+        props.getCron().setDemoSchedule("0 0 9 * * MON-FRI");
         ObjectMapper objectMapper = new ObjectMapper();
         PromptAssembly prompts = new PromptAssembly(toolRegistry, props);
         ToolStepService toolStepService = new ToolStepService(chat, prompts, toolRegistry, props, objectMapper);
@@ -53,8 +54,8 @@ class ModeRegistryTest {
                         new ReActModeHandler(chat, prompts, props, toolRegistry, objectMapper, 4),
                         new PlanAndExecuteModeHandler(chat, prompts, toolStepService, 8, true),
                         new WorkflowModeHandler(chat, prompts, wfReg, toolStepService),
-                        new AgentTeamModeHandler(chat, prompts),
-                        new CronModeHandler("0 0 9 * * MON-FRI"),
+                        new AgentTeamModeHandler(chat, prompts, 1),
+                        new CronModeHandler(props),
                         new StateTrackingModeHandler(),
                         new HumanInLoopModeHandler());
 
