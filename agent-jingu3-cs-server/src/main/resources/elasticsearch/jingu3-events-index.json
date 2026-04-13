@@ -1,0 +1,38 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "event_id": { "type": "keyword" },
+      "conversation_id": { "type": "keyword" },
+      "user_id": { "type": "keyword" },
+      "timestamp": { "type": "date" },
+      "action": {
+        "type": "text",
+        "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
+      },
+      "result": { "type": "text" },
+      "actors": { "type": "keyword" },
+      "assertion": { "type": "keyword" },
+      "event_subject": {
+        "type": "text",
+        "fields": { "keyword": { "type": "keyword", "ignore_above": 512 } }
+      },
+      "event_location": {
+        "type": "text",
+        "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
+      },
+      "trigger_terms": { "type": "keyword" },
+      "modality": { "type": "keyword" },
+      "temporal_semantic": { "type": "keyword" },
+      "metadata": {
+        "type": "object",
+        "enabled": true
+      },
+      "vector_id": { "type": "keyword" },
+      "message_id": { "type": "keyword" }
+    }
+  }
+}

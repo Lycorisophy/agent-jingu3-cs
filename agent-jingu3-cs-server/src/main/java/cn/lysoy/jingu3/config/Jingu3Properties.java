@@ -32,6 +32,9 @@ public class Jingu3Properties {
     /** 本地/自建 Milvus（向量库）；未接向量检索前仅作配置占位，默认 gRPC 19530 */
     private Milvus milvus = new Milvus();
 
+    /** Elasticsearch（事件全文；v0.6-C）；默认关闭 */
+    private Elasticsearch elasticsearch = new Elasticsearch();
+
     private Ollama ollama = new Ollama();
 
     @Data
@@ -179,6 +182,27 @@ public class Jingu3Properties {
 
         /** 未启用鉴权时留空 */
         private String user = "";
+
+        private String password = "";
+    }
+
+    @Data
+    public static class Elasticsearch {
+
+        /** 为 true 时注册 ES 客户端、索引初始化与 {@code /api/v1/events} 实验 API */
+        private boolean enabled = false;
+
+        private String host = "127.0.0.1";
+
+        private int port = 9200;
+
+        private String scheme = "http";
+
+        /** 事件索引名，与物化清单一致 */
+        private String indexEvents = "jingu3-events";
+
+        /** 未启用安全时留空 */
+        private String username = "";
 
         private String password = "";
     }

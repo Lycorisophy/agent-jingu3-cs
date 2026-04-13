@@ -33,6 +33,11 @@
 - **对话注入**：`jingu3.memory.injection-enabled`（默认 `false`）；为 `true` 且 Milvus 启用时，`ChatService` / `ChatStreamService` / `ModePlanExecutor` 在构造 `ExecutionContext` 前拼接参考记忆（意图路由仍用用户原文）。
 - **本地联调**：[`application-local.yml.example`](../../agent-jingu3-cs-server/src/main/resources/application-local.yml.example)。
 
+### M2 / v0.6-C（部分已实现）
+
+- **Elasticsearch**：`jingu3.elasticsearch.enabled`（默认 `false`）；`POST /api/v1/events`、`GET /api/v1/events/search`；索引名 `jingu3.elasticsearch.index-events`（默认 `jingu3-events`）；映射见服务端 `resources/elasticsearch/jingu3-events-index.json`（与仓库 `docs/data/elasticsearch/events-index.json` 可并存：后者可含 IK）。
+- **未纳入本批**：对话回合自动写 ES、Milvus `jingu3_event_vectors`、Neo4j `EVENT_LINK`。
+
 ## 工序清单（发布前勾选）
 
 - [x] README.md（本目录入口）

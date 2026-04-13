@@ -264,6 +264,67 @@ paths:
       responses:
         "200":
           description: ApiResult void
+  /api/v1/events:
+    post:
+      summary: 写入事件文档（v0.6-C；需 jingu3.elasticsearch.enabled=true）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                eventId:
+                  type: string
+                userId:
+                  type: string
+                conversationId:
+                  type: string
+                timestamp:
+                  type: string
+                action:
+                  type: string
+                result:
+                  type: string
+                eventSubject:
+                  type: string
+                eventLocation:
+                  type: string
+                modality:
+                  type: string
+                temporalSemantic:
+                  type: string
+                vectorId:
+                  type: string
+                messageId:
+                  type: string
+      responses:
+        "200":
+          description: ApiResult object with eventId
+  /api/v1/events/search:
+    get:
+      summary: 按用户与关键词检索事件
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: ApiResult list EventSearchHitVo
 components:
   schemas:
     ChatRequest:

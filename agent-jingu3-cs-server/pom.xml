@@ -136,6 +136,13 @@
             <version>2.4.4</version>
         </dependency>
 
+        <!-- v0.6-C：Elasticsearch 8.x Java API（可选启用 jingu3.elasticsearch.enabled） -->
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+            <version>8.14.3</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

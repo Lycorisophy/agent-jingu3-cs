@@ -55,6 +55,15 @@ jingu3:
     password: ${MILVUS_PASSWORD:}
   memory:
     injection-enabled: false
+  # 需要事件全文检索时启用（本机 Elasticsearch 8.x，索引名默认 jingu3-events）
+  elasticsearch:
+    enabled: false
+    host: ${ES_HOST:127.0.0.1}
+    port: ${ES_PORT:9200}
+    scheme: http
+    index-events: jingu3-events
+    username: ${ES_USERNAME:}
+    password: ${ES_PASSWORD:}
 
 logging:
   level:
