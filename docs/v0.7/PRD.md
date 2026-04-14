@@ -16,12 +16,13 @@
 
 ## 3. Workspace 验收（引用设计文档）
 
-- **Phase 1**：`WorkspaceManager` / `WorkspaceFileService` / 路径安全 / 工具注册 — **代码已部分落地**（见 [README.md](./README.md)）。
-- **Phase 2**：`SandboxExecutor`、超时与资源限制、`execute_code` — 待实现。
-- **Phase 3**：`execution_history`、配额、**`/api/v1/workspace/...`** REST — 待实现。
+- **Phase 1**：`WorkspaceManager` / `WorkspaceFileService` / 路径安全 / 工具注册 — **已落地**（见 [README.md](./README.md)）。
+- **Phase 2**：`ProcessSandboxExecutor`、超时与资源限制、`workspace_execute_code`（Python/JS）— **已落地**（`jingu3.workspace.sandbox.enabled`）。
+- **Phase 3**：`workspace` / `workspace_execution`、配额、`/api/v1/workspace/**` REST — **已落地**。
 
 ## 4. 技能扩展验收（初稿）
 
+- **市场元数据只读**：`GET /api/v1/skills`、`GET /api/v1/skills/{slug}`、`GET /api/v1/skills/subscriptions` — **已落地**（见 [接口文档.md](./接口文档.md)）；对象存储下载与写接口仍待迭代。
 - JSON Schema 覆盖工具描述（范围以详细设计为准）。
 - 高危工具与 HITL 或确认流程可配置。
 
@@ -30,3 +31,4 @@
 | 日期 | 版本 | 说明 |
 |------|------|------|
 | 2026-04-13 | 0.1 | 初稿：HITL 协同表 + Phase 引用 |
+| 2026-04-13 | 0.2 | Workspace Phase 1～3 与技能只读 REST 与文档对齐 |

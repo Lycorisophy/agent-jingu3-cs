@@ -7,7 +7,10 @@
 | 文档 | 说明 |
 |------|------|
 | [PRD.md](./PRD.md) | 范围、与 HITL 协同的安全策略、Workspace 验收引用 |
-| [接口文档.md](./接口文档.md) | Workspace Phase 3 REST（`/api/v1/workspace/**`） |
+| [可行性分析.md](./可行性分析.md) | 技术结论与风险（与当前实现对齐） |
+| [概要设计.md](./概要设计.md) | 范围、架构摘录、数据与接口索引 |
+| [详细设计.md](./详细设计.md) | 占位：HITL×工具、MinIO、写入 API 等待决 |
+| [接口文档.md](./接口文档.md) | Workspace + 技能 REST |
 | [部署文档.md](./部署文档.md) | Flyway V9、配置与验收 |
 | [workspace-design.md](../workspace/workspace-design.md) | 工作空间权威设计（Phase 1～3） |
 | [skill-system-design.md](../workspace/skill-system-design.md) | 技能系统（市场、渐进式披露、客户端执行）权威设计 |
@@ -41,10 +44,10 @@
 ## 工序清单（发布前勾选）
 
 - [x] README.md
-- [x] PRD.md（初稿）
-- [ ] 可行性分析.md
-- [ ] 概要设计.md
-- [ ] 详细设计.md
-- [x] 接口文档.md（Workspace REST；OpenAPI 见 [docs/v0.5/openapi.yaml](../v0.5/openapi.yaml)）
+- [x] PRD.md（初稿，已对齐 Phase 1～3 与技能只读 REST）
+- [x] 可行性分析.md
+- [x] 概要设计.md
+- [ ] 详细设计.md（[占位稿](./详细设计.md) 待扩展为正式条目）
+- [x] 接口文档.md（Workspace + 技能；OpenAPI 见 [docs/v0.5/openapi.yaml](../v0.5/openapi.yaml)）
 - [ ] 单测与集成测（补充工具与 Controller 层）
 - [x] 部署文档.md（初稿）
