@@ -46,6 +46,9 @@ public final class EngineMessages {
             "[模式提示] 您选择了「%s」，但根据当前语句判断更适合直接回答，已切换为 Ask 模式。"
                     + "若确需该模式，请补充更具体的复杂任务或多角色协作场景。\n\n";
 
+    /** Elasticsearch 事件写入失败时，{@link cn.lysoy.jingu3.common.exception.ServiceException} 对用户可见说明 */
+    public static final String ES_EVENT_INDEX_UNAVAILABLE = "Elasticsearch 暂时不可用，事件未写入";
+
     private EngineMessages() {
     }
 }

@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.events.service;
 
+import cn.lysoy.jingu3.common.constant.EngineMessages;
 import cn.lysoy.jingu3.common.dto.CreateEventDocumentRequest;
 import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
@@ -17,11 +18,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * v0.6-C：事件写入与 multi_match 检索。
+ * <p>检索侧在 ES 异常时返回空列表并打 WARN；写入侧在 ES 异常时抛出 {@link ErrorCode#DEPENDENCY_UNAVAILABLE}（503）。</p>
  */
 @Slf4j
 @Service
@@ -72,7 +75,7 @@ public class DefaultEventIndexingService implements EventIndexingService {
             client.indices().refresh(r -> r.index(indexName));
         } catch (Exception ex) {
             log.error("ES 写入事件失败 eventId={}", eventId, ex);
-            throw new ServiceException(ErrorCode.INTERNAL_ERROR, "事件索引失败");
+            throw new ServiceException(ErrorCode.DEPENDENCY_UNAVAILABLE, EngineMessages.ES_EVENT_INDEX_UNAVAILABLE, ex);
         }
         return eventId;
     }
@@ -108,8 +111,8 @@ public class DefaultEventIndexingService implements EventIndexingService {
             }
             return out;
         } catch (Exception ex) {
-            log.error("ES 检索失败 userId={}", userId, ex);
-            throw new ServiceException(ErrorCode.INTERNAL_ERROR, "事件检索失败");
+            log.warn("ES 检索不可用，降级为空结果 userId={}", userId, ex);
+            return Collections.emptyList();
         }
     }
 

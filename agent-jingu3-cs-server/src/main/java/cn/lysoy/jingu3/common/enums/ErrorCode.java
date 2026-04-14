@@ -16,6 +16,11 @@ public enum ErrorCode {
 
     TOO_MANY_REQUESTS("AG_42901", "请求过于频繁，请稍后再试", HttpStatus.TOO_MANY_REQUESTS),
 
+    /**
+     * 外部依赖（如 Elasticsearch）暂时不可用；与通用 500 区分，便于网关与运维告警。
+     */
+    DEPENDENCY_UNAVAILABLE("AG_50301", "依赖服务暂时不可用", HttpStatus.SERVICE_UNAVAILABLE),
+
     INTERNAL_ERROR("AG_50001", "服务内部错误", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String code;

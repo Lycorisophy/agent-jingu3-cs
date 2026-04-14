@@ -24,7 +24,7 @@ INSERT INTO skill_version (id, skill_id, version, storage_path, changelog) VALUE
     ('eeeeeeee-ffff-4aaa-bbbb-ccccccccccc1', 'dddddddd-eeee-4fff-aaaa-bbbbbbbbbbb1', '1.0.0', 'skills/dddddddd-eeee-4fff-aaaa-bbbbbbbbbbb1/1.0.0/', '初始版本');
 
 INSERT INTO user_skill (id, user_id, skill_id, status, local_version, server_version) VALUES
-    ('ffffffff-aaaa-4bbb-cccc-dddddddddddd1', '001', 'dddddddd-eeee-4fff-aaaa-bbbbbbbbbbb1', 'ACTIVE', '1.0.0', '1.0.0');
+    ('ffffffffaaaa4bbbccccdddddddddddd1', '001', 'dddddddd-eeee-4fff-aaaa-bbbbbbbbbbb1', 'ACTIVE', '1.0.0', '1.0.0');
 
 -- 记忆条目（与 Milvus memory_entry_id 对齐时需用固定 id；以下为 BIGINT 自增环境可改为去掉 id 由库生成）
 INSERT INTO memory_entry (user_id, kind, summary, body) VALUES

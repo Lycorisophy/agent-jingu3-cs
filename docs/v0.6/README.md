@@ -36,6 +36,7 @@
 ### M2 / v0.6-C（部分已实现）
 
 - **Elasticsearch**：`jingu3.elasticsearch.enabled`（默认 `false`）；`POST /api/v1/events`、`GET /api/v1/events/search`；索引名 `jingu3.elasticsearch.index-events`（默认 `jingu3-events`）；映射见服务端 `resources/elasticsearch/jingu3-events-index.json`（与仓库 `docs/data/elasticsearch/events-index.json` 可并存：后者可含 IK）。
+- **依赖降级**：`GET /api/v1/events/search` 在 ES 异常时返回空列表并打 WARN；`POST` 失败为 **503** / `AG_50301`；记忆向量注入见 `MilvusMemoryRetrievalService` 与 `MemoryAugmentationService` 外层兜底。
 - **未纳入本批**：对话回合自动写 ES、Milvus `jingu3_event_vectors`、Neo4j `EVENT_LINK`。
 
 ## 工序清单（发布前勾选）
