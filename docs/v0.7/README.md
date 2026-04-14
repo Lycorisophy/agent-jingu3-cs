@@ -49,5 +49,5 @@
 - [x] 概要设计.md
 - [ ] 详细设计.md（[占位稿](./详细设计.md) 待扩展为正式条目）
 - [x] 接口文档.md（Workspace + 技能；OpenAPI 见 [docs/v0.5/openapi.yaml](../v0.5/openapi.yaml)）
-- [ ] 单测与集成测（补充工具与 Controller 层）
+- [ ] 单测与集成测（**Controller**：`SkillControllerWebTest`、`WorkspaceControllerWebTest`；工具/MyBatis 见既有用例）
 - [x] 部署文档.md（初稿）
