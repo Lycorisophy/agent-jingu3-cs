@@ -3,9 +3,11 @@ package cn.lysoy.jingu3.skill;
 import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
 import cn.lysoy.jingu3.common.vo.SkillListItemVo;
+import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.skill.entity.SkillEntity;
 import cn.lysoy.jingu3.skill.mapper.SkillMapper;
+import cn.lysoy.jingu3.skill.mapper.UserSkillMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +21,14 @@ public class DefaultSkillService implements SkillService {
 
     private final SkillMapper skillMapper;
 
+    private final UserSkillMapper userSkillMapper;
+
     private final Jingu3Properties properties;
 
-    public DefaultSkillService(SkillMapper skillMapper, Jingu3Properties properties) {
+    public DefaultSkillService(
+            SkillMapper skillMapper, UserSkillMapper userSkillMapper, Jingu3Properties properties) {
         this.skillMapper = skillMapper;
+        this.userSkillMapper = userSkillMapper;
         this.properties = properties;
     }
 
@@ -47,6 +53,15 @@ public class DefaultSkillService implements SkillService {
             throw new ServiceException(ErrorCode.NOT_FOUND, "技能不存在或未公开");
         }
         return toVo(e);
+    }
+
+    @Override
+    public List<SkillSubscriptionItemVo> listMySubscriptions(String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 不能为空");
+        }
+        int limit = Math.max(1, properties.getSkill().getListMaxSize());
+        return userSkillMapper.selectActiveSubscriptionsWithSkill(userId.trim(), limit);
     }
 
     private static SkillListItemVo toVo(SkillEntity e) {

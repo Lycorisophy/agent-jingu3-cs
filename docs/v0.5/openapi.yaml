@@ -377,6 +377,13 @@ paths:
       responses:
         "200":
           description: ApiResult list SkillListItemVo
+  /api/v1/skills/subscriptions:
+    get:
+      summary: 当前用户已订阅技能列表（v0.7）
+      description: 联表 user_skill + skill；用户 ID 为配置种子 jingu3.user.id；条数上限同 list-max-size。
+      responses:
+        "200":
+          description: ApiResult list SkillSubscriptionItemVo
   /api/v1/skills/{slug}:
     get:
       summary: 按 slug 查询公开技能（v0.7）
@@ -436,6 +443,48 @@ paths:
           description: ApiResult list WorkspaceExecutionItemVo；execution-history-enabled=false 时 data 为空数组
 components:
   schemas:
+    SkillSubscriptionItemVo:
+      type: object
+      properties:
+        subscriptionId:
+          type: string
+        userId:
+          type: string
+        subscriptionStatus:
+          type: string
+        localVersion:
+          type: string
+        serverVersion:
+          type: string
+        lastSyncAt:
+          type: string
+          format: date-time
+        externalSkill:
+          type: boolean
+        externalPath:
+          type: string
+        skillId:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+        category:
+          type: string
+        tags:
+          type: string
+        triggerWords:
+          type: string
+        iconUrl:
+          type: string
+        official:
+          type: boolean
+        skillStatus:
+          type: string
     SkillListItemVo:
       type: object
       properties:

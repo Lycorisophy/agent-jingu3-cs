@@ -2,6 +2,8 @@ package cn.lysoy.jingu3.controller;
 
 import cn.lysoy.jingu3.common.api.ApiResult;
 import cn.lysoy.jingu3.common.vo.SkillListItemVo;
+import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
+import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.skill.SkillService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,13 +23,21 @@ public class SkillController {
 
     private final SkillService skillService;
 
-    public SkillController(SkillService skillService) {
+    private final UserConstants userConstants;
+
+    public SkillController(SkillService skillService, UserConstants userConstants) {
         this.skillService = skillService;
+        this.userConstants = userConstants;
     }
 
     @GetMapping
     public ApiResult<List<SkillListItemVo>> list() {
         return ApiResult.ok(skillService.listPublicCatalog());
+    }
+
+    @GetMapping("/subscriptions")
+    public ApiResult<List<SkillSubscriptionItemVo>> mySubscriptions() {
+        return ApiResult.ok(skillService.listMySubscriptions(userConstants.getId()));
     }
 
     @GetMapping("/{slug}")

@@ -1,6 +1,7 @@
 package cn.lysoy.jingu3.skill;
 
 import cn.lysoy.jingu3.common.vo.SkillListItemVo;
+import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
 
 import java.util.List;
 
@@ -18,4 +19,9 @@ public interface SkillService {
      * 按 slug 查询公开且 ACTIVE 的技能；不存在或不可见时抛出 {@link cn.lysoy.jingu3.common.exception.ServiceException}（NOT_FOUND）。
      */
     SkillListItemVo getPublicBySlug(String slug);
+
+    /**
+     * 当前用户在 {@code user_skill} 中的有效订阅，并附带 {@code skill} 元数据。
+     */
+    List<SkillSubscriptionItemVo> listMySubscriptions(String userId);
 }
