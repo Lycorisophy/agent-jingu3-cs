@@ -226,6 +226,30 @@ paths:
                   type: string
                 factTag:
                   type: string
+                temporalTier:
+                  type: string
+                  description: kind=FACT 时可选，PERMANENT / LONG_TERM / SHORT_TERM，默认 SHORT_TERM
+                confirmed:
+                  type: boolean
+                  description: kind=FACT 时可选，true 则写入 confirmed_at
+      responses:
+        "200":
+          description: ApiResult MemoryEntryVo
+  /api/v1/memory/entries/{id}/confirm:
+    post:
+      summary: 事实确认（v0.6；kind=FACT）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: ApiResult MemoryEntryVo
@@ -258,6 +282,11 @@ paths:
                   enum: [FACT, EVENT]
                 factTag:
                   type: string
+                temporalTier:
+                  type: string
+                confirmed:
+                  type: boolean
+                  description: true 写入确认时刻；false 清空；null 不修改
       responses:
         "200":
           description: ApiResult MemoryEntryVo

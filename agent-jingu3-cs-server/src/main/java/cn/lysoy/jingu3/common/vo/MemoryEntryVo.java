@@ -22,6 +22,12 @@ public class MemoryEntryVo {
 
     private String factTag;
 
+    /** kind=FACT 时：PERMANENT / LONG_TERM / SHORT_TERM */
+    private String factTemporalTier;
+
+    /** kind=FACT 且已确认时：ISO-8601 UTC */
+    private String factConfirmedAt;
+
     private String createdAt;
 
     private String updatedAt;

@@ -16,6 +16,7 @@ import cn.lysoy.jingu3.memory.mapper.MemoryEntryMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +54,7 @@ public class DefaultMemoryService implements MemoryService {
     @Transactional
     public MemoryEntryVo create(CreateMemoryEntryRequest request) {
         MemoryEntryKind kind = parseKind(request.getKind());
+        rejectFactOnlyFieldsOnEvent(kind, request.getTemporalTier(), request.getConfirmed());
         var now = UtcTime.nowLocalDateTime();
         MemoryEntryEntity e = new MemoryEntryEntity();
         e.setUserId(request.getUserId().trim());
@@ -62,17 +64,60 @@ public class DefaultMemoryService implements MemoryService {
         e.setCreatedAt(now);
         e.setUpdatedAt(now);
         memoryEntryMapper.insert(e);
-        String factTagOut = null;
-        if (kind == MemoryEntryKind.FACT && request.getFactTag() != null && !request.getFactTag().isBlank()) {
-            factTagOut = request.getFactTag().trim();
+        if (kind == MemoryEntryKind.FACT) {
             FactMetadataEntity meta = new FactMetadataEntity();
             meta.setMemoryEntryId(e.getId());
-            meta.setTag(factTagOut);
+            meta.setTag(
+                    request.getFactTag() == null || request.getFactTag().isBlank()
+                            ? null
+                            : request.getFactTag().trim());
+            try {
+                meta.setTemporalTier(FactTemporalTier.parseRequired(request.getTemporalTier()).name());
+            } catch (IllegalArgumentException ex) {
+                throw new ServiceException(ErrorCode.BAD_REQUEST, ex.getMessage());
+            }
+            if (Boolean.TRUE.equals(request.getConfirmed())) {
+                meta.setConfirmedAt(now);
+            }
             factMetadataMapper.insert(meta);
         }
         memoryEntryListCache.evictListForUser(e.getUserId());
         memoryVectorIndexer.afterMemoryCreated(e);
-        return toVo(e, factTagOut);
+        return toVoWithOptionalFactTag(e);
+    }
+
+    @Override
+    @Transactional
+    public MemoryEntryVo confirmFact(long id, String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 不能为空");
+        }
+        MemoryEntryEntity e = memoryEntryMapper.selectById(id);
+        if (e == null) {
+            throw new ServiceException(ErrorCode.NOT_FOUND, "记忆条目不存在");
+        }
+        if (!e.getUserId().equals(userId.trim())) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 与条目不符");
+        }
+        if (e.getKind() != MemoryEntryKind.FACT) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "仅 kind=FACT 的条目可确认");
+        }
+        var now = UtcTime.nowLocalDateTime();
+        FactMetadataEntity meta = factMetadataMapper.selectById(id);
+        if (meta == null) {
+            meta = new FactMetadataEntity();
+            meta.setMemoryEntryId(id);
+            meta.setTemporalTier(FactTemporalTier.SHORT_TERM.name());
+            meta.setConfirmedAt(now);
+            factMetadataMapper.insert(meta);
+        } else {
+            meta.setConfirmedAt(now);
+            factMetadataMapper.updateById(meta);
+        }
+        e.setUpdatedAt(now);
+        memoryEntryMapper.updateById(e);
+        memoryEntryListCache.evictListForUser(e.getUserId());
+        return toVoWithOptionalFactTag(memoryEntryMapper.selectById(id));
     }
 
     @Override
@@ -99,8 +144,10 @@ public class DefaultMemoryService implements MemoryService {
         if (request.getSummary() == null
                 && request.getBody() == null
                 && request.getKind() == null
-                && request.getFactTag() == null) {
-            throw new ServiceException(ErrorCode.BAD_REQUEST, "至少提供 summary、body、kind、factTag 之一");
+                && request.getFactTag() == null
+                && request.getTemporalTier() == null
+                && request.getConfirmed() == null) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "至少提供 summary、body、kind、factTag、temporalTier、confirmed 之一");
         }
         MemoryEntryEntity e = memoryEntryMapper.selectById(id);
         if (e == null) {
@@ -110,6 +157,11 @@ public class DefaultMemoryService implements MemoryService {
         if (!e.getUserId().equals(uid)) {
             throw new ServiceException(ErrorCode.BAD_REQUEST, "userId 与条目不符");
         }
+        MemoryEntryKind finalKind = e.getKind();
+        if (request.getKind() != null && !request.getKind().isBlank()) {
+            finalKind = parseKind(request.getKind());
+        }
+        rejectFactOnlyFieldsOnEvent(finalKind, request.getTemporalTier(), request.getConfirmed());
         var now = UtcTime.nowLocalDateTime();
         if (request.getSummary() != null) {
             e.setSummary(request.getSummary());
@@ -117,14 +169,12 @@ public class DefaultMemoryService implements MemoryService {
         if (request.getBody() != null) {
             e.setBody(request.getBody());
         }
-        MemoryEntryKind finalKind = e.getKind();
         if (request.getKind() != null && !request.getKind().isBlank()) {
-            finalKind = parseKind(request.getKind());
             e.setKind(finalKind);
         }
         e.setUpdatedAt(now);
         memoryEntryMapper.updateById(e);
-        syncFactMetadataOnUpdate(id, request, finalKind);
+        syncFactMetadataOnUpdate(id, request, finalKind, now);
         memoryEntryListCache.evictListForUser(uid);
         memoryVectorIndexer.afterMemoryUpdated(e);
         return toVoWithOptionalFactTag(e);
@@ -148,38 +198,79 @@ public class DefaultMemoryService implements MemoryService {
         memoryEntryListCache.evictListForUser(e.getUserId());
     }
 
-    private void syncFactMetadataOnUpdate(long id, UpdateMemoryEntryRequest request, MemoryEntryKind finalKind) {
+    private void syncFactMetadataOnUpdate(
+            long id, UpdateMemoryEntryRequest request, MemoryEntryKind finalKind, LocalDateTime now) {
         if (finalKind == MemoryEntryKind.EVENT) {
             factMetadataMapper.deleteById(id);
             return;
         }
-        if (request.getFactTag() == null) {
+        boolean touchTag = request.getFactTag() != null;
+        boolean touchTier =
+                request.getTemporalTier() != null && !request.getTemporalTier().isBlank();
+        boolean touchConfirmed = request.getConfirmed() != null;
+        if (!touchTag && !touchTier && !touchConfirmed) {
             return;
         }
-        String trimmed = request.getFactTag().trim();
-        if (trimmed.isEmpty()) {
-            factMetadataMapper.deleteById(id);
-            return;
+        if (touchTag) {
+            String trimmed = request.getFactTag().trim();
+            if (trimmed.isEmpty()) {
+                factMetadataMapper.deleteById(id);
+                return;
+            }
         }
         FactMetadataEntity existing = factMetadataMapper.selectById(id);
+        FactMetadataEntity meta = existing != null ? existing : new FactMetadataEntity();
+        meta.setMemoryEntryId(id);
+        if (touchTag) {
+            meta.setTag(request.getFactTag().trim());
+        } else if (existing == null) {
+            meta.setTag(null);
+        }
+        if (touchTier) {
+            try {
+                meta.setTemporalTier(FactTemporalTier.parseRequired(request.getTemporalTier()).name());
+            } catch (IllegalArgumentException ex) {
+                throw new ServiceException(ErrorCode.BAD_REQUEST, ex.getMessage());
+            }
+        } else if (existing == null && meta.getTemporalTier() == null) {
+            meta.setTemporalTier(FactTemporalTier.SHORT_TERM.name());
+        }
+        if (touchConfirmed) {
+            if (Boolean.TRUE.equals(request.getConfirmed())) {
+                meta.setConfirmedAt(now);
+            } else {
+                meta.setConfirmedAt(null);
+            }
+        }
         if (existing == null) {
-            FactMetadataEntity meta = new FactMetadataEntity();
-            meta.setMemoryEntryId(id);
-            meta.setTag(trimmed);
+            if (meta.getTemporalTier() == null) {
+                meta.setTemporalTier(FactTemporalTier.SHORT_TERM.name());
+            }
             factMetadataMapper.insert(meta);
         } else {
-            existing.setTag(trimmed);
-            factMetadataMapper.updateById(existing);
+            factMetadataMapper.updateById(meta);
+        }
+    }
+
+    private static void rejectFactOnlyFieldsOnEvent(
+            MemoryEntryKind kind, String temporalTier, Boolean confirmed) {
+        if (kind != MemoryEntryKind.EVENT) {
+            return;
+        }
+        if (temporalTier != null && !temporalTier.isBlank()) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "temporalTier 仅适用于 kind=FACT");
+        }
+        if (confirmed != null) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "confirmed 仅适用于 kind=FACT");
         }
     }
 
     private MemoryEntryVo toVoWithOptionalFactTag(MemoryEntryEntity e) {
-        String tag = null;
+        FactMetadataEntity meta = null;
         if (e.getKind() == MemoryEntryKind.FACT) {
-            FactMetadataEntity meta = factMetadataMapper.selectById(e.getId());
-            tag = meta != null ? meta.getTag() : null;
+            meta = factMetadataMapper.selectById(e.getId());
         }
-        return toVo(e, tag);
+        return toVoFromMeta(e, meta);
     }
 
     private static MemoryEntryKind parseKind(String raw) {
@@ -193,14 +284,19 @@ public class DefaultMemoryService implements MemoryService {
         }
     }
 
-    private MemoryEntryVo toVo(MemoryEntryEntity e, String factTag) {
+    private MemoryEntryVo toVoFromMeta(MemoryEntryEntity e, FactMetadataEntity meta) {
         MemoryEntryVo vo = new MemoryEntryVo();
         vo.setId(e.getId());
         vo.setUserId(e.getUserId());
         vo.setKind(e.getKind().name());
         vo.setSummary(e.getSummary());
         vo.setBody(e.getBody());
-        vo.setFactTag(factTag);
+        if (meta != null) {
+            vo.setFactTag(meta.getTag());
+            vo.setFactTemporalTier(meta.getTemporalTier());
+            vo.setFactConfirmedAt(
+                    meta.getConfirmedAt() == null ? null : ISO.format(UtcTime.toInstant(meta.getConfirmedAt())));
+        }
         vo.setCreatedAt(ISO.format(UtcTime.toInstant(e.getCreatedAt())));
         vo.setUpdatedAt(ISO.format(UtcTime.toInstant(e.getUpdatedAt())));
         return vo;

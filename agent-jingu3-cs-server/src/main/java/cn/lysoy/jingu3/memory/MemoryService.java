@@ -18,4 +18,9 @@ public interface MemoryService {
     MemoryEntryVo update(long id, UpdateMemoryEntryRequest request);
 
     void delete(long id, String userId);
+
+    /**
+     * 将 kind=FACT 的条目标记为已确认（写入 {@code fact_metadata.confirmed_at}）；若无元数据行则补建默认短期行。
+     */
+    MemoryEntryVo confirmFact(long id, String userId);
 }

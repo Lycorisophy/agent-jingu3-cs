@@ -26,4 +26,15 @@ public class CreateMemoryEntryRequest {
 
     /** kind=FACT 时可选，写入 fact_metadata.tag */
     private String factTag;
+
+    /**
+     * kind=FACT 时可选：{@link cn.lysoy.jingu3.memory.FactTemporalTier} 名（PERMANENT / LONG_TERM / SHORT_TERM），默认
+     * SHORT_TERM。
+     */
+    private String temporalTier;
+
+    /**
+     * kind=FACT 时可选：为 true 则创建时写入 {@code fact_metadata.confirmed_at}（当前 UTC 时刻）。
+     */
+    private Boolean confirmed;
 }

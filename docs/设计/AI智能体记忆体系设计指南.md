@@ -1354,4 +1354,4 @@ class MigrationManager:
 
 *文档版本：v1.0*
 *更新时间：2026-04-12*
-*作者：Matrix Agent*
+*作者：LySoY and His Agent Team*

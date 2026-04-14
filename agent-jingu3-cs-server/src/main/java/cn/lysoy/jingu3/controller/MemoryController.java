@@ -54,4 +54,13 @@ public class MemoryController {
         memoryService.delete(id, userId);
         return ApiResult.ok(null);
     }
+
+    /**
+     * 事实确认：为 kind=FACT 写入 {@code fact_metadata.confirmed_at}（详见 v0.6 接口文档）。
+     */
+    @PostMapping("/entries/{id}/confirm")
+    public ApiResult<MemoryEntryVo> confirmFact(
+            @PathVariable("id") long id, @RequestParam("userId") String userId) {
+        return ApiResult.ok(memoryService.confirmFact(id, userId));
+    }
 }

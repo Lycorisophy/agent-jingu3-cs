@@ -22,7 +22,8 @@
 - **包**：`cn.lysoy.jingu3.memory`（实体、Mapper、`MemoryService` / `DefaultMemoryService`）。
 - **配置**：`jingu3.memory.api-enabled`（默认 `true`）、`jingu3.memory.max-list-size`（默认 `100`）。
 - **实验 API**（生产可关 `api-enabled`；**对话注入**见下节 M4）：
-  - `POST /api/v1/memory/entries` — 请求体 JSON：`userId`、`kind`（`FACT`|`EVENT`）、可选 `summary`、`body`；`FACT` 时可带 `factTag` 写入 `fact_metadata.tag`。
+  - `POST /api/v1/memory/entries` — 请求体 JSON：`userId`、`kind`（`FACT`|`EVENT`）、可选 `summary`、`body`；`FACT` 时可带 `factTag`、`temporalTier`、`confirmed`；**Flyway V8** 为 `fact_metadata` 增加 `temporal_tier` / `confirmed_at`。
+  - `POST /api/v1/memory/entries/{id}/confirm?userId=` — 事实确认 MVP（写入 `confirmed_at`）。
   - `GET /api/v1/memory/entries?userId=...` — 按用户倒序列表（受 `max-list-size` 限制）；可选 **Redis** 缓存（`jingu3.redis.enabled=true`）。
 
 ### M3 / M4 已实现（增量）
