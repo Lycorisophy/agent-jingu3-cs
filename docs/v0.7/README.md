@@ -7,6 +7,8 @@
 | 文档 | 说明 |
 |------|------|
 | [PRD.md](./PRD.md) | 范围、与 HITL 协同的安全策略、Workspace 验收引用 |
+| [接口文档.md](./接口文档.md) | Workspace Phase 3 REST（`/api/v1/workspace/**`） |
+| [部署文档.md](./部署文档.md) | Flyway V9、配置与验收 |
 | [workspace-design.md](../workspace/workspace-design.md) | 工作空间权威设计（Phase 1～3） |
 | [skill-system-design.md](../workspace/skill-system-design.md) | 技能系统（市场、渐进式披露、客户端执行）权威设计 |
 
@@ -37,6 +39,6 @@
 - [ ] 可行性分析.md
 - [ ] 概要设计.md
 - [ ] 详细设计.md
-- [ ] 接口文档.md（Workspace REST Phase 3 已实现最小集，文档待补 OpenAPI 条目）
+- [x] 接口文档.md（Workspace REST；OpenAPI 见 [docs/v0.5/openapi.yaml](../v0.5/openapi.yaml)）
 - [ ] 单测与集成测（补充工具与 Controller 层）
-- [ ] 部署文档.md
+- [x] 部署文档.md（初稿）

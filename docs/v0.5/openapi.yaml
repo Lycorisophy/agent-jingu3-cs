@@ -5,6 +5,7 @@ info:
   description: |
     与 [接口文档.md](./接口文档.md) 配套；对话主链路及 v0.5 横切 REST。
     记忆实验 API（v0.6 M1）见 `/api/v1/memory/entries`，详述见 [docs/v0.6/接口文档.md](../v0.6/接口文档.md)（若存在）或代码 `MemoryController`。
+    工作空间管理 API（v0.7 Phase 3）见 `/api/v1/workspace/**`，详述见 [docs/v0.7/接口文档.md](../v0.7/接口文档.md)。
 servers:
   - url: http://localhost:8080
 paths:
@@ -368,8 +369,111 @@ paths:
       responses:
         "200":
           description: ApiResult list EventSearchHitVo
+  /api/v1/workspace:
+    get:
+      summary: 当前用户工作空间概览（v0.7 Workspace Phase 3）
+      description: 用户 ID 取自配置种子用户（`jingu3.user.id`）。需 `jingu3.workspace.enabled=true` 且 `jingu3.workspace.rest-api-enabled=true`。
+      responses:
+        "200":
+          description: ApiResult WorkspaceSummaryVo
+          content:
+            application/json:
+              schema:
+                type: object
+                description: ApiResult 包装，data 为 WorkspaceSummaryVo
+    delete:
+      summary: 删除当前用户工作空间（磁盘 + DB 元数据）
+      responses:
+        "200":
+          description: ApiResult void
+  /api/v1/workspace/stats:
+    get:
+      summary: 工作空间磁盘占用统计
+      responses:
+        "200":
+          description: ApiResult WorkspaceFileStatsVo
+  /api/v1/workspace/reset:
+    post:
+      summary: 清空工作空间目录内容（保留目录）
+      responses:
+        "200":
+          description: ApiResult void
+  /api/v1/workspace/executions:
+    get:
+      summary: 沙箱执行历史（摘要）
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: 条数上限，受 jingu3.workspace.execution-history-list-limit 裁剪
+      responses:
+        "200":
+          description: ApiResult list WorkspaceExecutionItemVo；execution-history-enabled=false 时 data 为空数组
 components:
   schemas:
+    WorkspaceSummaryVo:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+        userId:
+          type: string
+        rootPath:
+          type: string
+        quotaMb:
+          type: integer
+          format: int64
+        fileCount:
+          type: integer
+          format: int64
+        totalSizeBytes:
+          type: integer
+          format: int64
+    WorkspaceFileStatsVo:
+      type: object
+      properties:
+        quotaMb:
+          type: integer
+          format: int64
+        fileCount:
+          type: integer
+          format: int64
+        totalSizeBytes:
+          type: integer
+          format: int64
+    WorkspaceExecutionItemVo:
+      type: object
+      properties:
+        id:
+          type: string
+        language:
+          type: string
+        runMode:
+          type: string
+          description: INLINE 或 FILE
+        relativePath:
+          type: string
+          nullable: true
+        codeHash:
+          type: string
+        success:
+          type: boolean
+        exitCode:
+          type: integer
+        durationMs:
+          type: integer
+          format: int64
+        errorType:
+          type: string
+          nullable: true
+        timedOut:
+          type: boolean
+        createdAt:
+          type: string
+          description: 服务端 LocalDateTime 序列化字符串
     ChatRequest:
       type: object
       required: [message]
