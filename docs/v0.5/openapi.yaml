@@ -6,6 +6,7 @@ info:
     与 [接口文档.md](./接口文档.md) 配套；对话主链路及 v0.5 横切 REST。
     记忆实验 API（v0.6 M1）见 `/api/v1/memory/entries`，详述见 [docs/v0.6/接口文档.md](../v0.6/接口文档.md)（若存在）或代码 `MemoryController`。
     工作空间管理 API（v0.7 Phase 3）见 `/api/v1/workspace/**`，详述见 [docs/v0.7/接口文档.md](../v0.7/接口文档.md)。
+    技能市场只读列表（v0.7）见 `GET /api/v1/skills`。
 servers:
   - url: http://localhost:8080
 paths:
@@ -369,6 +370,13 @@ paths:
       responses:
         "200":
           description: ApiResult list EventSearchHitVo
+  /api/v1/skills:
+    get:
+      summary: 公开技能目录列表（v0.7）
+      description: 需 jingu3.skill.api-enabled=true；返回 is_public 且 status=ACTIVE，不含 storage_path。
+      responses:
+        "200":
+          description: ApiResult list SkillListItemVo
   /api/v1/workspace:
     get:
       summary: 当前用户工作空间概览（v0.7 Workspace Phase 3）
@@ -414,6 +422,37 @@ paths:
           description: ApiResult list WorkspaceExecutionItemVo；execution-history-enabled=false 时 data 为空数组
 components:
   schemas:
+    SkillListItemVo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+        category:
+          type: string
+        tags:
+          type: string
+          description: JSON 数组字符串
+        triggerWords:
+          type: string
+          description: JSON 数组字符串
+        iconUrl:
+          type: string
+        official:
+          type: boolean
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
     WorkspaceSummaryVo:
       type: object
       properties:

@@ -26,6 +26,9 @@ public class Jingu3Properties {
 
     private Memory memory = new Memory();
 
+    /** v0.7：技能市场元数据（{@code skill} 表） */
+    private Skill skill = new Skill();
+
     /** 本地/自建 Redis（缓存）；未接业务 Bean 前仅作配置占位，默认本机 6379 */
     private Redis redis = new Redis();
 
@@ -96,6 +99,18 @@ public class Jingu3Properties {
 
         /** 对话前向量检索条数上限 */
         private int retrievalTopK = 5;
+    }
+
+    @Data
+    public static class Skill {
+
+        /**
+         * 是否暴露技能市场只读 API（{@code /api/v1/skills}）；下载与写操作后续迭代。
+         */
+        private boolean apiEnabled = true;
+
+        /** {@link cn.lysoy.jingu3.skill.DefaultSkillService#listPublicCatalog} 最大条数 */
+        private int listMaxSize = 100;
     }
 
     @Data

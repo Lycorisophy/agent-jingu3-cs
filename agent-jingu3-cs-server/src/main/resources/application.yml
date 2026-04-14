@@ -86,6 +86,10 @@ jingu3:
     embedding-model: qwen3-embedding:8b
     embedding-dimension: 0
     retrieval-top-k: 5
+  skill:
+    # v0.7：技能市场元数据列表（skill 表；MinIO 下载 URL 后续迭代）
+    api-enabled: true
+    list-max-size: 100
   redis:
     enabled: false
     host: 127.0.0.1
