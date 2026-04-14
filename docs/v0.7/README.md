@@ -36,7 +36,7 @@
 
 - 表：**V6** `skill`（见 [物化清单](../设计/系统数据存储-物化清单与测试数据.md)）；种子示例见 [`dev_seed.sql`](../data/seed/dev_seed.sql)
 - 配置：`jingu3.skill.api-enabled`、`jingu3.skill.list-max-size`
-- REST：**`GET /api/v1/skills`** — 公开且 `ACTIVE` 的技能元数据列表（不含 `storage_path`）；下载 URL / MinIO 后续迭代
+- REST：**`GET /api/v1/skills`**、**`GET /api/v1/skills/{slug}`** — 公开且 `ACTIVE` 的技能元数据（不含 `storage_path`）；下载 URL / MinIO 后续迭代
 
 ## 工序清单（发布前勾选）
 

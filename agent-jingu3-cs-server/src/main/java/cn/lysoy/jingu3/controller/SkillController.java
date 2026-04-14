@@ -5,6 +5,7 @@ import cn.lysoy.jingu3.common.vo.SkillListItemVo;
 import cn.lysoy.jingu3.skill.SkillService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,5 +28,10 @@ public class SkillController {
     @GetMapping
     public ApiResult<List<SkillListItemVo>> list() {
         return ApiResult.ok(skillService.listPublicCatalog());
+    }
+
+    @GetMapping("/{slug}")
+    public ApiResult<SkillListItemVo> getBySlug(@PathVariable("slug") String slug) {
+        return ApiResult.ok(skillService.getPublicBySlug(slug));
     }
 }

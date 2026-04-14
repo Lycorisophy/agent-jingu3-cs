@@ -1,5 +1,7 @@
 package cn.lysoy.jingu3.skill;
 
+import cn.lysoy.jingu3.common.enums.ErrorCode;
+import cn.lysoy.jingu3.common.exception.ServiceException;
 import cn.lysoy.jingu3.common.vo.SkillListItemVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.skill.entity.SkillEntity;
@@ -33,6 +35,18 @@ public class DefaultSkillService implements SkillService {
             out.add(toVo(e));
         }
         return out;
+    }
+
+    @Override
+    public SkillListItemVo getPublicBySlug(String slug) {
+        if (slug == null || slug.isBlank()) {
+            throw new ServiceException(ErrorCode.BAD_REQUEST, "slug 不能为空");
+        }
+        SkillEntity e = skillMapper.selectPublicActiveBySlug(slug.trim());
+        if (e == null) {
+            throw new ServiceException(ErrorCode.NOT_FOUND, "技能不存在或未公开");
+        }
+        return toVo(e);
     }
 
     private static SkillListItemVo toVo(SkillEntity e) {

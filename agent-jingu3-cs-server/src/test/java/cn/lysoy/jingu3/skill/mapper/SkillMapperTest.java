@@ -33,6 +33,9 @@ class SkillMapperTest {
         assertThat(list).hasSize(2);
         assertThat(list.get(0).getSlug()).isEqualTo("slug-b");
         assertThat(list.get(1).getSlug()).isEqualTo("slug-a");
+
+        assertThat(skillMapper.selectPublicActiveBySlug("slug-a").getName()).isEqualTo("skill-a");
+        assertThat(skillMapper.selectPublicActiveBySlug("unknown")).isNull();
     }
 
     private static SkillEntity row(String id, String name, String slug, LocalDateTime updatedAt) {

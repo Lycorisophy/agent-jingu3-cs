@@ -377,6 +377,20 @@ paths:
       responses:
         "200":
           description: ApiResult list SkillListItemVo
+  /api/v1/skills/{slug}:
+    get:
+      summary: 按 slug 查询公开技能（v0.7）
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ApiResult SkillListItemVo
+        "404":
+          description: 不存在或未公开（AG_40401）
   /api/v1/workspace:
     get:
       summary: 当前用户工作空间概览（v0.7 Workspace Phase 3）

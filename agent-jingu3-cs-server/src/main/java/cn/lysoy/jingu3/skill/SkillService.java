@@ -13,4 +13,9 @@ public interface SkillService {
      * 公开且状态为 ACTIVE 的技能列表，按 {@code updated_at} 倒序，条数受配置限制。
      */
     List<SkillListItemVo> listPublicCatalog();
+
+    /**
+     * 按 slug 查询公开且 ACTIVE 的技能；不存在或不可见时抛出 {@link cn.lysoy.jingu3.common.exception.ServiceException}（NOT_FOUND）。
+     */
+    SkillListItemVo getPublicBySlug(String slug);
 }

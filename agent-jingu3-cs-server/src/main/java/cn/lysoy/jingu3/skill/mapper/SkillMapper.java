@@ -12,4 +12,8 @@ public interface SkillMapper extends BaseMapper<SkillEntity> {
     @Select(
             "SELECT * FROM skill WHERE is_public = TRUE AND status = 'ACTIVE' ORDER BY updated_at DESC LIMIT #{limit}")
     List<SkillEntity> selectPublicActive(@Param("limit") int limit);
+
+    @Select(
+            "SELECT * FROM skill WHERE slug = #{slug} AND is_public = TRUE AND status = 'ACTIVE'")
+    SkillEntity selectPublicActiveBySlug(@Param("slug") String slug);
 }
