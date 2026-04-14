@@ -18,6 +18,11 @@
 - 配置：`jingu3.workspace.enabled`、`root-dir`、`max-file-size-mb`、`default-quota-mb`
 - **ToolRegistry** 工具：`workspace_read_file`、`workspace_list_files`、`workspace_write_file`（关闭 `jingu3.workspace.enabled=false` 则不注册）
 
+### Phase 2（进程沙箱）
+
+- 配置：`jingu3.workspace.sandbox.enabled`（默认 `false`）、`max-timeout-seconds`、`max-output-chars`、`max-code-chars`、`python-command`、`node-command`（见 `application.yml`）
+- `ProcessSandboxExecutor` + 工具 **`workspace_execute_code`**：在用户工作空间根下执行 Python / JavaScript（`code` 或 `relativePath`）；需同时满足 `jingu3.workspace` 可用且沙箱开启
+
 ## 工序清单（发布前勾选）
 
 - [x] README.md

@@ -112,6 +112,33 @@ public class Jingu3Properties {
 
         /** 配额展示与后续强校验占位（MB），Phase 3 可落库 enforcement */
         private long defaultQuotaMb = 1024L;
+
+        /**
+         * 进程沙箱（Workspace Phase 2）：默认关闭；开启后注册 {@code workspace_execute_code}。
+         */
+        private Sandbox sandbox = new Sandbox();
+
+        @Data
+        public static class Sandbox {
+
+            /** 是否启用沙箱执行与 {@code workspace_execute_code} 工具 */
+            private boolean enabled = false;
+
+            /** 单次执行超时上限（秒），实际取 min(请求, 此值) */
+            private int maxTimeoutSeconds = 30;
+
+            /** 合并 stdout/stderr 截断长度（字符） */
+            private int maxOutputChars = 65536;
+
+            /** 提交的源码最大字符数 */
+            private int maxCodeChars = 100_000;
+
+            /** Python 可执行文件（PATH 或绝对路径） */
+            private String pythonCommand = "python";
+
+            /** Node 可执行文件（用于 javascript） */
+            private String nodeCommand = "node";
+        }
     }
 
     @Data

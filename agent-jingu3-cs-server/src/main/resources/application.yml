@@ -65,6 +65,14 @@ jingu3:
     root-dir: ${user.home}/.jingu3/workspaces
     max-file-size-mb: 10
     default-quota-mb: 1024
+    # Phase 2 沙箱：开启后注册 workspace_execute_code（python/javascript 进程执行）
+    sandbox:
+      enabled: false
+      max-timeout-seconds: 30
+      max-output-chars: 65536
+      max-code-chars: 100000
+      python-command: python
+      node-command: node
   memory:
     # v0.6 M1：实验性记忆 API；关闭后不注册 MemoryController
     api-enabled: true

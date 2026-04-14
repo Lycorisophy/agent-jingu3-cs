@@ -69,6 +69,14 @@ jingu3:
     index-events: jingu3-events
     username: ${ES_USERNAME:}
     password: ${ES_PASSWORD:}
+  # 工作空间：默认与 application.yml 一致；Phase 2 沙箱需本机 python / node 在 PATH 或可执行路径
+  # workspace:
+  #   enabled: true
+  #   root-dir: ${user.home}/.jingu3/workspaces
+  #   sandbox:
+  #     enabled: true
+  #     python-command: python
+  #     node-command: node
 
 logging:
   level:
