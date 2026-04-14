@@ -48,6 +48,16 @@ public class DefaultWorkspaceFileService implements WorkspaceFileService {
         if (bytes.length > maxBytes) {
             throw new IOException("内容超过大小限制 " + properties.getWorkspace().getMaxFileSizeMb() + "MB");
         }
+        long quotaMb = properties.getWorkspace().getDefaultQuotaMb();
+        if (quotaMb > 0) {
+            long quotaBytes = quotaMb * 1024L * 1024L;
+            WorkspaceStats st = workspaceManager.getStats(userId);
+            long oldSize = Files.isRegularFile(file) ? Files.size(file) : 0L;
+            long newTotal = st.getTotalSizeBytes() - oldSize + bytes.length;
+            if (newTotal > quotaBytes) {
+                throw new IOException("超过工作空间配额（" + quotaMb + "MB）");
+            }
+        }
         Files.createDirectories(file.getParent());
         Files.writeString(file, content == null ? "" : content, StandardCharsets.UTF_8);
     }

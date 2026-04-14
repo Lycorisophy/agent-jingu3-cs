@@ -118,6 +118,22 @@ public class Jingu3Properties {
          */
         private Sandbox sandbox = new Sandbox();
 
+        /**
+         * Phase 3：是否暴露 {@code /api/v1/workspace/**} 管理/调试 REST。
+         */
+        private boolean restApiEnabled = true;
+
+        /**
+         * Phase 3：沙箱执行是否写入 {@code workspace_execution}；关闭后仍保留元数据表能力。
+         */
+        private boolean executionHistoryEnabled = true;
+
+        /** 执行历史 stdout/stderr 单字段落库最大字符数 */
+        private int executionHistorySnippetMaxChars = 8192;
+
+        /** REST 执行历史列表单页条数上限（客户端传入 limit 会被裁剪到此值） */
+        private int executionHistoryListLimit = 50;
+
         @Data
         public static class Sandbox {
 

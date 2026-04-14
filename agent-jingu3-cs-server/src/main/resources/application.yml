@@ -73,6 +73,10 @@ jingu3:
       max-code-chars: 100000
       python-command: python
       node-command: node
+    rest-api-enabled: true
+    execution-history-enabled: true
+    execution-history-snippet-max-chars: 8192
+    execution-history-list-limit: 50
   memory:
     # v0.6 M1：实验性记忆 API；关闭后不注册 MemoryController
     api-enabled: true

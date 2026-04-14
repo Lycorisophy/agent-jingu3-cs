@@ -3,7 +3,9 @@ package cn.lysoy.jingu3.workspace.sandbox;
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.workspace.WorkspaceManager;
 import cn.lysoy.jingu3.workspace.security.PathValidator;
+import cn.lysoy.jingu3.workspace.service.WorkspaceExecutionRecorder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -32,9 +34,15 @@ public class ProcessSandboxExecutor implements SandboxExecutor {
 
     private final Jingu3Properties properties;
 
-    public ProcessSandboxExecutor(WorkspaceManager workspaceManager, Jingu3Properties properties) {
+    private final ObjectProvider<WorkspaceExecutionRecorder> executionRecorder;
+
+    public ProcessSandboxExecutor(
+            WorkspaceManager workspaceManager,
+            Jingu3Properties properties,
+            ObjectProvider<WorkspaceExecutionRecorder> executionRecorder) {
         this.workspaceManager = workspaceManager;
         this.properties = properties;
+        this.executionRecorder = executionRecorder;
     }
 
     @Override
@@ -68,7 +76,9 @@ public class ProcessSandboxExecutor implements SandboxExecutor {
             }
             pb.directory(userRoot.toFile());
             pb.redirectErrorStream(true);
-            return runProcess(pb, timeout, cfg.getMaxOutputChars(), script);
+            SandboxResult result = runProcess(pb, timeout, cfg.getMaxOutputChars(), script);
+            executionRecorder.ifAvailable(r -> r.recordInline(userId, lang, code, result));
+            return result;
         } catch (Exception e) {
             log.warn("sandbox execute failed: {}", e.toString());
             return fail("execute_error", e.getMessage(), 0);
@@ -96,7 +106,9 @@ public class ProcessSandboxExecutor implements SandboxExecutor {
             }
             pb.directory(userRoot.toFile());
             pb.redirectErrorStream(true);
-            return runProcess(pb, timeout, cfg.getMaxOutputChars(), null);
+            SandboxResult result = runProcess(pb, timeout, cfg.getMaxOutputChars(), null);
+            executionRecorder.ifAvailable(r -> r.recordFile(userId, lang, relativePath, result));
+            return result;
         } catch (Exception e) {
             log.warn("sandbox executeFile failed: {}", e.toString());
             return fail("execute_error", e.getMessage(), 0);

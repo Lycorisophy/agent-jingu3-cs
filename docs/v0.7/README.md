@@ -23,6 +23,13 @@
 - 配置：`jingu3.workspace.sandbox.enabled`（默认 `false`）、`max-timeout-seconds`、`max-output-chars`、`max-code-chars`、`python-command`、`node-command`（见 `application.yml`）
 - `ProcessSandboxExecutor` + 工具 **`workspace_execute_code`**：在用户工作空间根下执行 Python / JavaScript（`code` 或 `relativePath`）；需同时满足 `jingu3.workspace` 可用且沙箱开启
 
+### Phase 3（配额、执行历史、REST）
+
+- Flyway **V9**：`workspace`、`workspace_execution`（见 [物化清单](../设计/系统数据存储-物化清单与测试数据.md)）
+- 写入配额：`default-quota-mb` 为 0 时不校验；否则 `writeFile` 前按当前目录占用 + 新内容校验
+- 沙箱执行落库：`jingu3.workspace.execution-history-enabled`（默认 `true`）；`execution-history-snippet-max-chars`、`execution-history-list-limit`
+- REST（`jingu3.workspace.rest-api-enabled`，默认 `true`）：`GET/DELETE /api/v1/workspace`、`POST /api/v1/workspace/reset`、`GET /api/v1/workspace/stats`、`GET /api/v1/workspace/executions?limit=`
+
 ## 工序清单（发布前勾选）
 
 - [x] README.md
@@ -30,6 +37,6 @@
 - [ ] 可行性分析.md
 - [ ] 概要设计.md
 - [ ] 详细设计.md
-- [ ] 接口文档.md（Workspace REST 待 Phase 3）
+- [ ] 接口文档.md（Workspace REST Phase 3 已实现最小集，文档待补 OpenAPI 条目）
 - [ ] 单测与集成测（补充工具与 Controller 层）
 - [ ] 部署文档.md

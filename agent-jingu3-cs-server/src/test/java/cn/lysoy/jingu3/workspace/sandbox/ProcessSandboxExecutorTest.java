@@ -2,8 +2,11 @@ package cn.lysoy.jingu3.workspace.sandbox;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.workspace.DefaultWorkspaceManager;
+import cn.lysoy.jingu3.workspace.service.WorkspaceExecutionRecorder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,7 +38,7 @@ class ProcessSandboxExecutorTest {
         Jingu3Properties p = props(tmp);
         p.getWorkspace().getSandbox().setMaxCodeChars(4);
         DefaultWorkspaceManager mgr = new DefaultWorkspaceManager(p);
-        ProcessSandboxExecutor ex = new ProcessSandboxExecutor(mgr, p);
+        ProcessSandboxExecutor ex = new ProcessSandboxExecutor(mgr, p, noRecorder());
         SandboxResult r = ex.execute("u1", "python", "12345", 10);
         assertThat(r.isSuccess()).isFalse();
         assertThat(r.getErrorType()).isEqualTo("code_too_long");
@@ -59,7 +62,7 @@ class ProcessSandboxExecutorTest {
         Files.writeString(userRoot.resolve("hello.py"), "print('hi')");
         Jingu3Properties p = props(tmp);
         DefaultWorkspaceManager mgr = new DefaultWorkspaceManager(p);
-        ProcessSandboxExecutor ex = new ProcessSandboxExecutor(mgr, p);
+        ProcessSandboxExecutor ex = new ProcessSandboxExecutor(mgr, p, noRecorder());
         SandboxResult r = ex.executeFile("u1", "python", "hello.py", 30);
         assertThat(r.isSuccess()).isTrue();
         assertThat(r.getStdout().trim()).isEqualTo("hi");
@@ -68,7 +71,14 @@ class ProcessSandboxExecutorTest {
     private static ProcessSandboxExecutor executor(Path workspaceRoot) {
         Jingu3Properties p = props(workspaceRoot);
         DefaultWorkspaceManager mgr = new DefaultWorkspaceManager(p);
-        return new ProcessSandboxExecutor(mgr, p);
+        return new ProcessSandboxExecutor(mgr, p, noRecorder());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<WorkspaceExecutionRecorder> noRecorder() {
+        ObjectProvider<WorkspaceExecutionRecorder> p = Mockito.mock(ObjectProvider.class);
+        Mockito.doNothing().when(p).ifAvailable(Mockito.any());
+        return p;
     }
 
     private static Jingu3Properties props(Path workspaceRoot) {
