@@ -11,6 +11,13 @@ paths:
   /api/v1/chat:
     post:
       summary: 同步对话
+      parameters:
+        - name: X-Jingu3-Client-Platform
+          in: header
+          required: false
+          description: 客户端平台标识（如 web、ios）；与请求体 `clientPlatform` 二选一或同时提供，请求头优先。
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -23,6 +30,13 @@ paths:
   /api/v1/chat/stream:
     post:
       summary: SSE 流式对话
+      parameters:
+        - name: X-Jingu3-Client-Platform
+          in: header
+          required: false
+          description: 客户端平台标识（如 web、ios）；与请求体 `clientPlatform` 二选一或同时提供，请求头优先。
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -347,3 +361,6 @@ components:
           type: string
         traceId:
           type: string
+        clientPlatform:
+          type: string
+          description: 客户端平台；浏览器 WebSocket 等无法自定义握手头时可仅传本字段；HTTP/SSE 可与 X-Jingu3-Client-Platform 二选一，请求头优先。
