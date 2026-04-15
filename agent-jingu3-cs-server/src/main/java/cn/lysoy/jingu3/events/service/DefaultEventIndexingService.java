@@ -116,11 +116,13 @@ public class DefaultEventIndexingService implements EventIndexingService {
     }
 
     private static Query buildUserScopedQuery(String userId, String queryText) {
-        return Query.of(q -> q.bool(b -> b
-                .must(m -> m.multiMatch(mm -> mm
-                        .query(queryText)
-                        .fields("action^2", "result", "event_subject", "event_location")
-                        .fuzziness("AUTO")))
-                .filter(f -> f.term(t -> t.field("user_id").value(userId)))))));
+        return Query.of(q -> q.bool(b -> {
+            b.must(m -> m.multiMatch(mm -> mm
+                    .query(queryText)
+                    .fields("action^2", "result", "event_subject", "event_location")
+                    .fuzziness("AUTO")));
+            b.filter(f -> f.term(t -> t.field("user_id").value(userId)));
+            return b;
+        }));
     }
 }
