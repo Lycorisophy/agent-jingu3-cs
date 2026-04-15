@@ -13,6 +13,9 @@ paths:
   /api/v1/chat:
     post:
       summary: 同步对话
+      description: |
+        `mode=AGENT_TEAM` 时执行 Leader → 多轮 Specialist（`jingu3.engine.agent-team.max-specialist-rounds`）→ 合成答复。
+        `jingu3.tool.enabled=true` 时专员轮与 Ask 相同可走内置工具 JSON 路由；专员提示词不承担卡片确认/引导创建定时任务（由合成步主协调表述）。
       parameters:
         - name: X-Jingu3-Client-Platform
           in: header
@@ -32,6 +35,9 @@ paths:
   /api/v1/chat/stream:
     post:
       summary: SSE 流式对话
+      description: |
+        事件体为 `StreamEvent` JSON（`text/event-stream`）。`mode=AGENT_TEAM` 时步标签含 `leader`、`specialist_{n}`、`synthesize`；
+        专员轮在 `jingu3.tool.enabled=true` 且实际调用工具时，可额外出现 `TOOL_RESULT` 事件。
       parameters:
         - name: X-Jingu3-Client-Platform
           in: header

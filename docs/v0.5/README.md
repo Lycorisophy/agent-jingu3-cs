@@ -22,7 +22,7 @@
 - [x] **Cron MVP**：Flyway `V1__scheduled_task`；`ScheduledTaskPoller`；**`/api/v1/cron/tasks`**
 - [x] **HITL MVP**：Flyway `V2__hitl_approval`；**`/api/v1/hitl`**（创建、`pending`、approve/reject）
 - [x] **DST 占位**：Flyway `V3__dialogue_state`；**`/api/v1/dst/{conversationId}`**（GET/PATCH/confirm）
-- [x] **Agent Team**：`jingu3.engine.agent-team.max-specialist-rounds` + 多轮 Specialist + **synthesize**；流式步 `leader` / `specialist_{n}` / `synthesize`
+- [x] **Agent Team**：`jingu3.engine.agent-team.max-specialist-rounds` + 多轮 Specialist + **synthesize**；`jingu3.tool.enabled` 时专员轮复用 Ask 工具路由；流式步 `leader` / `specialist_{n}` / `synthesize`，可选 **`TOOL_RESULT`**
 - [x] **用户提示词与平台**：请求头 `X-Jingu3-Client-Platform` / 体字段 `clientPlatform`（头优先）；记忆增强后送模侧附加标准时间与平台行；可选 **Flyway V7** `user_prompt_cipher` 对原始 `message` AES-GCM 落库（`jingu3.chat.persist-user-prompt`、`jingu3.crypto.user-prompt-aes-key-base64`）；见 [接口文档 §4](./接口文档.md) 与 [部署文档](./部署文档.md)
 
 ## 关闭本版本后的下一立项
