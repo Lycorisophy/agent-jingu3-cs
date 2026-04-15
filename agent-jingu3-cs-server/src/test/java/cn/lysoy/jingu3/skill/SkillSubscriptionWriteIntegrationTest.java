@@ -1,10 +1,11 @@
 package cn.lysoy.jingu3.skill;
 
 import cn.lysoy.jingu3.Jingu3Application;
+import cn.lysoy.jingu3.service.skill.SkillService;
 import cn.lysoy.jingu3.skill.entity.SkillEntity;
 import cn.lysoy.jingu3.skill.entity.UserSkillEntity;
-import cn.lysoy.jingu3.skill.mapper.SkillMapper;
-import cn.lysoy.jingu3.skill.mapper.UserSkillMapper;
+import cn.lysoy.jingu3.persistence.mapper.skill.SkillMapper;
+import cn.lysoy.jingu3.persistence.mapper.skill.UserSkillMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

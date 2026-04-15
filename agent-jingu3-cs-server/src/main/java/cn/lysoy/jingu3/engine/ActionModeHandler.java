@@ -8,7 +8,7 @@ import cn.lysoy.jingu3.stream.StreamEventSink;
  * <p>
  * <strong>职责边界</strong>：实现类根据 {@link ExecutionContext} 组装提示词（经 {@link cn.lysoy.jingu3.prompt.PromptAssembly}）、
  * 调用 LangChain4j 模型与可选 {@link cn.lysoy.jingu3.tool.ToolRegistry}，产出本轮助手可见文本或流式事件。
- * 同步 HTTP 路径走 {@link #execute}；SSE/WebSocket 走 {@link #stream}，由 {@link cn.lysoy.jingu3.service.ChatStreamService}
+ * 同步 HTTP 路径走 {@link #execute}；SSE/WebSocket 走 {@link #stream}，由 {@link cn.lysoy.jingu3.service.chat.ChatStreamService}
  * 统一调度，属于<strong>驾驭工程</strong>中与传输形态解耦的「模式内核」。
  * </p>
  *

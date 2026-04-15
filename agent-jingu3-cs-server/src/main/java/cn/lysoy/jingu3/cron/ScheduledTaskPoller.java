@@ -1,7 +1,7 @@
 package cn.lysoy.jingu3.cron;
 
 import cn.lysoy.jingu3.common.util.UtcTime;
-import cn.lysoy.jingu3.cron.mapper.ScheduledTaskMapper;
+import cn.lysoy.jingu3.persistence.mapper.cron.ScheduledTaskMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;

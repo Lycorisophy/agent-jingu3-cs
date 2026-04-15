@@ -1,9 +1,9 @@
 package cn.lysoy.jingu3.controller;
 
 import cn.lysoy.jingu3.common.api.ApiResult;
-import cn.lysoy.jingu3.hitl.HitlApprovalService;
-import cn.lysoy.jingu3.hitl.dto.CreateHitlApprovalRequest;
-import cn.lysoy.jingu3.hitl.dto.HitlApprovalVo;
+import cn.lysoy.jingu3.service.hitl.HitlApprovalService;
+import cn.lysoy.jingu3.common.dto.hitl.CreateHitlApprovalRequest;
+import cn.lysoy.jingu3.common.vo.hitl.HitlApprovalVo;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

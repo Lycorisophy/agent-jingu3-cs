@@ -4,7 +4,7 @@ import cn.lysoy.jingu3.common.api.ApiResult;
 import cn.lysoy.jingu3.common.dto.CreateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.dto.UpdateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.vo.MemoryEntryVo;
-import cn.lysoy.jingu3.memory.MemoryService;
+import cn.lysoy.jingu3.service.memory.MemoryService;
 import jakarta.validation.Valid;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.DeleteMapping;

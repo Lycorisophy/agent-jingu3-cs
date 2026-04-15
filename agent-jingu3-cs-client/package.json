@@ -1,0 +1,42 @@
+{
+  "name": "agent-jingu3-cs-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "node node_modules/electron-vite/bin/electron-vite.js dev",
+    "build": "node node_modules/electron-vite/bin/electron-vite.js build",
+    "dist": "node node_modules/electron-vite/bin/electron-vite.js build && node node_modules/electron-builder/out/cli/cli.js",
+    "preview": "node node_modules/electron-vite/bin/electron-vite.js preview",
+    "typecheck": "node node_modules/vue-tsc/bin/vue-tsc.js --noEmit -p tsconfig.web.json --composite false"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "typescript": "~5.6.3",
+    "vite": "^5.4.11",
+    "vue-tsc": "^2.1.10"
+  },
+  "build": {
+    "appId": "cn.lysoy.jingu3.client",
+    "productName": "JinGu3 Agent",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "win": {
+      "target": "dir"
+    }
+  }
+}

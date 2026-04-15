@@ -11,13 +11,13 @@ import java.util.List;
  * 单次「对话步」的<strong>执行上下文</strong>（上下文工程在引擎侧的载体）：把意图路由结果、用户侧文本、
  * 可选编排链负载与工作流 id 一并交给 {@link ActionModeHandler}，供八大行动模式中任一模式消费。
  * <p>
- * <strong>与上层的关系</strong>：{@link cn.lysoy.jingu3.service.ChatService} / {@link cn.lysoy.jingu3.service.ChatStreamService}
+ * <strong>与上层的关系</strong>：{@link cn.lysoy.jingu3.service.chat.ChatService} / {@link cn.lysoy.jingu3.service.chat.ChatStreamService}
  * 在校验与路由之后构造本对象，再经 {@link cn.lysoy.jingu3.engine.ModeRegistry} 分派到具体模式处理器，属于
  * 「驾驭工程」中连接 HTTP/WebSocket 与模式实现的枢纽类型。
  * </p>
  * <p>
  * 指南 §1.4 中的分层记忆（STM/Episodic/LTM）尚未完全落地时，{@link #history} 仍为占位列表；记忆注入主要发生在
- * {@link cn.lysoy.jingu3.prompt.UserPromptPreparationService}（送模前的用户串改写），与本字段解耦。
+ * {@link cn.lysoy.jingu3.service.prompt.UserPromptPreparationService}（送模前的用户串改写），与本字段解耦。
  * </p>
  */
 @Getter
@@ -30,7 +30,7 @@ public class ExecutionContext {
     /** 会话标识；State Tracking、日志、密文落库等横切能力使用 */
     private final String conversationId;
     /**
-     * 用户本轮原始消息（未经记忆向量检索扩写时即为请求体；经 {@link cn.lysoy.jingu3.prompt.UserPromptPreparationService}
+     * 用户本轮原始消息（未经记忆向量检索扩写时即为请求体；经 {@link cn.lysoy.jingu3.service.prompt.UserPromptPreparationService}
      * 处理后传入构造器的常为「已增强」串）。
      */
     private final String userMessage;
@@ -44,7 +44,7 @@ public class ExecutionContext {
     private final List<String> history;
     /**
      * <strong>编排链 / modePlan</strong> 上一步的拼接负载：由 {@link cn.lysoy.jingu3.engine.orchestration.ModePlanExecutor}
-     * 与流式 {@link cn.lysoy.jingu3.service.ChatStreamService#streamModePlan} 写入，格式为「用户原问 + 分隔符 + 上步模型答复」。
+     * 与流式 {@link cn.lysoy.jingu3.service.chat.ChatStreamService#streamModePlan} 写入，格式为「用户原问 + 分隔符 + 上步模型答复」。
      * 非空时 {@link #llmInput()} 优先返回本字段，使下一步模型具备链式上下文（指南 §11）。
      */
     private final String taskPayload;

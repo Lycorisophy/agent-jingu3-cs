@@ -3,7 +3,7 @@ package cn.lysoy.jingu3.workspace.tool;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.tool.Jingu3Tool;
 import cn.lysoy.jingu3.tool.ToolExecutionException;
-import cn.lysoy.jingu3.workspace.WorkspaceFileService;
+import cn.lysoy.jingu3.service.workspace.WorkspaceFileService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 

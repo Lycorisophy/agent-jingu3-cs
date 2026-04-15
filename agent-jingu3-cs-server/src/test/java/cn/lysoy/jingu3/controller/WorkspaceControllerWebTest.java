@@ -6,7 +6,7 @@ import cn.lysoy.jingu3.common.vo.WorkspaceFileStatsVo;
 import cn.lysoy.jingu3.common.vo.WorkspaceSummaryVo;
 import cn.lysoy.jingu3.component.ApiExceptionHandler;
 import cn.lysoy.jingu3.component.UserConstants;
-import cn.lysoy.jingu3.workspace.service.WorkspaceManagementService;
+import cn.lysoy.jingu3.service.workspace.WorkspaceManagementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

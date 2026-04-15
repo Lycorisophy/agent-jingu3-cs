@@ -1,10 +1,11 @@
 package cn.lysoy.jingu3.memory;
 
 import cn.lysoy.jingu3.Jingu3Application;
+import cn.lysoy.jingu3.service.memory.MemoryService;
 import cn.lysoy.jingu3.common.dto.CreateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.dto.UpdateMemoryEntryRequest;
 import cn.lysoy.jingu3.common.exception.ServiceException;
-import cn.lysoy.jingu3.memory.mapper.MemoryEntryMapper;
+import cn.lysoy.jingu3.persistence.mapper.memory.MemoryEntryMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

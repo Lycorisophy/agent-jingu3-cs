@@ -7,6 +7,10 @@
 - 路线图：[开发路线图.md § v0.9](../计划/开发路线图.md)
 - UAP 另见：[UAP jingu3 技术适配与落地方案](../设计/复杂系统未来势态量化预测统一智能体/复杂系统未来势态量化预测统一智能体jingu3架构的技术适配与落地方案.md)（与 v0.9 **无强制依赖**）
 
+## 工程落地（客户端）
+
+- **Electron + Vue 桌面端**已并入单仓目录 [`agent-jingu3-cs-client/`](../../agent-jingu3-cs-client/)：与 `POST /api/v1/chat`、`POST /api/v1/chat/stream`（SSE）联调；构建与 CI 见仓库根 [README.md](../../README.md)。
+
 ## 工序清单（发布前勾选）
 
 - [ ] PRD.md

@@ -23,17 +23,17 @@ public class MdcChatRequestBodyAspect {
         this.snowflakeIdGenerator = snowflakeIdGenerator;
     }
 
-    @Before("execution(* cn.lysoy.jingu3.service.ChatService.chat(..)) && args(request)")
+    @Before("execution(* cn.lysoy.jingu3.service.chat.ChatService.chat(..)) && args(request)")
     public void mergeChatBody(ChatRequest request) {
         MdcRequestTraceContext.mergeFromBody(request);
     }
 
-    @Before("execution(* cn.lysoy.jingu3.service.ChatStreamService.startSseStream(..)) && args(request,..)")
+    @Before("execution(* cn.lysoy.jingu3.service.chat.ChatStreamService.startSseStream(..)) && args(request,..)")
     public void mergeSseBody(ChatRequest request) {
         MdcRequestTraceContext.mergeFromBody(request);
     }
 
-    @Before("execution(* cn.lysoy.jingu3.service.ChatStreamService.startWebSocketStream(..)) && args(request,..)")
+    @Before("execution(* cn.lysoy.jingu3.service.chat.ChatStreamService.startWebSocketStream(..)) && args(request,..)")
     public void mergeWsBody(ChatRequest request) {
         MdcRequestTraceContext.ensureWebSocketMessage(request, snowflakeIdGenerator);
     }

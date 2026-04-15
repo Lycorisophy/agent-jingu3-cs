@@ -6,8 +6,8 @@ import java.util.Locale;
 
 /**
  * <strong>八大行动模式</strong>枚举，与 {@code docs/设计/AI智能体行动模式设计指南.md} 中 §1.3 / 各章模式一一对应；
- * 运行时由 {@link ModeRegistry} 映射到 {@link ActionModeHandler}，由 {@link cn.lysoy.jingu3.service.ChatService} /
- * {@link cn.lysoy.jingu3.service.ChatStreamService} 驱动，属<strong>驾驭工程</strong>核心契约。
+ * 运行时由 {@link ModeRegistry} 映射到 {@link ActionModeHandler}，由 {@link cn.lysoy.jingu3.service.chat.ChatService} /
+ * {@link cn.lysoy.jingu3.service.chat.ChatStreamService} 驱动，属<strong>驾驭工程</strong>核心契约。
  * <p>
  * 业界常见对应关系（便于与外部文档对照）：Ask≈单轮 QA；ReAct≈ Thought-Action-Observation 循环；
  * Plan-and-Execute≈先规划再按子任务执行；Workflow≈预设节点链；Agent Team≈多角色协作；

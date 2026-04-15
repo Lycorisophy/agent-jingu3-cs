@@ -7,7 +7,7 @@ import cn.lysoy.jingu3.common.vo.SkillListItemVo;
 import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
 import cn.lysoy.jingu3.component.ApiExceptionHandler;
 import cn.lysoy.jingu3.component.UserConstants;
-import cn.lysoy.jingu3.skill.SkillService;
+import cn.lysoy.jingu3.service.skill.SkillService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

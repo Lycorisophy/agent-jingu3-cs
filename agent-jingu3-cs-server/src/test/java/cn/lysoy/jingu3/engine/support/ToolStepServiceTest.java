@@ -6,6 +6,7 @@ import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
 import cn.lysoy.jingu3.engine.workflow.WorkflowNode;
 import cn.lysoy.jingu3.prompt.PromptAssembly;
+import cn.lysoy.jingu3.service.engine.ToolStepService;
 import cn.lysoy.jingu3.tool.CalculatorTool;
 import cn.lysoy.jingu3.tool.ToolRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -3,7 +3,7 @@ package cn.lysoy.jingu3.engine.mode;
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
-import cn.lysoy.jingu3.engine.support.ToolStepService;
+import cn.lysoy.jingu3.service.engine.ToolStepService;
 import cn.lysoy.jingu3.engine.workflow.WorkflowDefinition;
 import cn.lysoy.jingu3.engine.workflow.WorkflowDefinitionRegistry;
 import cn.lysoy.jingu3.engine.workflow.WorkflowNode;

@@ -2,7 +2,7 @@ package cn.lysoy.jingu3.cron;
 
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.common.vo.ChatVo;
-import cn.lysoy.jingu3.service.ChatService;
+import cn.lysoy.jingu3.service.chat.ChatService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

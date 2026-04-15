@@ -81,7 +81,7 @@ public class Jingu3Properties {
          */
         private boolean apiEnabled = true;
 
-        /** {@link cn.lysoy.jingu3.memory.DefaultMemoryService#listByUserId} 单次最大条数 */
+        /** {@link cn.lysoy.jingu3.service.memory.DefaultMemoryService#listByUserId} 单次最大条数 */
         private int maxListSize = 100;
 
         /**
@@ -109,7 +109,7 @@ public class Jingu3Properties {
          */
         private boolean apiEnabled = true;
 
-        /** {@link cn.lysoy.jingu3.skill.DefaultSkillService#listPublicCatalog} 最大条数 */
+        /** {@link cn.lysoy.jingu3.service.skill.DefaultSkillService#listPublicCatalog} 最大条数 */
         private int listMaxSize = 100;
     }
 

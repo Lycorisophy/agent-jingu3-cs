@@ -3,7 +3,7 @@ package cn.lysoy.jingu3.memory.vector;
 import cn.lysoy.jingu3.memory.entity.MemoryEntryEntity;
 
 /**
- * <strong>记忆条目与向量索引一致性</strong>（记忆与知识系统）：由 {@link cn.lysoy.jingu3.memory.DefaultMemoryService}
+ * <strong>记忆条目与向量索引一致性</strong>（记忆与知识系统）：由 {@link cn.lysoy.jingu3.service.memory.DefaultMemoryService}
  * 在事务边界外或成功后调用，将关系库中的 {@link MemoryEntryEntity} 同步到 Milvus（或关闭向量时的空实现）。
  * <p>与 {@link MilvusMemoryVectorService} 的关系：Indexer 侧重「业务事件 → 向量行」编排，底层 DML 可由 Milvus SDK 封装。</p>
  */

@@ -3,7 +3,7 @@ package cn.lysoy.jingu3.controller;
 import cn.lysoy.jingu3.common.api.ApiResult;
 import cn.lysoy.jingu3.common.dto.CreateEventDocumentRequest;
 import cn.lysoy.jingu3.common.vo.EventSearchHitVo;
-import cn.lysoy.jingu3.events.service.EventIndexingService;
+import cn.lysoy.jingu3.service.events.EventIndexingService;
 import jakarta.validation.Valid;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;

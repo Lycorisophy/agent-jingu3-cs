@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * 持久化定时任务（MVP：单次执行，到点后调用 {@link cn.lysoy.jingu3.service.ChatService}）。
+ * 持久化定时任务（MVP：单次执行，到点后调用 {@link cn.lysoy.jingu3.service.chat.ChatService}）。
  */
 @TableName("scheduled_task")
 @Getter

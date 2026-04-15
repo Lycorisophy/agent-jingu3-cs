@@ -5,7 +5,7 @@ import cn.lysoy.jingu3.common.vo.WorkspaceExecutionItemVo;
 import cn.lysoy.jingu3.common.vo.WorkspaceFileStatsVo;
 import cn.lysoy.jingu3.common.vo.WorkspaceSummaryVo;
 import cn.lysoy.jingu3.component.UserConstants;
-import cn.lysoy.jingu3.workspace.service.WorkspaceManagementService;
+import cn.lysoy.jingu3.service.workspace.WorkspaceManagementService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -10,7 +10,7 @@ import cn.lysoy.jingu3.engine.mode.ReActModeHandler;
 import cn.lysoy.jingu3.engine.mode.StateTrackingModeHandler;
 import cn.lysoy.jingu3.engine.mode.WorkflowModeHandler;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
-import cn.lysoy.jingu3.engine.support.ToolStepService;
+import cn.lysoy.jingu3.service.engine.ToolStepService;
 import cn.lysoy.jingu3.engine.workflow.WorkflowDefinitionRegistry;
 import cn.lysoy.jingu3.prompt.PromptAssembly;
 import cn.lysoy.jingu3.tool.CalculatorTool;

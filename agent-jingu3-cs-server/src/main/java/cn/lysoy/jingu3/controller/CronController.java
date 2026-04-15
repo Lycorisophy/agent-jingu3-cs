@@ -1,9 +1,9 @@
 package cn.lysoy.jingu3.controller;
 
 import cn.lysoy.jingu3.common.api.ApiResult;
-import cn.lysoy.jingu3.cron.dto.CreateScheduledTaskRequest;
-import cn.lysoy.jingu3.cron.dto.ScheduledTaskVo;
-import cn.lysoy.jingu3.cron.ScheduledTaskService;
+import cn.lysoy.jingu3.common.dto.cron.CreateScheduledTaskRequest;
+import cn.lysoy.jingu3.common.vo.cron.ScheduledTaskVo;
+import cn.lysoy.jingu3.service.cron.ScheduledTaskService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

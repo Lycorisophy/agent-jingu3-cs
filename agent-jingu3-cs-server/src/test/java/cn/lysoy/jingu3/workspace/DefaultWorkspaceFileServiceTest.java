@@ -1,6 +1,7 @@
 package cn.lysoy.jingu3.workspace;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
+import cn.lysoy.jingu3.service.workspace.DefaultWorkspaceFileService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

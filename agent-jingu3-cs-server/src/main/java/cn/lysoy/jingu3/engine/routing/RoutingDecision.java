@@ -5,7 +5,7 @@ import lombok.Getter;
 
 /**
  * 意图路由的<strong>不可变结果</strong>：本轮应采用的 {@link ActionMode}、决策来源（客户端 / 规则 / 模型 / 回落 / 守门），
- * 以及供日志、排障、产品提示用的说明文案。下游 {@link cn.lysoy.jingu3.service.ChatStreamService} 等据此选 Handler 与提示词装配策略。
+ * 以及供日志、排障、产品提示用的说明文案。下游 {@link cn.lysoy.jingu3.service.chat.ChatStreamService} 等据此选 Handler 与提示词装配策略。
  */
 @Getter
 public class RoutingDecision {

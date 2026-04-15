@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * <strong>八大行动模式注册表</strong>（驾驭工程）：{@link ActionMode} → {@link ActionModeHandler} 的编译期固定映射，
- * Spring 构造时注入八个具体 Handler，供 {@link cn.lysoy.jingu3.service.ChatService} 与 {@link cn.lysoy.jingu3.service.ChatStreamService}
+ * Spring 构造时注入八个具体 Handler，供 {@link cn.lysoy.jingu3.service.chat.ChatService} 与 {@link cn.lysoy.jingu3.service.chat.ChatStreamService}
  * 在路由完成后 O(1) 分派。
  * <p>新增对话可选模式时需同步：枚举 {@link ActionMode}、本表、{@link cn.lysoy.jingu3.engine.ActionModePolicy}、
  * {@link cn.lysoy.jingu3.engine.routing.IntentRouter} / 分类器白名单及客户端契约。</p>

@@ -1,9 +1,11 @@
 package cn.lysoy.jingu3.memory.vector;
 
 import cn.lysoy.jingu3.common.util.UtcTime;
+import cn.lysoy.jingu3.service.memory.MilvusMemoryVectorService;
 import cn.lysoy.jingu3.memory.entity.MemoryEmbeddingEntity;
 import cn.lysoy.jingu3.memory.entity.MemoryEntryEntity;
-import cn.lysoy.jingu3.memory.mapper.MemoryEmbeddingMapper;
+import cn.lysoy.jingu3.memory.vector.OllamaEmbeddingClient;
+import cn.lysoy.jingu3.persistence.mapper.memory.MemoryEmbeddingMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;

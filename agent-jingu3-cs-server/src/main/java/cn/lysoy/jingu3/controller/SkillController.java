@@ -5,7 +5,7 @@ import cn.lysoy.jingu3.common.dto.SubscribeSkillRequest;
 import cn.lysoy.jingu3.common.vo.SkillListItemVo;
 import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
 import cn.lysoy.jingu3.component.UserConstants;
-import cn.lysoy.jingu3.skill.SkillService;
+import cn.lysoy.jingu3.service.skill.SkillService;
 import jakarta.validation.Valid;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.DeleteMapping;

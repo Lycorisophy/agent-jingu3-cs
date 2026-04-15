@@ -1,9 +1,9 @@
 package cn.lysoy.jingu3.controller;
 
 import cn.lysoy.jingu3.common.api.ApiResult;
-import cn.lysoy.jingu3.dst.DialogueStateService;
-import cn.lysoy.jingu3.dst.dto.DialogueStateVo;
-import cn.lysoy.jingu3.dst.dto.PatchDialogueStateRequest;
+import cn.lysoy.jingu3.service.dst.DialogueStateService;
+import cn.lysoy.jingu3.common.dto.dst.PatchDialogueStateRequest;
+import cn.lysoy.jingu3.common.vo.dst.DialogueStateVo;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;

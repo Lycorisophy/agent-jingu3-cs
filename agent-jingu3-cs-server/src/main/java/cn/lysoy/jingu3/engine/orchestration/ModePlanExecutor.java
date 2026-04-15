@@ -11,7 +11,7 @@ import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.engine.ModeRegistry;
 import cn.lysoy.jingu3.engine.routing.RoutingFallbacks;
 import cn.lysoy.jingu3.engine.routing.RoutingSource;
-import cn.lysoy.jingu3.prompt.UserPromptPreparationService;
+import cn.lysoy.jingu3.service.prompt.UserPromptPreparationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -100,7 +100,7 @@ public class ModePlanExecutor {
     }
 
     /**
-     * 非法或空白 token 降级为 REACT，与 {@link cn.lysoy.jingu3.service.ChatStreamService} 中逻辑一致。
+     * 非法或空白 token 降级为 REACT，与 {@link cn.lysoy.jingu3.service.chat.ChatStreamService} 中逻辑一致。
      */
     private static ActionMode parseOrReact(String raw) {
         if (raw == null || raw.isBlank()) {
