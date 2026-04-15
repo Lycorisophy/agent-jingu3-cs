@@ -15,18 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 指南 §7 Agent Team：Leader 拆分子任务后，子 Agent 可配置多轮（{@code jingu3.engine.agent-team.max-specialist-rounds}），
- * 专员轮在 {@code jingu3.tool.enabled=true} 时复用 Ask 同款工具路由；最后经一次 LLM 合成用户可见答复；
- * 流式与 {@link ChatLanguageModel#generate} 步数一致。
+ * <strong>指南 §7 Agent Team</strong>（八大行动模式之一，多角色驾驭）：<strong>Leader</strong> 模型先读用户诉求并拆出子任务描述；
+ * <strong>专员</strong>（子 Agent）可跑多轮（{@code jingu3.engine.agent-team.max-specialist-rounds}），每轮在工具开启时复用
+ * {@link AskModeHandler#runToolAugmentedOneShot} 与 Ask 相同的 JSON 工具路由；最后 <strong>Synthesize</strong> 一步把 Leader 子任务
+ * 与专员轨迹拼成对用户单一答复。流式与阻塞路径步数语义对齐。
  */
 @Slf4j
 @Component
 public class AgentTeamModeHandler implements ActionModeHandler {
 
+    /** Leader / 专员直答 / 合成共用 */
     private final ChatLanguageModel chat;
+    /** Leader 子任务文案、专员边界、合成模板等 */
     private final PromptAssembly prompts;
+    /** 复用 Ask 工具管线，避免 AgentTeam 与 Ask 分叉两套 JSON 约定 */
     private final AskModeHandler askModeHandler;
+    /** 读取工具总开关等 */
     private final Jingu3Properties jingu3Properties;
+    /** 专员轮次数下限为 1，配置非法时在此 clamp */
     private final int maxSpecialistRounds;
 
     public AgentTeamModeHandler(

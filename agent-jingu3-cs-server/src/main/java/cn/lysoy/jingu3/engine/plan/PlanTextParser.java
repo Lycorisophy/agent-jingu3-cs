@@ -6,12 +6,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 从 Planner 输出的<strong>自然语言</strong>计划中抽取编号子任务（指南 §5：Executor 前的结构化步骤）。
- * 业界更稳妥的做法是要求模型输出 JSON Schema / 结构化字段；本仓库用正则解析 {@code 1. / 1) / 1、} 行以降低门槛，
- * 若解析不到编号行则退化为「整段文本算一步」。
+ * <strong>计划文本 → 子任务列表</strong>（Plan-and-Execute 驾驭链路的「弱结构化」环节）：从 Planner 输出的<strong>自然语言</strong>
+ * 中抽取编号行作为 Executor 逐步输入。业界更稳妥做法是强制 JSON Schema；本仓库用正则降低模型遵循成本，
+ * 若未匹配任何编号行则<strong>整段计划视为单步子任务</strong>，避免返回空列表导致无执行。
  */
 public final class PlanTextParser {
 
+    /** 匹配行首 {@code 1.} / {@code 1)} / {@code 1、} 等形式，捕获标题后正文 */
     private static final Pattern NUMBERED_LINE = Pattern.compile(
             "^\\s*\\d+[\\).、]\\s*(.+)$",
             Pattern.MULTILINE);

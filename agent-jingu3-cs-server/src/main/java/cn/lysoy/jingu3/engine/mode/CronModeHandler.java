@@ -8,12 +8,14 @@ import cn.lysoy.jingu3.stream.StreamEventSink;
 import org.springframework.stereotype.Component;
 
 /**
- * 指南 §8 Cron：定时任务、存储与触发管线；本类仅为对话侧「意图说明」占位，展示默认 cron 表达式，
- * 不连接 Quartz / Spring {@code @Scheduled}。完整能力见路线图「Cron 模块」设计草案。
+ * <strong>指南 §8 Cron</strong>（八大行动模式之一；<strong>非对话主路径</strong>）：对话内仅作「定时意图已记录」类说明，
+ * 使用配置项 {@code jingu3.cron.demo-schedule} 展示演示 Cron 表达式，<strong>不</strong>触发 Quartz / Spring {@code @Scheduled}。
+ * 真实调度、存储与幂等触发见路线图 Cron 独立模块与 {@code cron} 包内轮询等实现。
  */
 @Component
 public class CronModeHandler implements ActionModeHandler {
 
+    /** 部署可配置的演示调度串，便于文档/截图对齐 */
     private final String demoSchedule;
 
     public CronModeHandler(Jingu3Properties properties) {

@@ -14,7 +14,13 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.springframework.stereotype.Component;
 
 /**
- * Plan 子任务与工作流 TOOL 节点的工具路由与执行复用层（v0.4）。
+ * <strong>工具化子步骤复用层</strong>（驾驭工程 × 技能与工具系统，v0.4+）：把「Ask 式一行 JSON 路由 → 可选
+ * {@link ToolRegistry#execute} → 再 generate 汇总」抽成公共逻辑，供
+ * <ul>
+ *   <li>{@link cn.lysoy.jingu3.engine.mode.PlanAndExecuteModeHandler} 的 Plan 子任务；</li>
+ *   <li>{@link cn.lysoy.jingu3.engine.mode.WorkflowModeHandler} 的 {@code TOOL} 节点。</li>
+ * </ul>
+ * 避免 Plan 与 Workflow 在工具路径上复制粘贴，降低 JSON 约定漂移风险。
  */
 @Component
 public class ToolStepService {
@@ -48,8 +54,10 @@ public class ToolStepService {
             int stepNumber,
             StreamEventSink sink) {
         if (!properties.getTool().isEnabled()) {
+            // 全局关工具：子任务退化为单次 LLM 直答
             return chat.generate(prompts.buildSubtaskExecutePrompt(ctx, subtask, originalUserMessage, stepNumber));
         }
+        // 与 Ask 一致：先让模型输出一行 JSON 决定 direct 或 tool
         String routeRaw = chat.generate(prompts.buildPlanSubtaskToolRouterPrompt(ctx, subtask, originalUserMessage, stepNumber));
         ToolRoutingParser.AskRoutePayload route =
                 ToolRoutingParser.parseAskRoute(routeRaw, objectMapper)
@@ -76,6 +84,7 @@ public class ToolStepService {
      * 工作流 TOOL 节点：执行工具并将输出（或错误）拼入 {@code accumulated}。
      */
     public String runWorkflowToolNode(WorkflowNode node, String accumulated, StreamEventSink sink) {
+        // TOOL 节点：toolId 必填；instruction 作为工具输入串（可为空）
         String toolId = node.getToolId();
         if (toolId == null || toolId.isBlank()) {
             return accumulated

@@ -5,9 +5,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 工作流图中的一个节点（指南 §6：预设流程节点）。
- * <p>v0.4：{@code type} 为 {@code TOOL} 时 {@link #toolId} 必填，{@link #instruction} 作为工具单字符串参数；缺省 {@code type} 视为
- * LLM 节点。</p>
+ * <strong>工作流图节点</strong>（指南 §6，JSON 工作流 DSL 的最小单元）：由 {@link WorkflowDefinition} 持有顺序列表，
+ * {@link cn.lysoy.jingu3.engine.mode.WorkflowModeHandler} 按序执行。{@link #id} 用于流式 step 标签与日志。
+ * <p>v0.4 约定：{@code type=TOOL} 时 {@link #toolId} 必填，{@link #instruction} 作为 {@link cn.lysoy.jingu3.tool.ToolRegistry}
+ * 的单字符串入参；缺省或空白 {@code type} 视为 <strong>LLM</strong> 节点，{@link #instruction} 拼入
+ * {@link cn.lysoy.jingu3.prompt.PromptAssembly#buildWorkflowNodePrompt}。</p>
  */
 @Getter
 @Setter

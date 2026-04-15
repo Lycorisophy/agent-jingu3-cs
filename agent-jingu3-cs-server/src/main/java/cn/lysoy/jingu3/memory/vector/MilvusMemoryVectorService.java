@@ -28,23 +28,30 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Milvus 集合：memory_entry_id（PK）、user_id、embedding；单集合 MVP。
+ * <strong>Milvus 向量集合网关</strong>（记忆与知识系统）：维护单集合 MVP（字段：{@link #F_MEMORY_ENTRY_ID}、
+ * {@link #F_USER_ID}、{@link #F_EMBEDDING}），负责启动时建表/建索引/Load、插入/删除及按 user 过滤的相似检索。
+ * <p>向量维度优先读配置；未配置时用 {@link OllamaEmbeddingClient} 探针向量推断，与 Ollama 嵌入模型输出维一致。</p>
  */
 @Slf4j
 @Component
 @ConditionalOnProperty(prefix = "jingu3.milvus", name = "enabled", havingValue = "true")
 public class MilvusMemoryVectorService {
 
+    /** 与业务表主键对应，便于检索后回表 */
     static final String F_MEMORY_ENTRY_ID = "memory_entry_id";
+    /** 多租户隔离标量过滤字段（单用户阶段仍写入固定种子用户） */
     static final String F_USER_ID = "user_id";
+    /** 嵌入向量列，维度须与索引及插入数据一致 */
     static final String F_EMBEDDING = "embedding";
 
     private final Jingu3Properties properties;
 
     private final OllamaEmbeddingClient ollamaEmbeddingClient;
 
+    /** Milvus SDK 同步客户端；在 {@link #init()} 中创建、{@link jakarta.annotation.PreDestroy} 关闭 */
     private MilvusServiceClient client;
 
+    /** 与 collection 字段维一致；启动期推断或来自配置 */
     private volatile int vectorDimension;
 
     public MilvusMemoryVectorService(Jingu3Properties properties, OllamaEmbeddingClient ollamaEmbeddingClient) {
@@ -54,6 +61,7 @@ public class MilvusMemoryVectorService {
 
     @PostConstruct
     public void init() {
+        // 连接 Milvus → 确定维 → 确保集合存在并已 load，失败时由上层条件装配或日志暴露
         Jingu3Properties.Milvus m = properties.getMilvus();
         ConnectParam.Builder cb = ConnectParam.newBuilder().withHost(m.getHost()).withPort(m.getPort());
         if (m.getUser() != null && !m.getUser().isBlank()) {

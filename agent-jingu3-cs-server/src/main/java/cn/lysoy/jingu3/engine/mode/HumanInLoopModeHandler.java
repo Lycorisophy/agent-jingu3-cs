@@ -8,8 +8,9 @@ import cn.lysoy.jingu3.stream.StreamEventSink;
 import org.springframework.stereotype.Component;
 
 /**
- * 指南 §10 Human-in-the-Loop：人在环审批、待办队列与决策回流。对话模式仍为静态说明 + 用户输入摘要；
- * 持久化审批队列见 {@code hitl_approval} 与 {@code HitlController}（{@code /api/v1/hitl}）。
+ * <strong>指南 §10 Human-in-the-Loop</strong>（八大行动模式之一）：对话内返回<strong>静态待审批说明</strong>并附带用户输入摘要，
+ * 不调用 LLM 做自动通过/拒绝。持久化审批单、REST 查询与后续「决策回流到对话」见 Flyway {@code hitl_approval}、
+ * {@code HitlController}（{@code /api/v1/hitl}）及路线图 HITL 史诗。
  */
 @Component
 public class HumanInLoopModeHandler implements ActionModeHandler {

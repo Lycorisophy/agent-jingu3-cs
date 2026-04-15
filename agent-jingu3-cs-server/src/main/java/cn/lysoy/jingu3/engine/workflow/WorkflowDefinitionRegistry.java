@@ -22,8 +22,12 @@ public class WorkflowDefinitionRegistry {
 
     private static final String LOCATION = "classpath*:workflows/*.json";
 
+    /** 工作流 id → 反序列化后的定义（启动期装载，运行期只读） */
     private final Map<String, WorkflowDefinition> byId = new ConcurrentHashMap<>();
 
+    /**
+     * 构造时扫描 {@link #LOCATION}，将合法 JSON 定义放入内存；单条资源解析失败时跳过并打 warn，不影响其它文件。
+     */
     public WorkflowDefinitionRegistry(ResourcePatternResolver resourcePatternResolver) {
         Resource[] resources;
         try {

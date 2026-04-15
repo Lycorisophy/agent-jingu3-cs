@@ -22,19 +22,30 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+/**
+ * {@link MemoryService} 的默认实现：<strong>结构化记忆条目</strong>（MyBatis 持久化）与 <strong>向量索引</strong>
+ * （{@link MemoryVectorIndexer}，可接 Milvus）之间的编排；列表结果可经 {@link MemoryEntryListCache} 加速。
+ * <p>与对话链路的关系：在线检索注入不经过本类，而走 {@link cn.lysoy.jingu3.memory.injection.MilvusMemoryRetrievalService}；
+ * 本类主要服务 REST CRUD 与写后索引一致性。</p>
+ */
 @Service
 public class DefaultMemoryService implements MemoryService {
 
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_INSTANT;
 
+    /** 记忆主表 CRUD */
     private final MemoryEntryMapper memoryEntryMapper;
 
+    /** FACT 类条目的时序/确认等元数据 */
     private final FactMetadataMapper factMetadataMapper;
 
+    /** 记忆相关功能开关、向量维等 */
     private final Jingu3Properties properties;
 
+    /** 列表缓存（如 Redis），降低热点用户 list 压力 */
     private final MemoryEntryListCache memoryEntryListCache;
 
+    /** 写入/更新/删除后同步向量侧（实现可为 Milvus 或空操作） */
     private final MemoryVectorIndexer memoryVectorIndexer;
 
     public DefaultMemoryService(

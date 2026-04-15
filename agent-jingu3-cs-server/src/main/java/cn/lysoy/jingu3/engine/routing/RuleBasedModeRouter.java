@@ -9,13 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 基于关键词的简单规则路由。
+ * <strong>规则意图路由</strong>（指南 §2 三源中的第二源）：对用户自然语言做<strong>子串包含</strong>匹配，命中则返回对应
+ * {@link ActionMode}；未命中返回 empty，交由 {@link ModelIntentClassifier}。关键词维护在 {@link RoutingRuleKeywords}，
+ * 避免魔法字符串散落在业务代码中。
  * <p>不映射 CRON / STATE_TRACKING / HUMAN_IN_LOOP（对话不可选，见 {@link cn.lysoy.jingu3.engine.ActionModePolicy}）。</p>
  */
 @Component
 public class RuleBasedModeRouter {
 
-    /** 有序匹配：先匹配先生效 */
+    /** LinkedHashMap：有序匹配，先声明的关键词优先（如先匹配「计划」再匹配泛化词） */
     private final Map<String, ActionMode> keywordToMode;
 
     public RuleBasedModeRouter() {

@@ -14,11 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 指南 §6 Workflow：按预置流程（本仓库为 classpath {@code workflows/*.json} 顺序节点）逐段执行；
- * {@code LLM} 节点走提示链，{@code TOOL} 节点经 {@link cn.lysoy.jingu3.engine.support.ToolStepService} 调用
- * {@link cn.lysoy.jingu3.tool.ToolRegistry} 并将输出拼入上下文。
- * 无定义或空节点时回退为历史「摘要 → 方案」两步，与早期固定两阶段行为兼容。
- * <p>流式：每节点一次 BLOCK，STEP 标签优先使用节点 {@link WorkflowNode#getId()}；TOOL 节点可先发 {@code TOOL_RESULT}。</p>
+ * <strong>指南 §6 Workflow</strong>（八大行动模式之一）：按预置<strong>有向节点链</strong>执行（本仓库为 classpath
+ * {@code workflows/*.json}，由 {@link WorkflowDefinitionRegistry} 加载）。节点类型：{@code LLM} 走
+ * {@link PromptAssembly#buildWorkflowNodePrompt}；{@code TOOL} 经 {@link ToolStepService#runWorkflowToolNode}
+ * 调 {@link cn.lysoy.jingu3.tool.ToolRegistry}，输出拼入累计上下文供后续节点消费。
+ * <p>无定义或空节点时回退为「摘要 → 方案」两步固定提示，兼容早期无 JSON 工作流场景。</p>
+ * <p><strong>流式</strong>：每节点一步 stepBegin/block/stepEnd；TOOL 可在 block 前 toolResult。</p>
  */
 @Slf4j
 @Component
@@ -26,7 +27,9 @@ public class WorkflowModeHandler implements ActionModeHandler {
 
     private final ChatLanguageModel chat;
     private final PromptAssembly prompts;
+    /** workflowId → 节点链定义（进程内缓存） */
     private final WorkflowDefinitionRegistry workflowDefinitionRegistry;
+    /** TOOL 节点与 Plan 子任务共享工具执行与提示拼装 */
     private final ToolStepService toolStepService;
 
     public WorkflowModeHandler(
@@ -57,7 +60,7 @@ public class WorkflowModeHandler implements ActionModeHandler {
             return fallbackTwoStep(context, in, context.getUserMessage());
         }
 
-        // 顺序链：每节点把「节点指令 + 已累计的中间结果 + 原始用户话」交给模型，形成链式上下文
+        // 顺序链：accumulated 携带「入口输入 + 各节点产出」，供下游 LLM/TOOL 作为单一上下文串消费
         String accumulated = in;
         for (WorkflowNode node : def.getNodes()) {
             if (node.isToolNode()) {

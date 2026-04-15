@@ -22,6 +22,7 @@ import java.util.Optional;
 @Component
 public class ModelIntentClassifier {
 
+    /** 专用于短分类提示的阻塞模型（与主对话模型可为同一 Bean，但提示极短） */
     private final ChatLanguageModel chat;
 
     public ModelIntentClassifier(ChatLanguageModel chat) {

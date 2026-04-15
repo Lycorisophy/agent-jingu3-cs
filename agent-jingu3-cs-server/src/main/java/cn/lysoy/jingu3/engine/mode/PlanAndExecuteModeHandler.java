@@ -15,21 +15,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 指南 §5 Plan-and-Execute：先 Planner 产出编号计划，再 Executor 逐步执行子任务；失败时可 Replanner 修订计划。
- * 业界对比：相对 ReAct 减少「每步都问模型」的开销，适合步骤结构较清晰的任务。
+ * <strong>指南 §5 Plan-and-Execute</strong>（八大行动模式之一，驾驭工程）：<strong>Planner</strong> 先产出自然语言计划，
+ * <strong>Executor</strong> 再按子任务顺序执行；相对 ReAct 减少「每步都问模型是否结束」的开销，适合步骤边界较清晰的任务。
  * <p>
- * 本实现：计划与子任务均为阻塞 {@code generate}；子任务列表由 {@link PlanTextParser} 从自然语言中抽取编号行；
- * 重规划最多一次（{@code replan-enabled}），与「最小 Replanner」一致。
+ * 本实现特点：计划与子任务均为阻塞 {@code generate}；子任务列表由 {@link PlanTextParser} 从计划文本中抽取编号行（非 JSON Schema，
+ * 属 MVP 取舍）；子任务内工具路由复用 {@link ToolStepService}（与 Workflow TOOL 节点同套路）；失败时可选<strong>单次</strong>
+ * Replanner（{@code jingu3.engine.plan.replan-enabled}），第二次失败则向上抛或流式 error。
  * </p>
  */
 @Slf4j
 @Component
 public class PlanAndExecuteModeHandler implements ActionModeHandler {
 
+    /** Planner / Executor / Replanner 共用的主推理模型 */
     private final ChatLanguageModel chat;
+    /** 各阶段送模串拼装 */
     private final PromptAssembly prompts;
+    /** 子任务内 Ask 式工具路由 + 汇总 */
     private final ToolStepService toolStepService;
+    /** 防止计划过长耗尽 token/时间 */
     private final int maxSubtasks;
+    /** 是否允许在子任务失败后自动重规划一次 */
     private final boolean replanEnabled;
 
     public PlanAndExecuteModeHandler(
@@ -47,6 +53,7 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
 
     @Override
     public String execute(ExecutionContext context) {
+        // 阶段 1：仅生成计划文本（不执行工具）
         String plan = chat.generate(prompts.buildPlanAndExecutePlanPrompt(context));
         return executeWithPlan(context, plan, context.getUserMessage(), false);
     }
@@ -78,6 +85,7 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
         }
         int stepIdx = nextStepIndex;
         try {
+            // 阶段 2：逐步执行子任务；sink 非空时由 ToolStepService 在工具路径上发 TOOL_RESULT
             for (int i = 0; i < subtasks.size(); i++) {
                 sink.stepBegin(stepIdx, "subtask_" + (i + 1));
                 String r = toolStepService.runPlanSubtask(
@@ -90,6 +98,7 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
             log.warn("plan step failed: {}", ex.toString());
             if (replanEnabled && !afterReplan) {
                 sink.stepBegin(stepIdx, "replan");
+                // Replanner：把失败计划与错误摘要喂给模型，生成新计划文本后再走同一执行管线
                 String newPlan = chat.generate(
                         prompts.buildReplannerPrompt(ctx, plan, ex.getMessage(), originalUserMessage));
                 sink.block(newPlan == null ? "" : newPlan);
@@ -119,6 +128,7 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
         } catch (RuntimeException ex) {
             log.warn("plan step failed: {}", ex.toString());
             if (replanEnabled && !afterReplan) {
+                // 同步路径：重规划后直接递归；afterReplan 为 true 时不再 replan，将异常交给全局异常处理
                 String newPlan = chat.generate(
                         prompts.buildReplannerPrompt(ctx, plan, ex.getMessage(), originalUserMessage));
                 return executeWithPlan(ctx, newPlan, originalUserMessage, true);
@@ -126,6 +136,7 @@ public class PlanAndExecuteModeHandler implements ActionModeHandler {
             throw ex;
         }
 
+        // 汇总：便于人类阅读；客户端若以 JSON 消费可只取最后一步或自行解析
         StringBuilder sb = new StringBuilder();
         sb.append("【计划】\n").append(plan).append("\n\n【分步结果】\n");
         for (int i = 0; i < stepOutputs.size(); i++) {

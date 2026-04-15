@@ -13,21 +13,28 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 基于 Milvus 向量检索拼装注入文本。
+ * <strong>记忆检索 + 拼装</strong>（记忆与知识系统 × 上下文工程）：在 Milvus 启用时，将当前用户句嵌入向量，
+ * 按 user 隔离检索 Top-K {@code memory_entry_id}，回表读取 {@link MemoryEntryEntity} 摘要与正文预览，拼成
+ * {@link cn.lysoy.jingu3.common.constant.PromptFragments#MEMORY_REFERENCE_HEADER} 引导的引用块并置于用户消息<strong>之前</strong>。
+ * <p>本 Bean 仅在 {@code jingu3.milvus.enabled=true} 时注册；外层降级见 {@link MemoryAugmentationService}。</p>
  */
 @Slf4j
 @Service
 @ConditionalOnProperty(prefix = "jingu3.milvus", name = "enabled", havingValue = "true")
 public class MilvusMemoryRetrievalService {
 
+    /** 单条记忆正文注入预览上限，防止提示词爆炸 */
     private static final int BODY_PREVIEW_MAX = 500;
 
     private final Jingu3Properties properties;
 
+    /** 与 Ollama 嵌入模型对齐的查询向量 */
     private final OllamaEmbeddingClient ollamaEmbeddingClient;
 
+    /** Milvus 向量检索与集合生命周期 */
     private final MilvusMemoryVectorService milvusMemoryVectorService;
 
+    /** 向量 id → 业务字段（MySQL 等） */
     private final MemoryEntryMapper memoryEntryMapper;
 
     public MilvusMemoryRetrievalService(
@@ -50,6 +57,7 @@ public class MilvusMemoryRetrievalService {
         }
         String uid = userId == null ? "" : userId.trim();
         try {
+            // 1) 查询句嵌入 2) Milvus 相似检索（带 user 过滤）3) 回表取条目 4) 拼引用块
             float[] q = ollamaEmbeddingClient.embed(userMessage);
             int topK = Math.max(1, properties.getMemory().getRetrievalTopK());
             List<Long> ids = milvusMemoryVectorService.searchSimilar(uid, q, topK);

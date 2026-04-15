@@ -11,12 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 指南 §9 State Tracking：跨轮次状态与轨迹；本实现为按 {@link ExecutionContext#getConversationId()}
- * 维度的进程内计数器，重启即丢失。异步管道与持久化轨迹依赖记忆/存储史诗。
+ * <strong>指南 §9 State Tracking</strong>（八大行动模式之一；<strong>占位实现</strong>）：目标为跨轮次会话状态与轨迹，
+ * 与 DST（{@code /api/v1/dst}）等持久化能力协同；当前 Handler 仅维护 {@link ExecutionContext#getConversationId()} →
+ * 交互次数的<strong>进程内</strong>计数，<strong>进程重启即丢失</strong>，用于演示与联调占位。
  */
 @Component
 public class StateTrackingModeHandler implements ActionModeHandler {
 
+    /** 会话 id → 累计交互次数（非集群安全；多实例部署时需改为 Redis/DB） */
     private final ConcurrentHashMap<String, AtomicLong> interactionCount = new ConcurrentHashMap<>();
 
     /**
