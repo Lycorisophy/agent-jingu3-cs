@@ -384,6 +384,36 @@ paths:
       responses:
         "200":
           description: ApiResult list SkillSubscriptionItemVo
+    post:
+      summary: 订阅技能（v0.7）
+      description: JSON body skillId；公开且 ACTIVE 技能；已 ACTIVE 幂等。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscribeSkillRequest"
+      responses:
+        "200":
+          description: ApiResult void
+        "400":
+          description: 用户不存在或技能未公开/不可用
+        "404":
+          description: 技能主键不存在
+  /api/v1/skills/subscriptions/{skillId}:
+    delete:
+      summary: 取消订阅（v0.7）
+      parameters:
+        - name: skillId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ApiResult void
+        "404":
+          description: 未找到订阅
   /api/v1/skills/{slug}:
     get:
       summary: 按 slug 查询公开技能（v0.7）
@@ -485,6 +515,14 @@ components:
           type: boolean
         skillStatus:
           type: string
+    SubscribeSkillRequest:
+      type: object
+      required:
+        - skillId
+      properties:
+        skillId:
+          type: string
+          description: 技能主键（skill.id）
     SkillListItemVo:
       type: object
       properties:

@@ -1,6 +1,8 @@
 package cn.lysoy.jingu3.skill.mapper;
 
 import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
+import cn.lysoy.jingu3.skill.entity.UserSkillEntity;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -9,7 +11,7 @@ import java.util.List;
 /**
  * 用户技能关联查询（{@code user_skill} JOIN {@code skill}）。
  */
-public interface UserSkillMapper {
+public interface UserSkillMapper extends BaseMapper<UserSkillEntity> {
 
     @Select({
         "SELECT us.id AS subscriptionId, us.user_id AS userId, us.status AS subscriptionStatus,",

@@ -23,7 +23,9 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -100,5 +102,26 @@ class SkillControllerWebTest {
         mockMvc.perform(get("/api/v1/skills/subscriptions").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].slug").value("my-skill"));
+    }
+
+    @Test
+    void postSubscribeCallsService() throws Exception {
+        mockMvc.perform(
+                        post("/api/v1/skills/subscriptions")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"skillId\":\"sk-abc\"}")
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        verify(skillService).subscribe("001", "sk-abc");
+    }
+
+    @Test
+    void deleteUnsubscribeCallsService() throws Exception {
+        mockMvc.perform(delete("/api/v1/skills/subscriptions/sk99").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(skillService).unsubscribe("001", "sk99");
     }
 }

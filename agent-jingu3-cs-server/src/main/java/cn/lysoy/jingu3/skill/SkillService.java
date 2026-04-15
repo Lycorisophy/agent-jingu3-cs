@@ -6,7 +6,7 @@ import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
 import java.util.List;
 
 /**
- * 技能元数据查询（v0.7 市场只读）。
+ * 技能市场元数据与订阅（v0.7）。
  */
 public interface SkillService {
 
@@ -24,4 +24,12 @@ public interface SkillService {
      * 当前用户在 {@code user_skill} 中的有效订阅，并附带 {@code skill} 元数据。
      */
     List<SkillSubscriptionItemVo> listMySubscriptions(String userId);
+
+    /**
+     * 订阅公开且可用的技能；已 ACTIVE 则幂等；曾非 ACTIVE 则恢复为 ACTIVE。
+     */
+    void subscribe(String userId, String skillId);
+
+    /** 取消订阅（删除 {@code user_skill} 行）。 */
+    void unsubscribe(String userId, String skillId);
 }
