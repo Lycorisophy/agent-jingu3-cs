@@ -21,7 +21,7 @@ alwaysApply: true
 ## 每版本工序与文档位置
 
 每个版本在实现前按序完成：**PRD（用户故事 + 验收标准）→ 可行性分析 → 概要设计 → 详细设计 → 服务端实现（注释）→ 接口文档 → 前端（若有）→ 后端单测 → 部署文档**。  
-过程文档放在 **`docs/{版本号}/`**（如 `docs/v0.1/`）；源代码在 `agent-jingu3-cs-server/` 与客户端工程。
+过程文档放在 **`docs/{版本号}/`**（如 `docs/v0.1/`）；源代码在 `agent-jingu3-cs-server/` 与客户端工程。Maven **仓库根** `pom.xml` 为父工程，聚合 `agent-jingu3-cs-server`。
 
 ## 本地开发 Ollama 默认模型
 
@@ -67,4 +67,4 @@ alwaysApply: true
 - 是否违反 [开发路线图 v2.0](docs/计划/开发路线图.md) 与 [规范 §2](docs/规范/jingu3-开发规范.md) 的交付顺序？  
 - 本版本 `docs/v0.x/` 文档是否随功能同步更新？  
 - 新增接口是否走 `ApiResult` 与标准错误码？
-- 是否在 `agent-jingu3-cs-server` 下执行过 `mvn clean verify`（或至少 `pmd:check` + `spotbugs:check`）且无新增违规？
+- 是否在**仓库根**执行过 `mvn clean verify`（或 `mvn -f agent-jingu3-cs-server/pom.xml clean verify`；或至少 `pmd:check` + `spotbugs:check`）且无新增违规？

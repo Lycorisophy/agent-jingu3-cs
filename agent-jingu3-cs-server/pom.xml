@@ -5,28 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.12</version>
-        <relativePath/>
+        <groupId>cn.lysoy</groupId>
+        <artifactId>agent-jingu3-cs</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>cn.lysoy</groupId>
     <artifactId>agent-jingu3-cs-server</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <name>agent-jingu3-cs-server</name>
     <description>jingu3 CS Agent server</description>
-
-    <properties>
-        <java.version>17</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <langchain4j.version>0.36.2</langchain4j.version>
-        <p3c-pmd.version>2.1.1</p3c-pmd.version>
-        <!-- 3.25+ 默认 PMD 7 与 p3c-pmd 2.1.x 不兼容；锁定 3.21.x（PMD 6.55） -->
-        <!-- 3.25 默认绑定 PMD 7，与 p3c-pmd 2.1.x 不兼容；3.21.2 绑定 PMD 6.55 -->
-        <maven-pmd-plugin.version>3.21.2</maven-pmd-plugin.version>
-        <spotbugs-maven-plugin.version>4.8.6.6</spotbugs-maven-plugin.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -76,13 +63,11 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-            <version>3.5.9</version>
         </dependency>
         <!-- 3.5.9 起分页插件 PaginationInnerInterceptor 迁至 jsqlparser 模块，须显式引入 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <version>3.5.9</version>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
@@ -121,7 +106,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.3.1-jre</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -131,24 +115,20 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-ollama</artifactId>
-            <version>${langchain4j.version}</version>
         </dependency>
         <dependency>
             <groupId>net.objecthunter</groupId>
             <artifactId>exp4j</artifactId>
-            <version>0.4.8</version>
         </dependency>
         <dependency>
             <groupId>io.milvus</groupId>
             <artifactId>milvus-sdk-java</artifactId>
-            <version>2.4.4</version>
         </dependency>
 
         <!-- v0.6-C：Elasticsearch 8.x Java API（可选启用 jingu3.elasticsearch.enabled） -->
         <dependency>
             <groupId>co.elastic.clients</groupId>
             <artifactId>elasticsearch-java</artifactId>
-            <version>8.14.3</version>
         </dependency>
 
         <dependency>
@@ -182,64 +162,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <!-- 阿里巴巴 Java 手册 PMD 规则（p3c-pmd） -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd-plugin.version}</version>
-                <configuration>
-                    <!-- 与 p3c 对齐后存量告警（命名/事务/魔法值等）分批清零；先允许有限条数避免 verify 长期红 -->
-                    <maxAllowedViolations>40</maxAllowedViolations>
-                    <targetJdk>17</targetJdk>
-                    <printFailingErrors>true</printFailingErrors>
-                    <rulesets>
-                        <ruleset>rulesets/java/ali-concurrent.xml</ruleset>
-                        <ruleset>rulesets/java/ali-constant.xml</ruleset>
-                        <ruleset>rulesets/java/ali-exception.xml</ruleset>
-                        <ruleset>rulesets/java/ali-flowcontrol.xml</ruleset>
-                        <ruleset>rulesets/java/ali-naming.xml</ruleset>
-                        <ruleset>rulesets/java/ali-oop.xml</ruleset>
-                        <ruleset>rulesets/java/ali-orm.xml</ruleset>
-                        <ruleset>rulesets/java/ali-other.xml</ruleset>
-                        <ruleset>rulesets/java/ali-set.xml</ruleset>
-                    </rulesets>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.alibaba.p3c</groupId>
-                        <artifactId>p3c-pmd</artifactId>
-                        <version>${p3c-pmd.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>pmd-check</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs-maven-plugin.version}</version>
                 <configuration>
-                    <effort>Max</effort>
-                    <threshold>Low</threshold>
-                    <xmlOutput>true</xmlOutput>
                     <excludeFilterFile>${project.basedir}/spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>spotbugs-check</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
