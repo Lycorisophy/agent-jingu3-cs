@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 指南 §11 模式组合的一种实现：按客户端 {@link ChatRequest#getModePlan()} 声明的顺序，依次执行多种
- * {@link ActionMode}，步间通过 {@link PromptFragments#PLAN_CHAIN_SEPARATOR} 把用户原话与上一步答复拼进
- * {@link ExecutionContext#getTaskPayload()}，使下一步模型能「看见」链式上下文。
- * <p>仅顺序执行；并行 DAG 未在本类实现。</p>
+ * <strong>模式组合 / 显式编排</strong>（指南 §11，驾驭工程）：按客户端 {@link ChatRequest#getModePlan()} 声明的
+ * <strong>顺序列表</strong>，逐步执行多种 {@link ActionMode}；步间通过 {@link PromptFragments#PLAN_CHAIN_SEPARATOR}
+ * 将「用户原问 + 上一步模型输出」写入 {@link ExecutionContext#getTaskPayload()}，下一步的 {@link ExecutionContext#llmInput()}
+ * 即携带链式上下文，使不同模式在同一用户问题上形成<strong>流水线式推理</strong>。
+ * <p>仅实现<strong>线性顺序</strong>；并行 DAG、条件分支未在本类覆盖（见路线图与工作流平台设计）。</p>
  */
 @Slf4j
 @Component
@@ -32,8 +33,10 @@ public class ModePlanExecutor {
     /** 防止过长编排耗尽资源 */
     public static final int MAX_STEPS = 8;
 
+    /** 每步根据解析出的模式调用对应 {@link cn.lysoy.jingu3.engine.ActionModeHandler#execute} */
     private final ModeRegistry modeRegistry;
 
+    /** 与对话主路径一致：每步使用同一「增强后」用户基线串 effectiveMessage */
     private final UserPromptPreparationService userPromptPreparationService;
 
     public ModePlanExecutor(ModeRegistry modeRegistry, UserPromptPreparationService userPromptPreparationService) {
@@ -61,9 +64,11 @@ public class ModePlanExecutor {
                 : request.getConversationId();
         String effectiveMessage = userPromptPreparationService.prepare(request, users.getId(), serverTimeUtc);
         List<PlanStepVo> steps = new ArrayList<>();
+        // 步间链式负载：首步为 null，之后每步为「用户原问 + 分隔符 + 上一步答复」
         String chainPayload = null;
         ActionMode lastMode = ActionMode.ASK;
         for (String token : raw) {
+            // modePlan 每步 token 解析为枚举；WORKFLOW 且无 workflowId 时回落 ASK，避免非法状态
             ActionMode mode =
                     RoutingFallbacks.modePlanStepOrAskIfWorkflowWithoutId(parseOrReact(token), request.getWorkflowId());
             lastMode = mode;

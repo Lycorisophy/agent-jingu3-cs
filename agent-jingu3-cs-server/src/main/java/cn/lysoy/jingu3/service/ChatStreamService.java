@@ -40,14 +40,15 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 流式对话编排：与 {@link ChatService} 共享「校验 + 路由 + 上下文构造」，但输出为
- * {@link cn.lysoy.jingu3.stream.StreamEvent} 序列而非单次 JSON。
+ * <strong>流式对话编排入口</strong>（驾驭工程 + 上下文工程）：SSE / WebSocket 将 {@link cn.lysoy.jingu3.stream.StreamEvent}
+ * 序列推给客户端，与 {@link ChatService} 在「校验、记忆增强、三源路由、modePlan、ExecutionContext」上语义对齐。
  * <ul>
- *   <li>Ask：Ollama 流式 API → {@link StreamEventSink#token}；若走工具路径可先 {@link StreamEventSink#toolResult}；</li>
- *   <li>多步模式：每轮 LLM 以 {@link StreamEventSink#stepBegin}/{@link StreamEventSink#block}/{@link StreamEventSink#stepEnd} 暴露；</li>
- *   <li>modePlan：与同步版一致逐步 {@link cn.lysoy.jingu3.engine.ActionModeHandler#execute}，仅块式推送，避免中途 DONE。</li>
+ *   <li><strong>Ask</strong>：流式模型 API → {@link StreamEventSink#token}；工具路径上可先发 {@link StreamEventSink#toolResult}；</li>
+ *   <li><strong>ReAct / Plan / Workflow / Agent Team</strong> 等：用 {@link StreamEventSink#stepBegin}、{@link StreamEventSink#block}、
+ *   {@link StreamEventSink#stepEnd} 暴露子步，便于 UI 展示「驾驭」过程；</li>
+ *   <li><strong>modePlan</strong>：与 {@link ModePlanExecutor} 同步顺序执行，每步 {@code execute}+BLOCK，避免步间误发 DONE。</li>
  * </ul>
- * 线程：实际推理在 {@code chatStreamExecutor} 中执行，避免阻塞 Tomcat 工作线程。
+ * <p><strong>线程模型</strong>：实际推理在 {@code chatStreamExecutor} 中执行，避免长时间占用 Tomcat 工作线程导致连接超时。</p>
  */
 @Slf4j
 @Service
@@ -55,19 +56,31 @@ public class ChatStreamService {
 
     private final ChatRequestValidator chatRequestValidator;
     private final IntentRouter intentRouter;
+    /** 流式路径仍通过 Registry 取 Handler，但部分模式直接注入具体类以调用 {@code stream}（避免重复 switch 扩散） */
     private final ModeRegistry modeRegistry;
     private final UserConstants userConstants;
+    /** 指南 §3 */
     private final AskModeHandler askModeHandler;
+    /** 指南 §4 */
     private final ReActModeHandler reActModeHandler;
+    /** 指南 §5 */
     private final PlanAndExecuteModeHandler planAndExecuteModeHandler;
+    /** 指南 §6：JSON 顺序工作流 */
     private final WorkflowModeHandler workflowModeHandler;
+    /** 指南 §7：Leader + 专员 + 合成 */
     private final AgentTeamModeHandler agentTeamModeHandler;
+    /** 指南 §8：定时意图说明（Stub/MVP） */
     private final CronModeHandler cronModeHandler;
+    /** 指南 §9：状态追踪占位 */
     private final StateTrackingModeHandler stateTrackingModeHandler;
+    /** 指南 §10：人在环说明 */
     private final HumanInLoopModeHandler humanInLoopModeHandler;
+    /** 异步执行流式管线的线程池（见配置 Bean 名 {@code chatStreamExecutor}） */
     private final TaskExecutor chatStreamExecutor;
+    /** 将 StreamEvent 序列化为与 SSE data 一致的 JSON 行 */
     private final ObjectMapper objectMapper;
 
+    /** 同 {@link ChatService}：记忆注入 + 送模前格式化 */
     private final UserPromptPreparationService userPromptPreparationService;
 
     private final UserPromptCipherPersistenceService userPromptCipherPersistenceService;
@@ -124,7 +137,7 @@ public class ChatStreamService {
     }
 
     /**
-     * 流式管线核心：单入口，供测试或扩展直接调用。
+     * 流式管线核心：单入口，供 SSE/WebSocket 启动方法或单测直接调用。
      */
     void runStream(ChatRequest request, StreamEventSink sink) {
         try {
@@ -137,11 +150,13 @@ public class ChatStreamService {
                 streamModePlan(request, sink, serverTime);
                 return;
             }
+            // 与 ChatService 一致：先上下文工程再意图路由
             String forLlm = userPromptPreparationService.prepare(request, userConstants.getId(), serverTime);
             RoutingDecision decision =
                     RoutingFallbacks.askIfWorkflowWithoutWorkflowId(
                             intentRouter.resolve(request.getMessage(), request.getMode()), request.getWorkflowId());
 
+            // 首帧 meta：客户端可展示当前模式与路由来源（对齐客户端 UI 规范）
             sink.meta(
                     decision.getMode().name(),
                     decision.getSource().name(),
@@ -153,6 +168,7 @@ public class ChatStreamService {
             }
 
             ExecutionContext ctx = buildContext(request, decision, forLlm);
+            // 按枚举分发到各模式 stream；各实现内部负责 TOKEN/BLOCK/DONE 约定
             streamByMode(decision.getMode(), ctx, sink);
         } catch (Exception e) {
             log.warn("stream pipeline failed: {}", e.toString());
@@ -161,7 +177,8 @@ public class ChatStreamService {
     }
 
     /**
-     * 与 {@link ModePlanExecutor} 对齐的顺序执行；每步用阻塞 execute，以 BLOCK 推送（不做 Ask 的 TOKEN 流，避免步间提前 DONE）。
+     * modePlan 流式：与 {@link ModePlanExecutor} 对齐的顺序执行；每步阻塞 {@code execute} 后以整块 BLOCK 推送，
+     * 避免单步内部 TOKEN 流导致客户端提前收到 DONE（与同步多步语义一致）。
      */
     private void streamModePlan(ChatRequest request, StreamEventSink sink, Instant serverTime) {
         List<String> raw = request.getModePlan();
@@ -232,7 +249,7 @@ public class ChatStreamService {
     }
 
     /**
-     * 按枚举分发到各 handler 的 {@code stream} 或回退为 execute+BLOCK（无流式实现的模式）。
+     * 按 {@link ActionMode} 分发到对应 Handler 的 {@code stream}；各模式自行约定 step/token 事件形态。
      */
     private void streamByMode(ActionMode mode, ExecutionContext ctx, StreamEventSink sink) {
         switch (mode) {

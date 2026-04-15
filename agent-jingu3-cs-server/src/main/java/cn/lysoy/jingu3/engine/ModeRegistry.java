@@ -14,14 +14,21 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * 行动模式到 {@link ActionModeHandler} 实例的注册表（Spring 注入各模式 Bean，启动时装配）。
- * <p>新增模式时需：增加 {@link ActionMode}、实现 handler、在此注册、并同步 {@link cn.lysoy.jingu3.engine.ActionModePolicy} 等策略。</p>
+ * <strong>八大行动模式注册表</strong>（驾驭工程）：{@link ActionMode} → {@link ActionModeHandler} 的编译期固定映射，
+ * Spring 构造时注入八个具体 Handler，供 {@link cn.lysoy.jingu3.service.ChatService} 与 {@link cn.lysoy.jingu3.service.ChatStreamService}
+ * 在路由完成后 O(1) 分派。
+ * <p>新增对话可选模式时需同步：枚举 {@link ActionMode}、本表、{@link cn.lysoy.jingu3.engine.ActionModePolicy}、
+ * {@link cn.lysoy.jingu3.engine.routing.IntentRouter} / 分类器白名单及客户端契约。</p>
  */
 @Component
 public class ModeRegistry {
 
+    /** 八种模式各唯一实现；未在构造器中 put 的模式在运行时应视为配置错误 */
     private final Map<ActionMode, ActionModeHandler> handlers = new EnumMap<>(ActionMode.class);
 
+    /**
+     * 由 Spring 注入全部 {@link ActionModeHandler} 实现并装入 EnumMap（顺序与枚举定义无关，以 put 键为准）。
+     */
     public ModeRegistry(
             AskModeHandler ask,
             ReActModeHandler react,

@@ -3,7 +3,10 @@ package cn.lysoy.jingu3.tool;
 import cn.lysoy.jingu3.common.enums.ToolRiskLevel;
 
 /**
- * 内置可调用工具契约：与 LangChain4j {@code Tool} 解耦，由 {@link ToolRegistry} 统一注册与执行。
+ * <strong>技能与工具系统 — 内置可调用工具契约</strong>：与 LangChain4j {@code Tool} 注解模型解耦，统一由
+ * {@link ToolRegistry} 在启动期收集 Spring Bean、构建目录并供 Ask/ReAct/Plan/AgentTeam 等模式<strong>经 JSON 路由调用</strong>。
+ * <p>企业级扩展（动态工具、市场下发、客户端执行）见路线图 v0.7 与 {@code docs/workspace/skill-system-design.md}；
+ * 当前内置工具均为低风险 {@link ToolRiskLevel#LOW} 示例或工作空间配套能力。</p>
  */
 public interface Jingu3Tool {
 

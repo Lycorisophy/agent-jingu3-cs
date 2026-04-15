@@ -5,8 +5,10 @@ import cn.lysoy.jingu3.engine.ActionMode;
 import cn.lysoy.jingu3.engine.ExecutionContext;
 
 /**
- * 将「本轮路由来源 + 当前模式自然语言说明 + 各模式含义」拼入送入 LLM 的提示词前缀，
- * 使模型能结合上下文善意提示用户切换到更合适模式（见 {@link PromptTemplates#MODE_CATALOG_FOR_LLM}）。
+ * <strong>意图与模式对 LLM 可见</strong>（提示词工程子模块）：在每条送模提示的<strong>最前部</strong>插入固定结构文案，
+ * 说明本轮 {@link cn.lysoy.jingu3.engine.routing.RoutingSource}、当前 {@link cn.lysoy.jingu3.engine.ActionMode} 以及
+ * 各模式职责速查（{@link PromptTemplates#MODE_CATALOG_FOR_LLM}），使模型在回答中能<strong>善意引导</strong>用户切换到
+ * 更契合任务的模式，并与《JinGu3 AI Agent 客户端 UI 设计规范》中「模式含义对用户/模型可见」的要求对齐。
  */
 public final class ModeRoutingPreamble {
 
@@ -20,6 +22,7 @@ public final class ModeRoutingPreamble {
         if (ctx == null) {
             return "";
         }
+        // 首行：人类可读的中文路由说明 + 内部枚举名，便于排障与模型对齐「谁决定了模式」
         String headLine = switch (ctx.getRoutingSource()) {
             case CLIENT_EXPLICIT ->
                     "【模式路由】用户显式选择了「" + modeDisplayZh(ctx.getSelectedMode()) + "」模式（内部标识 "

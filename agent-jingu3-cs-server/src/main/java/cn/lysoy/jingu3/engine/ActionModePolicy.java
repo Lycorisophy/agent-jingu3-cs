@@ -8,12 +8,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 行动模式在「对话 HTTP API」层的可见性策略：指南中八种模式均可能在引擎内存在，
- * 但面向终端用户的聊天接口仅开放其中一部分，避免 Cron/HITL 等被误选（与产品、§8/§10 边界一致）。
+ * 行动模式在「<strong>对话 HTTP/WebSocket API</strong>」层的<strong>可见性策略</strong>（产品驾驭边界）：
+ * 指南中八种模式在引擎内均有 {@link cn.lysoy.jingu3.engine.ActionModeHandler} 实现，但终端用户通过 {@code mode} /
+ * {@code modePlan} 仅允许选取其中五种（ASK、REACT、PLAN_AND_EXECUTE、WORKFLOW、AGENT_TEAM），避免将
+ * CRON、STATE_TRACKING、HUMAN_IN_LOOP 当作普通对话模式误选（与指南 §8/§9/§10 及路线图 Cron/HITL 独立入口一致）。
  */
 public final class ActionModePolicy {
 
-    /** 用户可通过 /chat 显式传入或由意图路由落入的模式集合 */
+    /** 用户可通过 /chat 显式传入或由意图路由落入的模式集合（与错误提示文案 {@link cn.lysoy.jingu3.common.constant.EngineMessages#MODE_NOT_CONVERSATION_SELECTABLE} 对应） */
     private static final Set<ActionMode> CONVERSATION_SELECTABLE = Set.of(
             ActionMode.ASK,
             ActionMode.REACT,

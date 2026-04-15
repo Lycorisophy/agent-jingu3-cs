@@ -16,12 +16,14 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * 指南 §4 ReAct：迭代式「思考 → 行动 → 观察」；v0.3 起行动可解析为真实工具调用，观察为工具输出写入「已有过程」。
+ * <strong>指南 §4 ReAct 模式</strong>：多步迭代「思考 →（可选）工具行动 → 观察」；在 {@code jingu3.tool.enabled=true}
+ * 时，步末由 {@link ToolRoutingParser} 解析 JSON 页脚，{@code invoke} 则调用 {@link ToolRegistry} 并将工具输出追加到
+ * <strong>prior 轨迹</strong> 供下一步模型消费；{@code done} 或出现 {@link #TASK_COMPLETE} 时结束循环。
  */
 @Component
 public class ReActModeHandler implements ActionModeHandler {
 
-    /** 与 PromptTemplates 中约定一致，用于显式声明本轮循环可结束 */
+    /** 与 PromptTemplates 中约定一致：模型可在正文任意位置包含此标记以提前结束（与 JSON footer 并存） */
     private static final String TASK_COMPLETE = "[TASK_COMPLETE]";
 
     private final ChatLanguageModel chat;
@@ -29,6 +31,7 @@ public class ReActModeHandler implements ActionModeHandler {
     private final Jingu3Properties properties;
     private final ToolRegistry toolRegistry;
     private final ObjectMapper objectMapper;
+    /** 防止无限循环；与配置 {@code jingu3.engine.react.max-steps} 对齐 */
     private final int maxSteps;
 
     public ReActModeHandler(
@@ -49,6 +52,7 @@ public class ReActModeHandler implements ActionModeHandler {
     @Override
     public String execute(ExecutionContext context) {
         String userMessage = context.llmInput();
+        // display：对用户展示的完整轨迹；prior：对模型隐藏的「已发生思考与观察」累积串
         StringBuilder display = new StringBuilder();
         StringBuilder prior = new StringBuilder();
         for (int step = 1; step <= maxSteps; step++) {

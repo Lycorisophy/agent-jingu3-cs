@@ -8,14 +8,24 @@ import cn.lysoy.jingu3.tool.ToolRegistry;
 import org.springframework.stereotype.Component;
 
 /**
- * 提示词拼装（ENG:提示词工程）：将 {@link PromptTemplates} 中的系统/角色文案与 {@link PromptFragments}
- * 中的换行、标签等拼成最终送入 LLM 的字符串；每条对话均在段首注入 {@link ModeRoutingPreamble}，
- * 标明路由来源、当前模式与各模式含义，便于模型善意提示用户切换模式。
+ * <strong>提示词工程（ENG: Prompt Engineering）</strong>在服务端的中枢：将 {@link PromptTemplates} 中按模式维护的
+ * 系统/角色/子任务模板与 {@link PromptFragments} 中的换行、用户标签等拼接为<strong>完整送模串</strong>。
+ * <p>
+ * <strong>与上下文工程的关系</strong>：本类不负责记忆检索或 UTC/平台行（见 {@link UserPromptPreparationService}），
+ * 仅假设 {@link ExecutionContext#getUserMessage()} / {@link ExecutionContext#llmInput()} 已是「路由与业务上希望模型看到」的文本；
+ * 每条提示均在段首通过 {@link ModeRoutingPreamble} 注入<strong>意图与模式可见性</strong>说明，满足指南与客户端规范对 LLM 透明度的要求。
+ * </p>
+ * <p>
+ * <strong>与工具系统的关系</strong>：Ask/ReAct/Plan 子任务/Agent Team 专员等路径按需拼接 {@link ToolRegistry#buildCatalogMarkdown()}，
+ * 与 {@link cn.lysoy.jingu3.tool.ToolRoutingParser} 产出的 JSON 约定闭合。
+ * </p>
  */
 @Component
 public class PromptAssembly {
 
+    /** 内置工具目录 Markdown，注入到「工具路由」类提示中 */
     private final ToolRegistry toolRegistry;
+    /** 是否启用工具、子 Agent 轮次等运行时开关 */
     private final Jingu3Properties properties;
 
     public PromptAssembly(ToolRegistry toolRegistry, Jingu3Properties properties) {
@@ -37,6 +47,7 @@ public class PromptAssembly {
         return PromptTemplates.REACT_SYSTEM;
     }
 
+    /** 统一在正文前拼接「模式路由说明 + 各模式速查」，避免各 build* 方法遗漏 */
     private static String withModePreamble(ExecutionContext ctx, String body) {
         return ModeRoutingPreamble.build(ctx) + PromptFragments.PARAGRAPH_BREAK + body;
     }
@@ -108,6 +119,7 @@ public class PromptAssembly {
                         + ctx.llmInput());
     }
 
+    /** 指南 §5 第一阶段：仅产出编号计划，不执行工具 */
     public String buildPlanAndExecutePlanPrompt(ExecutionContext ctx) {
         return withModePreamble(
                 ctx,
@@ -117,6 +129,9 @@ public class PromptAssembly {
                         + ctx.llmInput());
     }
 
+    /**
+     * 指南 §5 第二阶段：在已定计划下执行子任务（由 {@link cn.lysoy.jingu3.engine.mode.PlanAndExecuteModeHandler} 循环调用）。
+     */
     public String buildPlanAndExecuteExecutePrompt(
             ExecutionContext ctx, String planText, String originalUserMessage) {
         return withModePreamble(
@@ -130,6 +145,7 @@ public class PromptAssembly {
                         + originalUserMessage);
     }
 
+    /** 指南 §6：无 JSON 定义时的两步固定工作流 — 第一步（概括用户目标） */
     public String buildWorkflowStep1Prompt(ExecutionContext ctx, String llmInput) {
         return withModePreamble(
                 ctx,
@@ -139,6 +155,7 @@ public class PromptAssembly {
                         + llmInput);
     }
 
+    /** 指南 §6：两步固定工作流 — 第二步（在概括基础上作答） */
     public String buildWorkflowStep2Prompt(ExecutionContext ctx, String summary, String originalUserMessage) {
         return withModePreamble(
                 ctx,
@@ -265,6 +282,7 @@ public class PromptAssembly {
                         + "请用中文说明原因并尽量给出可操作的替代建议，并遵守上文【子 Agent 边界】。");
     }
 
+    /** 指南 §7：Leader 子任务 + 各专员轮输出 → 合成对用户可见的最终答复 */
     public String buildAgentTeamSynthesizePrompt(ExecutionContext ctx, String leaderSubtask, String trajectoryText) {
         return withModePreamble(
                 ctx,
@@ -308,6 +326,7 @@ public class PromptAssembly {
                         + (priorTrace == null || priorTrace.isBlank() ? "（无）" : priorTrace));
     }
 
+    /** Plan 子任务直答（不走路由 JSON 时）的单步执行提示 */
     public String buildSubtaskExecutePrompt(
             ExecutionContext ctx, String subtask, String originalUserMessage, int stepNumber) {
         return withModePreamble(
@@ -322,6 +341,7 @@ public class PromptAssembly {
                         + originalUserMessage);
     }
 
+    /** Plan 执行失败时的最小 Replanner 提示（单次重规划入口） */
     public String buildReplannerPrompt(
             ExecutionContext ctx, String failedPlan, String errorHint, String originalUserMessage) {
         return withModePreamble(
@@ -338,6 +358,7 @@ public class PromptAssembly {
                         + originalUserMessage);
     }
 
+    /** classpath JSON 工作流：单个 LLM 节点上的指令与用户上下文拼接 */
     public String buildWorkflowNodePrompt(
             ExecutionContext ctx, String nodeInstruction, String accumulatedContext, String originalUserMessage) {
         return withModePreamble(

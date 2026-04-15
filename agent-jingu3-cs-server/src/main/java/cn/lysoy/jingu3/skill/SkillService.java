@@ -6,7 +6,9 @@ import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
 import java.util.List;
 
 /**
- * 技能市场元数据与订阅（v0.7）。
+ * <strong>技能系统（市场侧）</strong>（路线图 v0.7）：管理「公开技能目录」与「用户订阅关系」，与对话内
+ * {@link cn.lysoy.jingu3.tool.Jingu3Tool} 内置工具体系<strong>解耦</strong>——本接口面向 REST 与元数据，
+ * 不在此直接执行客户端下发技能逻辑（参见 {@code docs/workspace/skill-system-design.md}）。
  */
 public interface SkillService {
 

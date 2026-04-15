@@ -23,8 +23,11 @@ import java.util.Optional;
 @Component
 public class IntentRouter {
 
+    /** 关键词/规则层：低成本、可解释，优先于模型分类 */
     private final RuleBasedModeRouter rules;
+    /** 模型意图分类：规则未命中时调用 LLM 产出 {@link ActionMode} */
     private final ModelIntentClassifier classifier;
+    /** 显式模式守门等路由相关开关 */
     private final Jingu3Properties properties;
 
     public IntentRouter(
@@ -43,10 +46,12 @@ public class IntentRouter {
      */
     public RoutingDecision resolve(String userMessage, String modeFromClient) {
         String msg = userMessage == null ? "" : userMessage;
+        // 分支 A：客户端显式 mode — 最高优先级，但仍受对话可选集合与显式守门约束
         if (modeFromClient != null && !modeFromClient.isBlank()) {
             try {
                 ActionMode mode = ActionMode.fromFlexibleName(modeFromClient);
                 ActionModePolicy.assertConversationSelectable(mode);
+                // 重模式守门：避免用户随手选 Plan/AgentTeam 而当前语句实为简单问答（可配置关闭）
                 if (properties.getRouting().isExplicitModeGuardEnabled()
                         && (mode == ActionMode.PLAN_AND_EXECUTE || mode == ActionMode.AGENT_TEAM)) {
                     Optional<ActionMode> inferredOpt = classifier.classifyOptional(msg);
@@ -74,6 +79,7 @@ public class IntentRouter {
                 return new RoutingDecision(ActionMode.ASK, RoutingSource.FALLBACK, RoutingNotes.INVALID_EXPLICIT_MODE);
             }
         }
+        // 分支 B：无显式 mode — 先规则后模型（与指南「三源」顺序一致）
         return rules.route(msg)
                 .map(m -> new RoutingDecision(m, RoutingSource.RULE, "keyword"))
                 .orElseGet(() -> {

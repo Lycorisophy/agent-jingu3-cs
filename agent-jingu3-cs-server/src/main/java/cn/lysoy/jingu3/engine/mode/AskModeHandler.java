@@ -21,16 +21,25 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * 指南 §3 Ask：单次对话为主；v0.3 起可经一轮 JSON 路由调用 {@link ToolRegistry} 内置工具再汇总。
+ * <strong>指南 §3 Ask 模式</strong>（八大行动模式之一）：以单次（或带历史）模型生成为主；在
+ * {@code jingu3.tool.enabled=true} 时走「<strong>工具路由 JSON → 可选一次工具 → 再生成用户可见答复</strong>」闭环，
+ * 工具调用经 {@link ToolRegistry}，路由格式由 {@link ToolRoutingParser} 解析。
+ * <p>{@link #stream} 使用流式模型 API 输出 TOKEN，并在工具路径上发出 {@link cn.lysoy.jingu3.stream.StreamEventSink#toolResult}。</p>
  */
 @Component
 public class AskModeHandler implements ActionModeHandler {
 
+    /** 阻塞式：工具路由、再生成、Agent Team 专员轮等复用 */
     private final ChatLanguageModel chat;
+    /** 流式：最终对用户的打字机输出 */
     private final StreamingChatLanguageModel streamingChat;
+    /** 提示词工程：Ask 各阶段模板拼装 */
     private final PromptAssembly prompts;
+    /** 工具总开关等 */
     private final Jingu3Properties properties;
+    /** 内置工具执行入口 */
     private final ToolRegistry toolRegistry;
+    /** 与模型约定 JSON 解析 */
     private final ObjectMapper objectMapper;
 
     public AskModeHandler(
@@ -50,6 +59,7 @@ public class AskModeHandler implements ActionModeHandler {
 
     @Override
     public String execute(ExecutionContext context) {
+        // 统一管线：与 Agent Team 专员等共享 runToolAugmentedOneShot，避免分叉逻辑
         return runToolAugmentedOneShot(
                         properties.getTool().isEnabled(),
                         prompts.buildAskToolRouterPrompt(context),
@@ -73,11 +83,13 @@ public class AskModeHandler implements ActionModeHandler {
         if (!toolsEnabled) {
             return new AugmentedLlmAnswer(chat.generate(directAnswerPrompt), null, null);
         }
+        // 第一步：模型仅输出一行 JSON，声明 direct 或 tool(toolId,input)
         String routeRaw = chat.generate(toolRouterPrompt);
         ToolRoutingParser.AskRoutePayload route =
                 ToolRoutingParser.parseAskRoute(routeRaw, objectMapper)
                         .orElse(ToolRoutingParser.AskRoutePayload.direct());
         if (!route.useTool()) {
+            // 解析失败或显式 direct：退回单次问答提示
             return new AugmentedLlmAnswer(chat.generate(directAnswerPrompt), null, null);
         }
         try {

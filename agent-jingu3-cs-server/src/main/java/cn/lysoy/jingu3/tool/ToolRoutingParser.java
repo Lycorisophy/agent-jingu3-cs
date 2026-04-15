@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 
 /**
- * 解析 Ask 路由 JSON 与 ReAct 页脚 JSON；与 {@link PromptTemplates} 中的格式约定一致。
+ * <strong>工具路由解析器</strong>（技能与工具系统 × 提示词工程）：把模型在<strong>受约束格式</strong>下输出的 JSON
+ * 解析为结构化载荷，供 Ask（首轮一行 JSON）与 ReAct（步末页脚 JSON 或 {@link #JINGU3_JSON_MARKER} 后载荷）消费。
+ * <p>解析失败时返回 {@link Optional#empty()}，调用方须<strong>显式回落</strong>（如直答或结束循环），避免将非 JSON 文本当工具调用。</p>
  */
 public final class ToolRoutingParser {
 

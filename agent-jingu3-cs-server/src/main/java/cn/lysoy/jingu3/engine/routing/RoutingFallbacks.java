@@ -6,7 +6,9 @@ import cn.lysoy.jingu3.engine.ActionMode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 路由层统一回落策略：在无法按原模式安全执行时改为 {@link ActionMode#ASK}。
+ * <strong>路由层统一回落策略</strong>（驾驭工程的安全网）：在「工作流缺 id」「modePlan 单步不合法」等场景下，
+ * 将可能失败或含糊的模式选择<strong>静默或带 note 地</strong>改为 {@link ActionMode#ASK}，保证接口不抛错且用户仍能收到回答。
+ * <p>与 {@link IntentRouter} 的「决策」互补：本类侧重<strong>执行前最后一英里</strong>的可行性修正。</p>
  */
 @Slf4j
 public final class RoutingFallbacks {

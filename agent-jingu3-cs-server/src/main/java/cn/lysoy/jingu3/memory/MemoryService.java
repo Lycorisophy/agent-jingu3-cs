@@ -7,7 +7,11 @@ import cn.lysoy.jingu3.common.vo.MemoryEntryVo;
 import java.util.List;
 
 /**
- * 记忆域门面（v0.6 起）；M1 提供写入与按用户列表，未接入 ChatService。
+ * <strong>记忆与知识系统</strong>（路线图 v0.6+）对 REST 暴露的<strong>应用门面</strong>：负责结构化记忆条目的增删改查、
+ * FACT 确认等；<strong>与对话主链路的关系</strong>：在线「检索注入」走 {@link cn.lysoy.jingu3.memory.injection.MemoryAugmentationService}
+ * + Milvus，而非本接口的同步 CRUD。
+ * <p>实现类 {@link cn.lysoy.jingu3.memory.DefaultMemoryService} 协调 MyBatis Mapper、向量索引器等；具体表结构与物化清单见
+ * {@code docs/设计/} 下记忆相关文档。</p>
  */
 public interface MemoryService {
 

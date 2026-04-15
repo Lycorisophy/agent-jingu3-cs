@@ -13,14 +13,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 内置工具注册表：启动时收集全部 {@link Jingu3Tool} Bean，按 id 查找并执行。
+ * <strong>工具注册表</strong>（技能与工具系统运行时核心）：Spring 注入全部 {@link Jingu3Tool} 实现，
+ * 在 {@link PostConstruct} 阶段建立 id → 实例映射；供 {@link cn.lysoy.jingu3.prompt.PromptAssembly} 生成工具目录、
+ * 供各 {@link cn.lysoy.jingu3.engine.ActionModeHandler} 通过 {@link #execute(String, String)} 同步调用。
+ * <p>重复 id 在启动期即失败，避免运行期非确定行为。</p>
  */
 @Slf4j
 @Component
 public class ToolRegistry {
 
+    /** 保留 Spring 容器声明顺序，便于目录与 REST 列表稳定 */
     private final List<Jingu3Tool> toolsInOrder;
 
+    /** 只读映射：init 完成后由 {@link Map#copyOf} 冻结 */
     private Map<String, Jingu3Tool> byId;
 
     public ToolRegistry(List<Jingu3Tool> tools) {
@@ -40,6 +45,7 @@ public class ToolRegistry {
     void initRegistry() {
         Map<String, Jingu3Tool> m = new LinkedHashMap<>();
         for (Jingu3Tool t : toolsInOrder) {
+            // putIfAbsent：同 id 第二次出现即视为配置错误，阻止带病启动
             Jingu3Tool prev = m.putIfAbsent(t.id(), t);
             if (prev != null) {
                 throw new IllegalStateException("duplicate tool id: " + t.id());
