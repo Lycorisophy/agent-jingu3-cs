@@ -22,7 +22,7 @@
 
 ## 4. 技能扩展验收（初稿）
 
-- **市场元数据只读**：`GET /api/v1/skills`、`GET /api/v1/skills/{slug}`、`GET /api/v1/skills/subscriptions` — **已落地**（见 [接口文档.md](./接口文档.md)）；对象存储下载与写接口仍待迭代。
+- **市场元数据 + 订阅**：`GET /api/v1/skills`、`GET /api/v1/skills/{slug}`、`GET /api/v1/skills/subscriptions`，以及 **`POST /api/v1/skills/subscriptions`**、**`DELETE /api/v1/skills/subscriptions/{skillId}`** — **已落地**（见 [接口文档.md](./接口文档.md)）；对象存储下载仍待迭代。
 - JSON Schema 覆盖工具描述（范围以详细设计为准）。
 - 高危工具与 HITL 或确认流程可配置。
 
@@ -31,5 +31,6 @@
 | 日期 | 版本 | 说明 |
 |------|------|------|
 | 2026-04-13 | 0.1 | 初稿：HITL 协同表 + Phase 引用 |
-| 2026-04-13 | 0.2 | Workspace Phase 1～3 与技能只读 REST 与文档对齐 |
+| 2026-04-13 | 0.2 | Workspace Phase 1～3 与技能市场 REST 与文档对齐 |
 | 2026-04-13 | 0.3 | 详细设计定稿；PRD 评审记录与 HITL 表表述对齐 |
+| 2026-04-13 | 0.4 | 技能验收条补充订阅写入 REST；与 README/概要/路线图版本状态一致 |
