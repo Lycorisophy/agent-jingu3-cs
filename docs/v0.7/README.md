@@ -2,7 +2,7 @@
 
 本版本对应 [开发路线图.md](../计划/开发路线图.md#v07--技能工具系统扩展原史诗③顺延--工作空间workspace)：**工具企业化能力**与 [工作空间系统设计](../workspace/workspace-design.md) 分阶段落地。
 
-**版本状态（与路线图一致）**：**进行中（工程抢跑）**——Workspace Phase 1～3 与技能 REST（含订阅写入）已在 `agent-jingu3-cs-server`；路线图「功能需求」中 **工具发现 / 客户端工具 / 安全分级 / 提示词扩展** 等条仍为后续迭代，不以本 README 勾选为准单方面关闭版本。
+**版本状态（与路线图一致）**：**进行中（工程抢跑）**——Workspace Phase 1～3、技能 REST（含订阅写入）与 **内置工具只读目录 `GET /api/v1/tools`**（`ToolRiskLevel`）已在 `agent-jingu3-cs-server`；路线图「功能需求」中 **企业级执行策略 / 客户端工具 / 安全分级与高危确认 / 提示词扩展** 等条仍为后续迭代，不以本 README 勾选为准单方面关闭版本。
 
 ## 文档索引
 
@@ -43,6 +43,11 @@
 - 配置：`jingu3.skill.api-enabled`、`jingu3.skill.list-max-size`
 - REST：**`GET /api/v1/skills`**、**`GET /api/v1/skills/{slug}`**、**`GET /api/v1/skills/subscriptions`**；**`POST /api/v1/skills/subscriptions`**、**`DELETE /api/v1/skills/subscriptions/{skillId}`**（不含 `storage_path`）；下载 URL / MinIO 后续迭代
 
+### 内置工具目录（只读）
+
+- 配置：`jingu3.tool.catalog-api-enabled`（默认 `true`，与 `jingu3.tool.enabled` 独立）
+- REST：**`GET /api/v1/tools`** → `ApiResult<List<ToolListItemVo>>`（`id`、`description`、`riskLevel`）
+
 ## 工序清单（发布前勾选）
 
 - [x] README.md
@@ -51,5 +56,5 @@
 - [x] 概要设计.md
 - [x] 详细设计.md（Workspace / 技能 / HITL 边界 / 测试锚点）
 - [x] 接口文档.md（Workspace + 技能；OpenAPI 见 [docs/v0.5/openapi.yaml](../v0.5/openapi.yaml)）
-- [x] 单测与集成测（**Controller**：`SkillControllerWebTest`、`WorkspaceControllerWebTest`；工具/MyBatis 见既有用例）
+- [x] 单测与集成测（**Controller**：`ToolControllerWebTest`、`SkillControllerWebTest`、`WorkspaceControllerWebTest`；工具/MyBatis 见既有用例）
 - [x] 部署文档.md（初稿）

@@ -6,6 +6,7 @@ info:
     与 [接口文档.md](./接口文档.md) 配套；对话主链路及 v0.5 横切 REST。
     记忆实验 API（v0.6 M1）见 `/api/v1/memory/entries`，详述见 [docs/v0.6/接口文档.md](../v0.6/接口文档.md)（若存在）或代码 `MemoryController`。
     工作空间管理 API（v0.7 Phase 3）见 `/api/v1/workspace/**`，详述见 [docs/v0.7/接口文档.md](../v0.7/接口文档.md)。
+    内置工具只读目录（v0.7）见 `GET /api/v1/tools`（`ToolListItemVo`），详述见 [docs/v0.7/接口文档.md](../v0.7/接口文档.md)。
     技能市场（v0.7）见 `GET /api/v1/skills`、`GET/POST/DELETE …/subscriptions` 等，详述见 [docs/v0.7/接口文档.md](../v0.7/接口文档.md)。
 servers:
   - url: http://localhost:8080
@@ -376,6 +377,13 @@ paths:
       responses:
         "200":
           description: ApiResult list EventSearchHitVo
+  /api/v1/tools:
+    get:
+      summary: 内置工具目录（v0.7）
+      description: 需 jingu3.tool.catalog-api-enabled=true；返回 ToolRegistry 已注册工具的 id、description、riskLevel（LOW/MEDIUM/HIGH）。
+      responses:
+        "200":
+          description: ApiResult list ToolListItemVo
   /api/v1/skills:
     get:
       summary: 公开技能目录列表（v0.7）
@@ -529,6 +537,19 @@ components:
         skillId:
           type: string
           description: 技能主键（skill.id）
+    ToolListItemVo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 稳定工具 ID（与路由 JSON toolId 一致）
+        description:
+          type: string
+          description: 与 Ask/ReAct 提示词内工具说明一致
+        riskLevel:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+          description: 内置 ToolRiskLevel 名
     SkillListItemVo:
       type: object
       properties:

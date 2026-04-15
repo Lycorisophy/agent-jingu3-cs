@@ -227,6 +227,11 @@ public class Jingu3Properties {
 
         /** 是否启用 Ask / ReAct 工具管线；关闭时行为与 v0.2 一致（无工具路由与执行） */
         private boolean enabled = true;
+
+        /**
+         * 是否暴露 {@code GET /api/v1/tools} 内置工具目录（id、description、riskLevel）；生产可关闭。
+         */
+        private boolean catalogApiEnabled = true;
     }
 
     @Data

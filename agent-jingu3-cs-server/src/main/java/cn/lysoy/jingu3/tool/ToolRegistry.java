@@ -1,8 +1,10 @@
 package cn.lysoy.jingu3.tool;
 
+import cn.lysoy.jingu3.common.vo.ToolListItemVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,6 +40,19 @@ public class ToolRegistry {
         return byId.values().stream()
                 .map(t -> "- `" + t.id() + "`：" + t.description())
                 .collect(Collectors.joining("\n"));
+    }
+
+    /** 供 REST 目录：顺序与启动注册顺序一致 */
+    public List<ToolListItemVo> buildCatalogList() {
+        List<ToolListItemVo> out = new ArrayList<>(byId.size());
+        for (Jingu3Tool t : byId.values()) {
+            ToolListItemVo row = new ToolListItemVo();
+            row.setId(t.id());
+            row.setDescription(t.description());
+            row.setRiskLevel(t.riskLevel().name());
+            out.add(row);
+        }
+        return out;
     }
 
     public String execute(String toolId, String input) throws ToolExecutionException {

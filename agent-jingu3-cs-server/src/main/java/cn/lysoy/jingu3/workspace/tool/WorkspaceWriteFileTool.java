@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.workspace.tool;
 
+import cn.lysoy.jingu3.common.enums.ToolRiskLevel;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.tool.Jingu3Tool;
 import cn.lysoy.jingu3.tool.ToolExecutionException;
@@ -36,6 +37,11 @@ public class WorkspaceWriteFileTool implements Jingu3Tool {
     public String description() {
         return "写入工作空间文本文件。input 为 JSON 字符串，字段 path（相对路径）、content（文件内容，可空字符串）。"
                 + "示例：{\"path\":\"notes/a.txt\",\"content\":\"hello\"}";
+    }
+
+    @Override
+    public ToolRiskLevel riskLevel() {
+        return ToolRiskLevel.MEDIUM;
     }
 
     @Override

@@ -31,6 +31,8 @@ jingu3:
     explicit-mode-guard-enabled: true
   tool:
     enabled: true
+    # 是否暴露 GET /api/v1/tools（内置工具 id、description、riskLevel）
+    catalog-api-enabled: true
   snowflake:
     worker-id: 1
     datacenter-id: 1

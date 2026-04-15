@@ -21,8 +21,11 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/workspace")
-@ConditionalOnProperty(prefix = "jingu3.workspace", name = "enabled", havingValue = "true", matchIfMissing = true)
-@ConditionalOnProperty(prefix = "jingu3.workspace", name = "rest-api-enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+        prefix = "jingu3.workspace",
+        name = {"enabled", "rest-api-enabled"},
+        havingValue = "true",
+        matchIfMissing = true)
 public class WorkspaceController {
 
     private final WorkspaceManagementService workspaceManagementService;

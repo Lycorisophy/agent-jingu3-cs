@@ -1,5 +1,7 @@
 package cn.lysoy.jingu3.tool;
 
+import cn.lysoy.jingu3.common.enums.ToolRiskLevel;
+
 /**
  * 内置可调用工具契约：与 LangChain4j {@code Tool} 解耦，由 {@link ToolRegistry} 统一注册与执行。
  */
@@ -10,6 +12,11 @@ public interface Jingu3Tool {
 
     /** 进入 Ask/ReAct 提示词的工具说明（多行 Markdown 列表项之一） */
     String description();
+
+    /** 风险等级；覆盖为 MEDIUM/HIGH 的工具有待客户端与策略层二次确认 */
+    default ToolRiskLevel riskLevel() {
+        return ToolRiskLevel.LOW;
+    }
 
     /**
      * 同步执行工具。

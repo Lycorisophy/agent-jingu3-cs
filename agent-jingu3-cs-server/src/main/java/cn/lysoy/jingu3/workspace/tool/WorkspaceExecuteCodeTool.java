@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.workspace.tool;
 
+import cn.lysoy.jingu3.common.enums.ToolRiskLevel;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.tool.Jingu3Tool;
 import cn.lysoy.jingu3.tool.ToolExecutionException;
@@ -42,6 +43,11 @@ public class WorkspaceExecuteCodeTool implements Jingu3Tool {
         return "在用户工作空间内执行 Python 或 JavaScript（进程沙箱，有超时）。"
                 + " input 为 JSON：{\"language\":\"python|javascript\",\"code\":\"...\"} "
                 + "或 {\"language\":\"python\",\"relativePath\":\"脚本相对路径\"}；可选 \"timeoutSeconds\": 正整数。";
+    }
+
+    @Override
+    public ToolRiskLevel riskLevel() {
+        return ToolRiskLevel.HIGH;
     }
 
     @Override
