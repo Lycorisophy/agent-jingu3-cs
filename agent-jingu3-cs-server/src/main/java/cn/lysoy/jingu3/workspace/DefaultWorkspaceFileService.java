@@ -58,7 +58,11 @@ public class DefaultWorkspaceFileService implements WorkspaceFileService {
                 throw new IOException("超过工作空间配额（" + quotaMb + "MB）");
             }
         }
-        Files.createDirectories(file.getParent());
+        Path parent = file.getParent();
+        if (parent == null) {
+            throw new IOException("无法解析父目录: " + relativePath);
+        }
+        Files.createDirectories(parent);
         Files.writeString(file, content == null ? "" : content, StandardCharsets.UTF_8);
     }
 
@@ -69,7 +73,12 @@ public class DefaultWorkspaceFileService implements WorkspaceFileService {
             throw new IOException("不是目录或不存在: " + relativePath);
         }
         try (Stream<Path> s = Files.list(dir)) {
-            return s.map(p -> p.getFileName().toString()).sorted(Comparator.naturalOrder()).toList();
+            return s.map(p -> {
+                        Path fn = p.getFileName();
+                        return fn != null ? fn.toString() : "";
+                    })
+                    .sorted(Comparator.naturalOrder())
+                    .toList();
         }
     }
 

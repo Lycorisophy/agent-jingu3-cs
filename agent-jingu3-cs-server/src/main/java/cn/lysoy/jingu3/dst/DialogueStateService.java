@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
+
 @Service
 public class DialogueStateService {
 
@@ -40,7 +42,8 @@ public class DialogueStateService {
             e.setSchemaVersion("1");
             e.setRevision(0L);
         }
-        if (request.getExpectedRevision() != null && request.getExpectedRevision() != e.getRevision()) {
+        if (request.getExpectedRevision() != null
+                && !Objects.equals(request.getExpectedRevision(), e.getRevision())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "revision 不匹配，请刷新后重试");
         }
         e.setStateJson(request.getStateJson());

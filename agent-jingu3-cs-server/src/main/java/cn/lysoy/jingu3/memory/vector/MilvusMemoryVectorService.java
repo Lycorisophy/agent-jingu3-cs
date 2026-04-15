@@ -14,7 +14,7 @@ import io.milvus.param.dml.DeleteParam;
 import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.SearchParam;
 import io.milvus.param.index.CreateIndexParam;
-import io.milvus.param.index.IndexType;
+import io.milvus.param.IndexType;
 import io.milvus.param.MetricType;
 import io.milvus.response.SearchResultsWrapper;
 import lombok.extern.slf4j.Slf4j;

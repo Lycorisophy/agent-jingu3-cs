@@ -30,6 +30,7 @@ class TraceRequestIdFilterTest {
     void setsMdcAndResponseHeaders() throws ServletException, IOException {
         Jingu3Properties props = new Jingu3Properties();
         SnowflakeIdGenerator gen = new SnowflakeIdGenerator(props);
+        gen.initForTest();
         TraceRequestIdFilter filter = new TraceRequestIdFilter(gen);
         MockHttpServletRequest req = new MockHttpServletRequest();
         MockHttpServletResponse res = new MockHttpServletResponse();
@@ -49,6 +50,7 @@ class TraceRequestIdFilterTest {
     void honorsIncomingHeaders() throws ServletException, IOException {
         Jingu3Properties props = new Jingu3Properties();
         SnowflakeIdGenerator gen = new SnowflakeIdGenerator(props);
+        gen.initForTest();
         TraceRequestIdFilter filter = new TraceRequestIdFilter(gen);
         MockHttpServletRequest req = new MockHttpServletRequest();
         req.addHeader(HttpTraceHeaders.REQUEST_ID, "client-req");

@@ -40,7 +40,7 @@ class ToolStepServiceTest {
 
     @BeforeEach
     void setUp() {
-        toolRegistry = new ToolRegistry(List.of(new CalculatorTool()));
+        toolRegistry = ToolRegistry.createForTest(List.of(new CalculatorTool()));
         properties = new Jingu3Properties();
         properties.getTool().setEnabled(true);
         service = new ToolStepService(chat, prompts, toolRegistry, properties, new ObjectMapper());

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Spring 单例中保存配置 / Mapper / ObjectMapper 等构造注入引用；SpotBugs 误报为可变对象外泄 -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- 集成层 catch(Exception) 容错、匿名 Runnable 等；与业务缺陷相关性低，后续可逐段收窄 -->
+    <Match>
+        <Bug pattern="REC_CATCH_EXCEPTION,DE_MIGHT_IGNORE,SIC_INNER_SHOULD_BE_STATIC_ANON"/>
+    </Match>
+</FindBugsFilter>

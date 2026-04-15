@@ -38,7 +38,7 @@ class ModeRegistryTest {
                 .thenReturn("r1")
                 .thenReturn("r2");
         StreamingChatLanguageModel streaming = Mockito.mock(StreamingChatLanguageModel.class);
-        ToolRegistry toolRegistry = new ToolRegistry(List.of(new CalculatorTool(), new UtcTimeTool()));
+        ToolRegistry toolRegistry = ToolRegistry.createForTest(List.of(new CalculatorTool(), new UtcTimeTool()));
         Jingu3Properties props = new Jingu3Properties();
         props.getTool().setEnabled(false);
         props.getCron().setDemoSchedule("0 0 9 * * MON-FRI");

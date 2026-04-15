@@ -38,7 +38,7 @@ public class ScheduledTaskEntity {
     @TableField("payload_json")
     private String payloadJson;
 
-    private Boolean enabled = true;
+    private boolean enabled = true;
 
     @TableField("last_run_at")
     private LocalDateTime lastRunAt;
@@ -55,11 +55,4 @@ public class ScheduledTaskEntity {
     @TableField("updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    public boolean isEnabled() {
-        return Boolean.TRUE.equals(enabled);
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 }

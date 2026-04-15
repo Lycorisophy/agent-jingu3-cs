@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,9 +25,9 @@ class MemoryEntryMapperTest {
 
     @Test
     void findByUserIdOrder() {
-        MemoryEntryEntity a = entry("001", MemoryEntryKind.EVENT, "a");
-        MemoryEntryEntity b = entry("001", MemoryEntryKind.FACT, "b");
-        MemoryEntryEntity c = entry("002", MemoryEntryKind.FACT, "c");
+        MemoryEntryEntity a = entry("001", MemoryEntryKind.EVENT, "a", 0);
+        MemoryEntryEntity b = entry("001", MemoryEntryKind.FACT, "b", 1);
+        MemoryEntryEntity c = entry("002", MemoryEntryKind.FACT, "c", 0);
         memoryEntryMapper.insert(a);
         memoryEntryMapper.insert(b);
         memoryEntryMapper.insert(c);
@@ -37,13 +38,13 @@ class MemoryEntryMapperTest {
         assertThat(list.get(1).getSummary()).isEqualTo("a");
     }
 
-    private static MemoryEntryEntity entry(String userId, MemoryEntryKind kind, String summary) {
+    private static MemoryEntryEntity entry(String userId, MemoryEntryKind kind, String summary, int createdAtPlusSeconds) {
         MemoryEntryEntity e = new MemoryEntryEntity();
         e.setUserId(userId);
         e.setKind(kind);
         e.setSummary(summary);
         e.setBody("x");
-        var n = UtcTime.nowLocalDateTime();
+        var n = UtcTime.nowLocalDateTime().plus(createdAtPlusSeconds, ChronoUnit.SECONDS);
         e.setCreatedAt(n);
         e.setUpdatedAt(n);
         return e;

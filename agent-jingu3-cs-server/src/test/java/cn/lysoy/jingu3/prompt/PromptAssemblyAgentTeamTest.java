@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PromptAssemblyAgentTeamTest {
 
     private static PromptAssembly assembly() {
-        ToolRegistry registry = new ToolRegistry(List.of(new CalculatorTool(), new UtcTimeTool()));
+        ToolRegistry registry = ToolRegistry.createForTest(List.of(new CalculatorTool(), new UtcTimeTool()));
         return new PromptAssembly(registry, new Jingu3Properties());
     }
 

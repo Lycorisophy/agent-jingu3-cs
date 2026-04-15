@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.controller;
 
+import cn.lysoy.jingu3.common.trace.SnowflakeIdGenerator;
 import cn.lysoy.jingu3.common.vo.WorkspaceExecutionItemVo;
 import cn.lysoy.jingu3.common.vo.WorkspaceFileStatsVo;
 import cn.lysoy.jingu3.common.vo.WorkspaceSummaryVo;
@@ -47,9 +48,13 @@ class WorkspaceControllerWebTest {
     @MockBean
     private UserConstants userConstants;
 
+    @MockBean
+    private SnowflakeIdGenerator snowflakeIdGenerator;
+
     @BeforeEach
     void stubUser() {
         when(userConstants.getId()).thenReturn("001");
+        when(snowflakeIdGenerator.nextIdString()).thenReturn("1");
     }
 
     @Test

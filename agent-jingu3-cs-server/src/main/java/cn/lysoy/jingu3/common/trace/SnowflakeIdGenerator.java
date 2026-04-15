@@ -1,6 +1,7 @@
 package cn.lysoy.jingu3.common.trace;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,16 +32,29 @@ public class SnowflakeIdGenerator {
     private long lastTimestamp = -1L;
 
     public SnowflakeIdGenerator(Jingu3Properties properties) {
-        long w = properties.getSnowflake().getWorkerId();
-        long d = properties.getSnowflake().getDatacenterId();
-        if (w > MAX_WORKER_ID || w < 0) {
+        this.workerId = properties.getSnowflake().getWorkerId();
+        this.datacenterId = properties.getSnowflake().getDatacenterId();
+    }
+
+    @PostConstruct
+    void afterSpringConstruct() {
+        validateSnowflakeIds();
+    }
+
+    /**
+     * 非 Spring 单测在 {@code new SnowflakeIdGenerator(props)} 之后调用，与 {@link PostConstruct} 行为一致。
+     */
+    public void initForTest() {
+        validateSnowflakeIds();
+    }
+
+    private void validateSnowflakeIds() {
+        if (workerId > MAX_WORKER_ID || workerId < 0) {
             throw new IllegalArgumentException("jingu3.snowflake.worker-id out of range 0.." + MAX_WORKER_ID);
         }
-        if (d > MAX_DATACENTER_ID || d < 0) {
+        if (datacenterId > MAX_DATACENTER_ID || datacenterId < 0) {
             throw new IllegalArgumentException("jingu3.snowflake.datacenter-id out of range 0.." + MAX_DATACENTER_ID);
         }
-        this.workerId = w;
-        this.datacenterId = d;
     }
 
     public synchronized long nextId() {

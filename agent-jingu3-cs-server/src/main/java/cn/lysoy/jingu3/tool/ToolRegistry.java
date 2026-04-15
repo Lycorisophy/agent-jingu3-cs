@@ -1,6 +1,7 @@
 package cn.lysoy.jingu3.tool;
 
 import cn.lysoy.jingu3.common.vo.ToolListItemVo;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +19,27 @@ import java.util.stream.Collectors;
 @Component
 public class ToolRegistry {
 
-    private final Map<String, Jingu3Tool> byId;
+    private final List<Jingu3Tool> toolsInOrder;
+
+    private Map<String, Jingu3Tool> byId;
 
     public ToolRegistry(List<Jingu3Tool> tools) {
+        this.toolsInOrder = tools == null ? List.of() : List.copyOf(tools);
+    }
+
+    /**
+     * 单测等非 Spring 场景：容器外构造后调用，等价于 Spring 对 {@link PostConstruct} 的调用。
+     */
+    public static ToolRegistry createForTest(List<Jingu3Tool> tools) {
+        ToolRegistry r = new ToolRegistry(tools);
+        r.initRegistry();
+        return r;
+    }
+
+    @PostConstruct
+    void initRegistry() {
         Map<String, Jingu3Tool> m = new LinkedHashMap<>();
-        for (Jingu3Tool t : tools) {
+        for (Jingu3Tool t : toolsInOrder) {
             Jingu3Tool prev = m.putIfAbsent(t.id(), t);
             if (prev != null) {
                 throw new IllegalStateException("duplicate tool id: " + t.id());

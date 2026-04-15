@@ -178,9 +178,7 @@ public class ProcessSandboxExecutor implements SandboxExecutor {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             long ms = (System.nanoTime() - t0) / 1_000_000L;
-            if (p != null) {
-                p.destroyForcibly();
-            }
+            p.destroyForcibly();
             return fail("interrupted", e.getMessage(), ms);
         } catch (IOException e) {
             long ms = (System.nanoTime() - t0) / 1_000_000L;

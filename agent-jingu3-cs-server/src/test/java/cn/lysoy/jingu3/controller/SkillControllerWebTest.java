@@ -2,6 +2,7 @@ package cn.lysoy.jingu3.controller;
 
 import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
+import cn.lysoy.jingu3.common.trace.SnowflakeIdGenerator;
 import cn.lysoy.jingu3.common.vo.SkillListItemVo;
 import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;
 import cn.lysoy.jingu3.component.ApiExceptionHandler;
@@ -47,9 +48,13 @@ class SkillControllerWebTest {
     @MockBean
     private UserConstants userConstants;
 
+    @MockBean
+    private SnowflakeIdGenerator snowflakeIdGenerator;
+
     @BeforeEach
     void stubUser() {
         when(userConstants.getId()).thenReturn("001");
+        when(snowflakeIdGenerator.nextIdString()).thenReturn("1");
     }
 
     @Test

@@ -28,7 +28,7 @@ class ScheduledTaskMapperTest {
     void findDueIds_returnsEnabledPastNextRun() {
         Instant nowInstant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         ScheduledTaskEntity due = newEntity(nowInstant.minusSeconds(60), true);
-        ScheduledTaskEntity future = newEntity(nowInstant.plusHours(1), true);
+        ScheduledTaskEntity future = newEntity(nowInstant.plus(1, ChronoUnit.HOURS), true);
         ScheduledTaskEntity disabled = newEntity(nowInstant.minusSeconds(30), false);
         scheduledTaskMapper.insert(due);
         scheduledTaskMapper.insert(future);

@@ -57,8 +57,11 @@ public class AgentTeamModeHandler implements ActionModeHandler {
     @Override
     public void stream(ExecutionContext context, StreamEventSink sink) {
         String leader = chat.generate(prompts.buildAgentTeamLeadPrompt(context));
+        if (leader == null) {
+            leader = "";
+        }
         sink.stepBegin(1, "leader");
-        sink.block(leader == null ? "" : leader);
+        sink.block(leader);
         sink.stepEnd(1);
         List<String> rounds = new ArrayList<>();
         StringBuilder acc = new StringBuilder();

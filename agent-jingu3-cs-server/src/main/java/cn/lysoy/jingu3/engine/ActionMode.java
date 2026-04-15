@@ -2,6 +2,8 @@ package cn.lysoy.jingu3.engine;
 
 import cn.lysoy.jingu3.common.constant.EngineMessages;
 
+import java.util.Locale;
+
 /**
  * 八大行动模式枚举，与 {@code docs/设计/AI智能体行动模式设计指南.md} 中 §1.3 / 各章模式一一对应。
  * <p>
@@ -48,7 +50,7 @@ public enum ActionMode {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException(EngineMessages.MODE_CANNOT_BE_BLANK);
         }
-        String n = raw.trim().toUpperCase().replace('-', '_');
+        String n = raw.trim().toUpperCase(Locale.ROOT).replace('-', '_');
         return ActionMode.valueOf(n);
     }
 }

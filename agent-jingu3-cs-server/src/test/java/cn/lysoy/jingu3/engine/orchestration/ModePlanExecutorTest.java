@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 class ModePlanExecutorTest {
 
     private static ModeRegistry buildRegistry(ChatLanguageModel chat, StreamingChatLanguageModel streaming) {
-        ToolRegistry toolRegistry = new ToolRegistry(List.of(new CalculatorTool(), new UtcTimeTool()));
+        ToolRegistry toolRegistry = ToolRegistry.createForTest(List.of(new CalculatorTool(), new UtcTimeTool()));
         Jingu3Properties props = new Jingu3Properties();
         props.getTool().setEnabled(false);
         props.getCron().setDemoSchedule("0 0 9 * * MON-FRI");

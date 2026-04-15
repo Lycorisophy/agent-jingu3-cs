@@ -1,8 +1,10 @@
 package cn.lysoy.jingu3.controller;
 
+import cn.lysoy.jingu3.common.trace.SnowflakeIdGenerator;
 import cn.lysoy.jingu3.common.vo.ToolListItemVo;
 import cn.lysoy.jingu3.component.ApiExceptionHandler;
 import cn.lysoy.jingu3.tool.ToolRegistry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,6 +35,14 @@ class ToolControllerWebTest {
 
     @MockBean
     private ToolRegistry toolRegistry;
+
+    @MockBean
+    private SnowflakeIdGenerator snowflakeIdGenerator;
+
+    @BeforeEach
+    void stubTraceIds() {
+        when(snowflakeIdGenerator.nextIdString()).thenReturn("1");
+    }
 
     @Test
     void listReturnsApiResultWithRiskLevel() throws Exception {
