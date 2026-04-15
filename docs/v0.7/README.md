@@ -9,7 +9,7 @@
 | [PRD.md](./PRD.md) | 范围、与 HITL 协同的安全策略、Workspace 验收引用 |
 | [可行性分析.md](./可行性分析.md) | 技术结论与风险（与当前实现对齐） |
 | [概要设计.md](./概要设计.md) | 范围、架构摘录、数据与接口索引 |
-| [详细设计.md](./详细设计.md) | 占位：HITL×工具、MinIO、写入 API 等待决 |
+| [详细设计.md](./详细设计.md) | Workspace / 技能 / 工具契约、HITL 目标态与现状、测试锚点 |
 | [接口文档.md](./接口文档.md) | Workspace + 技能 REST |
 | [部署文档.md](./部署文档.md) | Flyway V9、配置与验收 |
 | [workspace-design.md](../workspace/workspace-design.md) | 工作空间权威设计（Phase 1～3） |
@@ -47,7 +47,7 @@
 - [x] PRD.md（初稿，已对齐 Phase 1～3 与技能只读 REST）
 - [x] 可行性分析.md
 - [x] 概要设计.md
-- [ ] 详细设计.md（[占位稿](./详细设计.md) 待扩展为正式条目）
+- [x] 详细设计.md（Workspace / 技能 / HITL 边界 / 测试锚点）
 - [x] 接口文档.md（Workspace + 技能；OpenAPI 见 [docs/v0.5/openapi.yaml](../v0.5/openapi.yaml)）
-- [ ] 单测与集成测（**Controller**：`SkillControllerWebTest`、`WorkspaceControllerWebTest`；工具/MyBatis 见既有用例）
+- [x] 单测与集成测（**Controller**：`SkillControllerWebTest`、`WorkspaceControllerWebTest`；工具/MyBatis 见既有用例）
 - [x] 部署文档.md（初稿）
