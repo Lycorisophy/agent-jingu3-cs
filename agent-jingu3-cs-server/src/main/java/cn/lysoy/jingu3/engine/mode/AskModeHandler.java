@@ -17,6 +17,8 @@ import dev.langchain4j.model.output.Response;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * 指南 §3 Ask：单次对话为主；v0.3 起可经一轮 JSON 路由调用 {@link ToolRegistry} 内置工具再汇总。
@@ -48,21 +50,69 @@ public class AskModeHandler implements ActionModeHandler {
 
     @Override
     public String execute(ExecutionContext context) {
-        if (!properties.getTool().isEnabled()) {
-            return chat.generate(prompts.buildAskCombinedPrompt(context));
+        return runToolAugmentedOneShot(
+                        properties.getTool().isEnabled(),
+                        prompts.buildAskToolRouterPrompt(context),
+                        prompts.buildAskCombinedPrompt(context),
+                        (toolId, toolOut) -> prompts.buildAskAfterToolPrompt(context, toolId, toolOut),
+                        msg -> prompts.buildAskToolFailurePrompt(context, msg))
+                .getText();
+    }
+
+    /**
+     * 与 {@link #execute} 相同的「JSON 路由 → 可选工具 → 最终 generate」管线，提示词由调用方传入（如 Agent Team 专员轮）。
+     *
+     * @param afterToolPromptBuilder 参数为 toolId、工具原始输出，返回送入模型的完整提示词
+     */
+    public AugmentedLlmAnswer runToolAugmentedOneShot(
+            boolean toolsEnabled,
+            String toolRouterPrompt,
+            String directAnswerPrompt,
+            BiFunction<String, String, String> afterToolPromptBuilder,
+            Function<String, String> toolFailurePromptBuilder) {
+        if (!toolsEnabled) {
+            return new AugmentedLlmAnswer(chat.generate(directAnswerPrompt), null, null);
         }
-        String routeRaw = chat.generate(prompts.buildAskToolRouterPrompt(context));
+        String routeRaw = chat.generate(toolRouterPrompt);
         ToolRoutingParser.AskRoutePayload route =
                 ToolRoutingParser.parseAskRoute(routeRaw, objectMapper)
                         .orElse(ToolRoutingParser.AskRoutePayload.direct());
         if (!route.useTool()) {
-            return chat.generate(prompts.buildAskCombinedPrompt(context));
+            return new AugmentedLlmAnswer(chat.generate(directAnswerPrompt), null, null);
         }
         try {
             String toolOut = toolRegistry.execute(route.toolId(), route.input());
-            return chat.generate(prompts.buildAskAfterToolPrompt(context, route.toolId(), toolOut));
+            String text = chat.generate(afterToolPromptBuilder.apply(route.toolId(), toolOut));
+            return new AugmentedLlmAnswer(text, route.toolId(), toolOut);
         } catch (ToolExecutionException e) {
-            return chat.generate(prompts.buildAskToolFailurePrompt(context, e.getMessage()));
+            String msg = e.getMessage() != null ? e.getMessage() : e.toString();
+            String text = chat.generate(toolFailurePromptBuilder.apply(msg));
+            return new AugmentedLlmAnswer(text, route.toolId(), null);
+        }
+    }
+
+    /** {@link #runToolAugmentedOneShot} 的生成结果；工具未调用时 {@link #getInvokedToolId()} 为 null。 */
+    public static final class AugmentedLlmAnswer {
+        private final String text;
+        private final String invokedToolId;
+        private final String invokedToolOutput;
+
+        public AugmentedLlmAnswer(String text, String invokedToolId, String invokedToolOutput) {
+            this.text = text;
+            this.invokedToolId = invokedToolId;
+            this.invokedToolOutput = invokedToolOutput;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public String getInvokedToolId() {
+            return invokedToolId;
+        }
+
+        public String getInvokedToolOutput() {
+            return invokedToolOutput;
         }
     }
 

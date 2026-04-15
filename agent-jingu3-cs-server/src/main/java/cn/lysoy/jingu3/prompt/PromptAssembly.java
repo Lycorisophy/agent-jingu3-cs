@@ -160,17 +160,109 @@ public class PromptAssembly {
     }
 
     public String buildAgentTeamSubPrompt(ExecutionContext ctx, String subtask) {
-        return withModePreamble(ctx, PromptTemplates.AGENT_TEAM_SUB_PREFIX + subtask);
+        return withModePreamble(
+                ctx,
+                PromptTemplates.AGENT_TEAM_SUB_BOUNDARY
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.AGENT_TEAM_SUB_PREFIX
+                        + subtask);
     }
 
     public String buildAgentTeamSubFollowUpPrompt(ExecutionContext ctx, String subtask, String priorRoundsText) {
         return withModePreamble(
                 ctx,
-                PromptTemplates.AGENT_TEAM_SUB_FOLLOWUP
+                PromptTemplates.AGENT_TEAM_SUB_BOUNDARY
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.AGENT_TEAM_SUB_FOLLOWUP
                         + subtask
                         + PromptFragments.PARAGRAPH_BREAK
                         + "此前各轮输出：\n"
                         + priorRoundsText);
+    }
+
+    /** 专员轮：供工具路由与直答的「用户侧」段落（首轮，含原始用户问题）。 */
+    public String buildAgentTeamSpecialistUserParagraphRound1(ExecutionContext ctx, String leaderSubtask) {
+        return PromptTemplates.AGENT_TEAM_SUB_PREFIX
+                + leaderSubtask
+                + PromptFragments.PARAGRAPH_BREAK
+                + "用户原始问题：\n"
+                + ctx.llmInput();
+    }
+
+    /** 专员轮：供工具路由与直答的「用户侧」段落（后续轮）。 */
+    public String buildAgentTeamSpecialistUserParagraphFollowUp(
+            ExecutionContext ctx, String leaderSubtask, String priorRoundsText) {
+        return PromptTemplates.AGENT_TEAM_SUB_FOLLOWUP
+                + leaderSubtask
+                + PromptFragments.PARAGRAPH_BREAK
+                + "此前各轮输出：\n"
+                + priorRoundsText
+                + PromptFragments.PARAGRAPH_BREAK
+                + "用户原始问题：\n"
+                + ctx.llmInput();
+    }
+
+    /** 专员轮：Ask 同款 JSON 工具路由提示（含子 Agent 边界）。 */
+    public String buildAgentTeamSpecialistToolRouterPrompt(ExecutionContext ctx, String specialistUserParagraph) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.AGENT_TEAM_SUB_BOUNDARY
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.ASK_TOOL_ROUTER_INSTRUCTION
+                        + toolRegistry.buildCatalogMarkdown()
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptFragments.USER_LABEL_WITH_NEWLINE
+                        + specialistUserParagraph);
+    }
+
+    /** 专员轮：不调工具时的单次作答提示。 */
+    public String buildAgentTeamSpecialistDirectPrompt(ExecutionContext ctx, String specialistUserParagraph) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.AGENT_TEAM_SUB_BOUNDARY
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.ASK_SYSTEM
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptFragments.USER_LABEL_WITH_NEWLINE
+                        + specialistUserParagraph);
+    }
+
+    /** 专员轮：工具成功后的汇总提示。 */
+    public String buildAgentTeamSpecialistAfterToolPrompt(
+            ExecutionContext ctx, String specialistUserParagraph, String toolId, String toolOutput) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.AGENT_TEAM_SUB_BOUNDARY
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.ASK_SYSTEM
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "子 Agent 待完成内容：\n"
+                        + specialistUserParagraph
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "工具 `"
+                        + toolId
+                        + "` 输出：\n"
+                        + toolOutput
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "请仅输出中文正文结果，并遵守上文【子 Agent 边界】。");
+    }
+
+    /** 专员轮：工具失败时的说明提示。 */
+    public String buildAgentTeamSpecialistToolFailurePrompt(
+            ExecutionContext ctx, String specialistUserParagraph, String errorMessage) {
+        return withModePreamble(
+                ctx,
+                PromptTemplates.AGENT_TEAM_SUB_BOUNDARY
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + PromptTemplates.ASK_SYSTEM
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "子 Agent 待完成内容：\n"
+                        + specialistUserParagraph
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "工具调用失败："
+                        + errorMessage
+                        + PromptFragments.PARAGRAPH_BREAK
+                        + "请用中文说明原因并尽量给出可操作的替代建议，并遵守上文【子 Agent 边界】。");
     }
 
     public String buildAgentTeamSynthesizePrompt(ExecutionContext ctx, String leaderSubtask, String trajectoryText) {

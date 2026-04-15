@@ -81,7 +81,19 @@ public final class PromptTemplates {
 
     /** Agent Team：主 Agent 只输出子任务一句。 */
     public static final String AGENT_TEAM_LEAD =
-            "你是主协调 Agent。把用户问题拆成一条可交给子 Agent 执行的具体子任务（一句话）。只输出子任务描述。";
+            "你是主协调 Agent。把用户问题拆成一条可交给子 Agent 执行的具体子任务（一句话）。只输出子任务描述。"
+                    + "若用户需要「点按钮确认」「人在环审批」或「新建定时任务」等，不要塞在这条子任务里让子 Agent 代劳；"
+                    + "留到合成阶段由你在最终答复中面向用户说明或引导（子 Agent 只做执行与事实整理）。";
+
+    /**
+     * Agent Team：子 Agent 行为边界（拼在子 Agent 各轮提示词前；与主协调/合成职责划分一致）。
+     * <p>卡片：指客户端结构化确认块、审批流入口等；子 Agent 仅输出纯文本，不得冒充可交互控件。</p>
+     */
+    public static final String AGENT_TEAM_SUB_BOUNDARY =
+            "【子 Agent 边界】你只负责执行主协调给出的子任务并输出纯文本结果。"
+                    + "禁止输出需用户点击确认的卡片、审批入口、表单块或等价结构化确认话术；"
+                    + "禁止引导用户去创建定时任务、禁止给出调用定时任务 API、cron 表达式落库步骤或「已为你创建定时任务」等表述（你没有创建权限）。"
+                    + "若子任务本身涉及审批或定时，用一两句说明事实或缺口，并写明「请由主协调在最终答复中向用户说明如何操作」即可。";
 
     /** Agent Team：子 Agent 前缀（后接子任务）。 */
     public static final String AGENT_TEAM_SUB_PREFIX =
@@ -95,7 +107,7 @@ public final class PromptTemplates {
     /** Agent Team：合成用户可见答复（后接主任务与各轮子 Agent 全文）。 */
     public static final String AGENT_TEAM_SYNTHESIZE =
             "你是主协调 Agent。根据下列「子任务」与「子 Agent 各轮输出」，生成一段面向用户的最终答复（中文、结构清晰、可直接作为回复正文）。"
-                    + "不要重复内部角色标签，不要添加「作为 AI」之类套话。\n\n";
+                    + "子 Agent 输出不得包含需用户点击的卡片或代用户创建定时任务；若用户确有审批或定时诉求，由你在本最终答复中说明产品能力、引导或下一步（勿重复内部角色标签，不要添加「作为 AI」之类套话）。\n\n";
 
     /**
      * 供 {@link cn.lysoy.jingu3.prompt.ModeRoutingPreamble} 注入：对话层可选模式的自然语言释义，

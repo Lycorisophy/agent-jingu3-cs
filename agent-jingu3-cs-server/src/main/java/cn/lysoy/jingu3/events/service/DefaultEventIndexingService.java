@@ -8,7 +8,6 @@ import cn.lysoy.jingu3.common.vo.EventSearchHitVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.events.model.EventDocument;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -117,28 +116,11 @@ public class DefaultEventIndexingService implements EventIndexingService {
     }
 
     private static Query buildUserScopedQuery(String userId, String queryText) {
-        return Query.of(
-                q ->
-                        q.bool(
-                                b ->
-                                        b.must(
-                                                        m ->
-                                                                m.multiMatch(
-                                                                        mm ->
-                                                                                mm.query(queryText)
-                                                                                        .fields(
-                                                                                                "action^2",
-                                                                                                "result",
-                                                                                                "event_subject",
-                                                                                                "event_location")
-                                                                                        .fuzziness("AUTO")))
-                                                .filter(
-                                                        f ->
-                                                                f.term(
-                                                                        t ->
-                                                                                t.field("user_id")
-                                                                                        .value(
-                                                                                                FieldValue.of(
-                                                                                                        userId)))));
+        return Query.of(q -> q.bool(b -> b
+                .must(m -> m.multiMatch(mm -> mm
+                        .query(queryText)
+                        .fields("action^2", "result", "event_subject", "event_location")
+                        .fuzziness("AUTO")))
+                .filter(f -> f.term(t -> t.field("user_id").value(userId)))))));
     }
 }

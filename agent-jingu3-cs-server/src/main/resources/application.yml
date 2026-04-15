@@ -46,7 +46,7 @@ jingu3:
       max-subtasks: 8
       replan-enabled: true
     agent-team:
-      # 子 Agent 轮数（每轮一次 LLM）；之后还有一次合成答复调用
+      # 子 Agent 轮数（每轮一次 LLM；jingu3.tool.enabled=true 时专员轮与 Ask 相同走 JSON 工具路由）；之后还有一次合成答复调用
       max-specialist-rounds: 2
   ollama:
     base-url: http://localhost:11434

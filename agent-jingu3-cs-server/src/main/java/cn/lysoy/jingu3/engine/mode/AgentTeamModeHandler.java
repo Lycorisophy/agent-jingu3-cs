@@ -1,5 +1,6 @@
 package cn.lysoy.jingu3.engine.mode;
 
+import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.engine.ActionModeHandler;
 import cn.lysoy.jingu3.engine.ExecutionContext;
 import cn.lysoy.jingu3.engine.team.AgentTeamResult;
@@ -15,7 +16,8 @@ import java.util.List;
 
 /**
  * 指南 §7 Agent Team：Leader 拆分子任务后，子 Agent 可配置多轮（{@code jingu3.engine.agent-team.max-specialist-rounds}），
- * 最后经一次 LLM 合成用户可见答复；流式与 {@link ChatLanguageModel#generate} 步数一致。
+ * 专员轮在 {@code jingu3.tool.enabled=true} 时复用 Ask 同款工具路由；最后经一次 LLM 合成用户可见答复；
+ * 流式与 {@link ChatLanguageModel#generate} 步数一致。
  */
 @Slf4j
 @Component
@@ -23,14 +25,20 @@ public class AgentTeamModeHandler implements ActionModeHandler {
 
     private final ChatLanguageModel chat;
     private final PromptAssembly prompts;
+    private final AskModeHandler askModeHandler;
+    private final Jingu3Properties jingu3Properties;
     private final int maxSpecialistRounds;
 
     public AgentTeamModeHandler(
             ChatLanguageModel chat,
             PromptAssembly prompts,
+            AskModeHandler askModeHandler,
+            Jingu3Properties jingu3Properties,
             @Value("${jingu3.engine.agent-team.max-specialist-rounds:2}") int maxSpecialistRounds) {
         this.chat = chat;
         this.prompts = prompts;
+        this.askModeHandler = askModeHandler;
+        this.jingu3Properties = jingu3Properties;
         this.maxSpecialistRounds = Math.max(1, maxSpecialistRounds);
     }
 
@@ -55,14 +63,7 @@ public class AgentTeamModeHandler implements ActionModeHandler {
         List<String> rounds = new ArrayList<>();
         StringBuilder acc = new StringBuilder();
         for (int r = 1; r <= maxSpecialistRounds; r++) {
-            String prompt =
-                    r == 1
-                            ? prompts.buildAgentTeamSubPrompt(context, leader)
-                            : prompts.buildAgentTeamSubFollowUpPrompt(context, leader, acc.toString());
-            String out = chat.generate(prompt);
-            if (out == null) {
-                out = "";
-            }
+            String out = runSpecialistRound(context, leader, r, acc.toString(), sink);
             rounds.add(out);
             sink.stepBegin(1 + r, "specialist_" + r);
             sink.block(out);
@@ -95,14 +96,7 @@ public class AgentTeamModeHandler implements ActionModeHandler {
         List<String> rounds = new ArrayList<>();
         StringBuilder acc = new StringBuilder();
         for (int r = 1; r <= maxSpecialistRounds; r++) {
-            String prompt =
-                    r == 1
-                            ? prompts.buildAgentTeamSubPrompt(context, leader)
-                            : prompts.buildAgentTeamSubFollowUpPrompt(context, leader, acc.toString());
-            String out = chat.generate(prompt);
-            if (out == null) {
-                out = "";
-            }
+            String out = runSpecialistRound(context, leader, r, acc.toString(), null);
             rounds.add(out);
             if (r < maxSpecialistRounds) {
                 acc.append("第").append(r).append("轮：\n").append(out).append("\n\n");
@@ -120,5 +114,42 @@ public class AgentTeamModeHandler implements ActionModeHandler {
             sb.append("第").append(i + 1).append("轮：\n").append(rounds.get(i)).append("\n\n");
         }
         return sb.toString();
+    }
+
+    /**
+     * 专员一轮：工具关闭时用单段提示；工具开启时用 Ask 同款路由（提示词含 {@link cn.lysoy.jingu3.common.constant.PromptTemplates#AGENT_TEAM_SUB_BOUNDARY}）。
+     *
+     * @param sink 非空且本步调用了工具时下发 {@link StreamEventSink#toolResult}，供流式客户端展示
+     */
+    private String runSpecialistRound(
+            ExecutionContext context, String leader, int round, String priorRoundsText, StreamEventSink sink) {
+        if (!jingu3Properties.getTool().isEnabled()) {
+            String fullPrompt =
+                    round == 1
+                            ? prompts.buildAgentTeamSubPrompt(context, leader)
+                            : prompts.buildAgentTeamSubFollowUpPrompt(context, leader, priorRoundsText);
+            String out = chat.generate(fullPrompt);
+            return out == null ? "" : out;
+        }
+        String specialistUserParagraph =
+                round == 1
+                        ? prompts.buildAgentTeamSpecialistUserParagraphRound1(context, leader)
+                        : prompts.buildAgentTeamSpecialistUserParagraphFollowUp(context, leader, priorRoundsText);
+        AskModeHandler.AugmentedLlmAnswer ans =
+                askModeHandler.runToolAugmentedOneShot(
+                        true,
+                        prompts.buildAgentTeamSpecialistToolRouterPrompt(context, specialistUserParagraph),
+                        prompts.buildAgentTeamSpecialistDirectPrompt(context, specialistUserParagraph),
+                        (toolId, toolOut) ->
+                                prompts.buildAgentTeamSpecialistAfterToolPrompt(
+                                        context, specialistUserParagraph, toolId, toolOut),
+                        msg -> prompts.buildAgentTeamSpecialistToolFailurePrompt(context, specialistUserParagraph, msg));
+        if (sink != null
+                && ans.getInvokedToolId() != null
+                && ans.getInvokedToolOutput() != null) {
+            sink.toolResult(ans.getInvokedToolId(), ans.getInvokedToolOutput());
+        }
+        String t = ans.getText();
+        return t == null ? "" : t;
     }
 }

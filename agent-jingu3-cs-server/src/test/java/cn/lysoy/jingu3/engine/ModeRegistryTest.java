@@ -48,13 +48,14 @@ class ModeRegistryTest {
         WorkflowDefinitionRegistry wfReg = Mockito.mock(WorkflowDefinitionRegistry.class);
         when(wfReg.get(Mockito.any())).thenReturn(null);
 
+        AskModeHandler ask = new AskModeHandler(chat, streaming, prompts, props, toolRegistry, objectMapper);
         var registry =
                 new ModeRegistry(
-                        new AskModeHandler(chat, streaming, prompts, props, toolRegistry, objectMapper),
+                        ask,
                         new ReActModeHandler(chat, prompts, props, toolRegistry, objectMapper, 4),
                         new PlanAndExecuteModeHandler(chat, prompts, toolStepService, 8, true),
                         new WorkflowModeHandler(chat, prompts, wfReg, toolStepService),
-                        new AgentTeamModeHandler(chat, prompts, 1),
+                        new AgentTeamModeHandler(chat, prompts, ask, props, 1),
                         new CronModeHandler(props),
                         new StateTrackingModeHandler(),
                         new HumanInLoopModeHandler());
