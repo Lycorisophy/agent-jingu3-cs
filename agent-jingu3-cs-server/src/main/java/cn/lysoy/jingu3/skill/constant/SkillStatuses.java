@@ -8,5 +8,6 @@ public final class SkillStatuses {
     private SkillStatuses() {
     }
 
+    /** 技能或订阅处于可用状态（与 DB 约束及业务校验一致）。 */
     public static final String ACTIVE = "ACTIVE";
 }

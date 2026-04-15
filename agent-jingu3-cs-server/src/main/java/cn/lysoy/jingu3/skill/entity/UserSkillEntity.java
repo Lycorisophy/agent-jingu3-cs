@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * 用户与技能的订阅关系：谁在何时以何种版本持有某技能；支持后续「外部技能路径」扩展字段。
+ */
 @TableName("user_skill")
 @Getter
 @Setter
@@ -23,6 +26,7 @@ public class UserSkillEntity {
     @TableField("skill_id")
     private String skillId;
 
+    /** 订阅是否有效等，与 {@link cn.lysoy.jingu3.skill.constant.SkillStatuses} 对齐。 */
     private String status;
 
     @TableField("local_version")

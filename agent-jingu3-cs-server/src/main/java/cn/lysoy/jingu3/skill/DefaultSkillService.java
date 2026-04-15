@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 技能域默认实现：公开技能目录查询、按 slug 拉取元数据、用户订阅/退订（{@code skill} / {@code user_skill} 表）。
+ * <p>与「技能与工具」史诗对齐：此处管<strong>技能包生命周期与订阅关系</strong>；对话中是否注入某技能正文由
+ * {@link SkillService} 的消费方（编排 / 提示词装配）决定。可通过 {@code jingu3.skill.api-enabled=false} 关闭本 Bean。</p>
+ */
 @Service
 @ConditionalOnProperty(prefix = "jingu3.skill", name = "api-enabled", havingValue = "true", matchIfMissing = true)
 public class DefaultSkillService implements SkillService {
@@ -150,6 +155,7 @@ public class DefaultSkillService implements SkillService {
         }
     }
 
+    /** 领域实体转列表/详情 VO，避免 Controller 直接依赖 MyBatis 实体。 */
     private static SkillListItemVo toVo(SkillEntity e) {
         SkillListItemVo vo = new SkillListItemVo();
         vo.setId(e.getId());
@@ -168,6 +174,7 @@ public class DefaultSkillService implements SkillService {
         return vo;
     }
 
+    /** 时间展示用简化字符串；null 安全。 */
     private static String formatTime(LocalDateTime t) {
         return t == null ? null : t.toString();
     }
