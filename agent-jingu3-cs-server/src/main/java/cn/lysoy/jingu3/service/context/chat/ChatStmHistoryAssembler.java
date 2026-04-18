@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.chat;
+package cn.lysoy.jingu3.service.context.chat;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.dto.ChatRequest;

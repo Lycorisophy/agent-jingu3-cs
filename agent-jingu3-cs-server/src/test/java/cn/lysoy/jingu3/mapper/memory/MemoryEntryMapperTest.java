@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.memory;
+package cn.lysoy.jingu3.mapper.memory;
 
 import cn.lysoy.jingu3.Jingu3Application;
 import cn.lysoy.jingu3.util.UtcTime;

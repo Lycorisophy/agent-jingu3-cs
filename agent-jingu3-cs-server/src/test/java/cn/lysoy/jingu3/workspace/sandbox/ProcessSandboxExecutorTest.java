@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.sandbox;
+package cn.lysoy.jingu3.skill.workspace.sandbox;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.skill.workspace.DefaultWorkspaceManager;

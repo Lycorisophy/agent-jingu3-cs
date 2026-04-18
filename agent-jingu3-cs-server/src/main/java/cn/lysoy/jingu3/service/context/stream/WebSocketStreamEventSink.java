@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.stream;
+package cn.lysoy.jingu3.service.context.stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.socket.TextMessage;

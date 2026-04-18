@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.vo;
+package cn.lysoy.jingu3.common.vo;
 
 import lombok.Getter;
 import lombok.Setter;

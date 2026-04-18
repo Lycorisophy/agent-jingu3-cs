@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.tool;
+package cn.lysoy.jingu3.skill.tool;
 
 /**
  * 工具执行失败（参数非法、运行时错误等），由 Handler 捕获后写入 Observation 或降级提示。

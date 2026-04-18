@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.prompt;
+package cn.lysoy.jingu3.service.prompt;
 
 import cn.lysoy.jingu3.common.constant.PromptTemplates;
 import cn.lysoy.jingu3.service.guard.ActionMode;

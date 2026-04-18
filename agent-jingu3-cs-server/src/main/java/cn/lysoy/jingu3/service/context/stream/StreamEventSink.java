@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.stream;
+package cn.lysoy.jingu3.service.context.stream;
 
 /**
  * 流式通道抽象：把一次对话过程拆成 {@link StreamEvent} 序列，由 SSE 与 WebSocket 各自适配写入客户端。

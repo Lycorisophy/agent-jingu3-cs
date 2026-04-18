@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.rag.vector;
+package cn.lysoy.jingu3.rag.vector;
 
 import cn.lysoy.jingu3.util.UtcTime;
 import cn.lysoy.jingu3.rag.service.MilvusMemoryVectorService;

@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.handler;
+package cn.lysoy.jingu3.service.mode.handler;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.EngineMessages;

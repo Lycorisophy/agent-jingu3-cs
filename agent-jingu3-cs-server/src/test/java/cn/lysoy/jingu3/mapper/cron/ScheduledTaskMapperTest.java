@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.cron;
+package cn.lysoy.jingu3.mapper.cron;
 
 import cn.lysoy.jingu3.Jingu3Application;
 import cn.lysoy.jingu3.util.UtcTime;

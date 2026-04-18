@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.dst;
+package cn.lysoy.jingu3.mapper.dst;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;

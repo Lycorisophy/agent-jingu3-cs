@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.tool;
+package cn.lysoy.jingu3.skill.tool;
 
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.springframework.stereotype.Component;

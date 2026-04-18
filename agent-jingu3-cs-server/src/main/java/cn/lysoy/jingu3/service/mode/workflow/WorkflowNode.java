@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.workflow;
+package cn.lysoy.jingu3.service.mode.workflow;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

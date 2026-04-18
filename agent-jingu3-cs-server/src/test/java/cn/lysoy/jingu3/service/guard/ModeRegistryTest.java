@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.guard;
+package cn.lysoy.jingu3.service.guard;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.service.mode.handler.AgentTeamModeHandler;

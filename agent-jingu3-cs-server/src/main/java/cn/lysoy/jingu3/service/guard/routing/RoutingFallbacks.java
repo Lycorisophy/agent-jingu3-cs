@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.guard.routing;
+package cn.lysoy.jingu3.service.guard.routing;
 
 import cn.lysoy.jingu3.common.constant.LogMessagePatterns;
 import cn.lysoy.jingu3.common.constant.RoutingNotes;

@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.tool;
+package cn.lysoy.jingu3.skill.tool;
 
 import cn.lysoy.jingu3.common.vo.ToolListItemVo;
 import jakarta.annotation.PostConstruct;

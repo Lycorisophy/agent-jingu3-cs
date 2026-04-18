@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.constant;
+package cn.lysoy.jingu3.common.constant;
 
 /**
  * 提示词拼装用片段（换行、标签），避免魔法字符串散落。

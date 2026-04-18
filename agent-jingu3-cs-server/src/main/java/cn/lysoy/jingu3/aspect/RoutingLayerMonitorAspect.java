@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.aspect;
+package cn.lysoy.jingu3.aspect;
 
 import cn.lysoy.jingu3.service.guard.routing.RoutingDecision;
 import lombok.extern.slf4j.Slf4j;

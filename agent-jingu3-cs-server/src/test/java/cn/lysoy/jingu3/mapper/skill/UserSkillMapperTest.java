@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.skill;
+package cn.lysoy.jingu3.mapper.skill;
 
 import cn.lysoy.jingu3.Jingu3Application;
 import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;

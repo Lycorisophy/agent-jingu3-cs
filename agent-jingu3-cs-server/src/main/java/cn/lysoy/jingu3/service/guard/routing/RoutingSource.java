@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.guard.routing;
+package cn.lysoy.jingu3.service.guard.routing;
 
 /**
  * 意图场景识别中「本轮模式由谁拍板」的来源枚举，用于日志、指标与产品解释。

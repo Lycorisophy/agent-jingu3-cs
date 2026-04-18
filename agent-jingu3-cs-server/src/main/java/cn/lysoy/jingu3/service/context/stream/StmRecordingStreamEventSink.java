@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.stream;
+package cn.lysoy.jingu3.service.context.stream;
 
 import cn.lysoy.jingu3.service.context.chat.ConversationStmBuffer;
 

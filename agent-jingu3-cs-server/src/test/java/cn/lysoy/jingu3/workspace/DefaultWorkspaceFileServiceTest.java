@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace;
+package cn.lysoy.jingu3.skill.workspace;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.service.workspace.DefaultWorkspaceFileService;

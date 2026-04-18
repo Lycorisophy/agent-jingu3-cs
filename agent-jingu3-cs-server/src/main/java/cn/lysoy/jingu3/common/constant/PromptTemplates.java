@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.constant;
+package cn.lysoy.jingu3.common.constant;
 
 /**
  * LLM 系统提示词与固定指令模板（不含运行时动态枚举列表）。

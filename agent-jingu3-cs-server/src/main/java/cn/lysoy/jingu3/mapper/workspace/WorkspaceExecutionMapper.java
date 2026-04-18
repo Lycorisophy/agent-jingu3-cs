@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.workspace;
+package cn.lysoy.jingu3.mapper.workspace;
 
 import cn.lysoy.jingu3.skill.workspace.entity.WorkspaceExecutionEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

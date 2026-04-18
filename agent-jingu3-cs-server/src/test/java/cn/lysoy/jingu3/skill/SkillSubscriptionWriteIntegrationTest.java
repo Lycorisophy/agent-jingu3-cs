@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill;
+package cn.lysoy.jingu3.skill;
 
 import cn.lysoy.jingu3.Jingu3Application;
 import cn.lysoy.jingu3.skill.service.SkillService;

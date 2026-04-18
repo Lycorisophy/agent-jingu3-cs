@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.memory;
+package cn.lysoy.jingu3.mapper.memory;
 
 import cn.lysoy.jingu3.rag.entity.FactMetadataEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

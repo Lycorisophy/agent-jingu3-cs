@@ -49,6 +49,7 @@ public class MilvusMemoryRetrievalService {
 
     /**
      * 将检索到的记忆摘要拼在用户消息前；失败或无结果时返回原消息。
+     * TODO 先让模型判断是否搜索，如果搜索的话可以输出搜索message和bm25
      */
     public String augmentUserMessage(String userMessage, String userId) {
         if (userMessage == null || userMessage.isBlank()) {
@@ -67,6 +68,7 @@ public class MilvusMemoryRetrievalService {
             if (rows.isEmpty()) {
                 return userMessage;
             }
+            // TODO 可加重排序rerank
             StringBuilder sb = new StringBuilder();
             sb.append(PromptFragments.MEMORY_REFERENCE_HEADER);
             for (MemoryEntryEntity e : rows) {

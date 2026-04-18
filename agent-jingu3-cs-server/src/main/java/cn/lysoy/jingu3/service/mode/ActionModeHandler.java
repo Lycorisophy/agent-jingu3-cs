@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode;
+package cn.lysoy.jingu3.service.mode;
 
 import cn.lysoy.jingu3.service.context.stream.StreamEventSink;
 import cn.lysoy.jingu3.service.guard.ExecutionContext;

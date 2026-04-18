@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.aspect;
+package cn.lysoy.jingu3.aspect;
 
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.common.trace.MdcRequestTraceContext;

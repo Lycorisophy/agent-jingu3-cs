@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.job;
+package cn.lysoy.jingu3.job;
 
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.common.vo.ChatVo;

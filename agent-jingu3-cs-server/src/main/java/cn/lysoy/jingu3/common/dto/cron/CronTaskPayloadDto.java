@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.dto.cron;
+package cn.lysoy.jingu3.common.dto.cron;
 
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.job.ScheduledTaskScope;

@@ -117,6 +117,10 @@
             <artifactId>langchain4j-ollama</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.bsc.langgraph4j</groupId>
+            <artifactId>langgraph4j-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.objecthunter</groupId>
             <artifactId>exp4j</artifactId>
         </dependency>

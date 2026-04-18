@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.rag.vector;
+package cn.lysoy.jingu3.rag.vector;
 
 import cn.lysoy.jingu3.rag.entity.MemoryEntryEntity;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

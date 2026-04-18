@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.security;
+package cn.lysoy.jingu3.skill.workspace.security;
 
 import java.nio.file.Path;
 

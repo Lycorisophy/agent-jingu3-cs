@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.job.entity;
+package cn.lysoy.jingu3.job.entity;
 
 import cn.lysoy.jingu3.job.ScheduledTaskScope;
 import com.baomidou.mybatisplus.annotation.IdType;

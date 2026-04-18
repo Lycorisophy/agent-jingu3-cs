@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.constant;
+package cn.lysoy.jingu3.common.constant;
 
 /**
  * SLF4J 占位日志文案（与 {@link org.slf4j.Logger#warn(String, Object...)} 占位符一致）。

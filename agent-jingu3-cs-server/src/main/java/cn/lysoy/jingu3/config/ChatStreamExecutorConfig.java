@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.config;
+package cn.lysoy.jingu3.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

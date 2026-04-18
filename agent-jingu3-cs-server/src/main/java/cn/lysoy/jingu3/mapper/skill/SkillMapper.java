@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.skill;
+package cn.lysoy.jingu3.mapper.skill;
 
 import cn.lysoy.jingu3.skill.entity.SkillEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

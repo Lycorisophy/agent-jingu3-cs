@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.stream;
+package cn.lysoy.jingu3.service.context.stream;
 
 /**
  * 流式事件类型枚举：与 {@link StreamEvent} 字段组合使用，前后端可据此分支渲染（打字机 / 分步卡片 / 错误提示）。

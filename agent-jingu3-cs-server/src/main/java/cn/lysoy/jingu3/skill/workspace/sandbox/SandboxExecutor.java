@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.sandbox;
+package cn.lysoy.jingu3.skill.workspace.sandbox;
 
 /**
  * 在用户工作空间目录下执行代码（进程级沙箱，Phase 2 MVP）。

@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.stream;
+package cn.lysoy.jingu3.service.context.stream;
 
 /**
  * 将异常信息转为适合 SSE/WebSocket 用户可读短句（避免堆栈直出）。

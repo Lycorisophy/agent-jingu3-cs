@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.constant;
+package cn.lysoy.jingu3.common.constant;
 
 /**
  * 对话状态（DST）API 的 HTTP 错误原因短语（与 {@link cn.lysoy.jingu3.service.context.dst.DialogueStateService} 对齐）。

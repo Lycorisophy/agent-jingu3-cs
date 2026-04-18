@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.support;
+package cn.lysoy.jingu3.service.mode.support;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.service.guard.ActionMode;

@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.config;
+package cn.lysoy.jingu3.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

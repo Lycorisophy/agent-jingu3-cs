@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.chat;
+package cn.lysoy.jingu3.service.context.chat;
 
 import cn.lysoy.jingu3.common.entity.UserPromptCipherEntity;
 import cn.lysoy.jingu3.mapper.chat.UserPromptCipherMapper;

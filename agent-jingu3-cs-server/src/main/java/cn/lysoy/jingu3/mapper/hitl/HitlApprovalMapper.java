@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.hitl;
+package cn.lysoy.jingu3.mapper.hitl;
 
 import cn.lysoy.jingu3.common.enums.HitlApprovalStatus;
 import cn.lysoy.jingu3.common.entity.HitlApprovalEntity;

@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.controller.app;
+package cn.lysoy.jingu3.controller.app;
 
 import cn.lysoy.jingu3.common.constant.ChatHttpHeaders;
 import cn.lysoy.jingu3.common.dto.ChatRequest;

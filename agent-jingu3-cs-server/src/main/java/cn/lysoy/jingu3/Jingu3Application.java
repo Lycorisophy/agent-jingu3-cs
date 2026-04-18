@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3;
+package cn.lysoy.jingu3;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import org.springframework.boot.SpringApplication;

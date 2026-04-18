@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.controller.api;
+package cn.lysoy.jingu3.controller.api;
 
 import cn.lysoy.jingu3.common.api.ApiResult;
 import cn.lysoy.jingu3.common.dto.SubscribeSkillRequest;

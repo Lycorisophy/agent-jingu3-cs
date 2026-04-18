@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.vo.dst;
+package cn.lysoy.jingu3.common.vo.dst;
 
 import cn.lysoy.jingu3.util.UtcTime;
 import cn.lysoy.jingu3.mapper.dst.DialogueStateEntity;

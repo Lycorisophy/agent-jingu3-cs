@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.component;
+package cn.lysoy.jingu3.component;
 
 import cn.lysoy.jingu3.common.dto.ChatRequest;
 import cn.lysoy.jingu3.service.guard.ActionMode;

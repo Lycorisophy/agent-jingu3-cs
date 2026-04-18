@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.rag.cache;
+package cn.lysoy.jingu3.rag.cache;
 
 import cn.lysoy.jingu3.common.vo.MemoryEntryVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;

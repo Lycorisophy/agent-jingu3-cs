@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.cron;
+package cn.lysoy.jingu3.service.cron;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.CronApiMessages;

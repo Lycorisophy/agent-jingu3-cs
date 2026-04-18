@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.service;
+package cn.lysoy.jingu3.skill.workspace.service;
 
 import cn.lysoy.jingu3.skill.workspace.sandbox.SandboxResult;
 

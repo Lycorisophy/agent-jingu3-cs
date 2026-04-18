@@ -1,2 +1,2 @@
-﻿/** 对话状态持久化 {@code dialogue_state}。 */
+/** 对话状态持久化 {@code dialogue_state}。 */
 package cn.lysoy.jingu3.mapper.dst;

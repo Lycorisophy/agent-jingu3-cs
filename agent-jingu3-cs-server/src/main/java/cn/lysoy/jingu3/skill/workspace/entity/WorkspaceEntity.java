@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.entity;
+package cn.lysoy.jingu3.skill.workspace.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

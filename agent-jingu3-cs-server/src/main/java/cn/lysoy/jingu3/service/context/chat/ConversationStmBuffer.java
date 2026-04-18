@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.chat;
+package cn.lysoy.jingu3.service.context.chat;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import org.springframework.stereotype.Component;

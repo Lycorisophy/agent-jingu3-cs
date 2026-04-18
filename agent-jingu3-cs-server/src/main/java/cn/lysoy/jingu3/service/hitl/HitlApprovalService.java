@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.hitl;
+package cn.lysoy.jingu3.service.hitl;
 
 import cn.lysoy.jingu3.common.constant.HitlApiMessages;
 import cn.lysoy.jingu3.util.UtcTime;

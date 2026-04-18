@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.plan;
+package cn.lysoy.jingu3.service.mode.plan;
 
 import org.junit.jupiter.api.Test;
 

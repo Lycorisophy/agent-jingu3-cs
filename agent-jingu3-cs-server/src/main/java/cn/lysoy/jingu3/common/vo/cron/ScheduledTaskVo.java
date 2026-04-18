@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.vo.cron;
+package cn.lysoy.jingu3.common.vo.cron;
 
 import cn.lysoy.jingu3.job.ScheduledTaskScope;
 import lombok.Builder;

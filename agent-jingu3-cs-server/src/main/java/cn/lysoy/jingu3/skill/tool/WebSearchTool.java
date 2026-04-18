@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -22,9 +20,6 @@ import java.time.Duration;
  * 联网搜索：默认 DuckDuckGo Instant Answer（免 Key）；可选 Tavily（需 API Key）。
  */
 @Slf4j
-@Component
-@ConditionalOnProperty(prefix = "jingu3.tool", name = "enabled", havingValue = "true", matchIfMissing = true)
-@ConditionalOnProperty(prefix = "jingu3.tool.web-search", name = "enabled", havingValue = "true")
 public class WebSearchTool implements Jingu3Tool {
 
     private static final String UA = "Jingu3Agent/1.0 (web_search; +https://github.com/)";

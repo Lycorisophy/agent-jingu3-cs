@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.sandbox;
+package cn.lysoy.jingu3.skill.workspace.sandbox;
 
 import lombok.Builder;
 import lombok.Data;

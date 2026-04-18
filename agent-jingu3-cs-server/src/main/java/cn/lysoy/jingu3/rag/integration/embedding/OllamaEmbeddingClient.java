@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.rag.integration.embedding;
+package cn.lysoy.jingu3.rag.integration.embedding;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import com.fasterxml.jackson.databind.JsonNode;

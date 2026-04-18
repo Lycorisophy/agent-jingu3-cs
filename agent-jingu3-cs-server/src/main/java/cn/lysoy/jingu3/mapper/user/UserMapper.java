@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.mapper.user;
+package cn.lysoy.jingu3.mapper.user;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

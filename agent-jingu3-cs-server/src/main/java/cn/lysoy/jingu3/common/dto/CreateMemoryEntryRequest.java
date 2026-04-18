@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.dto;
+package cn.lysoy.jingu3.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;

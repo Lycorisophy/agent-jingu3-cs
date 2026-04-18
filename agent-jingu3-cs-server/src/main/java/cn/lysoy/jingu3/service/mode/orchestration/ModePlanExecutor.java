@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.orchestration;
+package cn.lysoy.jingu3.service.mode.orchestration;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.PromptFragments;

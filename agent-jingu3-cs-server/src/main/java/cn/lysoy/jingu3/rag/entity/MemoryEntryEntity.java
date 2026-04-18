@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.rag.entity;
+package cn.lysoy.jingu3.rag.entity;
 
 import cn.lysoy.jingu3.rag.MemoryEntryKind;
 import com.baomidou.mybatisplus.annotation.IdType;

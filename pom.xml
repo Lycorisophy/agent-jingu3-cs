@@ -37,6 +37,7 @@
         <exp4j.version>0.4.8</exp4j.version>
         <milvus-sdk-java.version>2.4.4</milvus-sdk-java.version>
         <elasticsearch-java.version>8.14.3</elasticsearch-java.version>
+        <langgraph4j.version>1.8.12</langgraph4j.version>
     </properties>
 
     <dependencyManagement>
@@ -77,6 +78,13 @@
                 <groupId>io.milvus</groupId>
                 <artifactId>milvus-sdk-java</artifactId>
                 <version>${milvus-sdk-java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bsc.langgraph4j</groupId>
+                <artifactId>langgraph4j-bom</artifactId>
+                <version>${langgraph4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>co.elastic.clients</groupId>

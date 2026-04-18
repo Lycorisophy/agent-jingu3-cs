@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.support;
+package cn.lysoy.jingu3.service.mode.support;
 
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.config.Jingu3Properties;

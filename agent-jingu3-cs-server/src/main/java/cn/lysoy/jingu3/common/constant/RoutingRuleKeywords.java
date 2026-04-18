@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.constant;
+package cn.lysoy.jingu3.common.constant;
 
 /**
  * 规则路由关键词（与 {@link cn.lysoy.jingu3.service.guard.routing.RuleBasedModeRouter} 顺序无关，由 Map 插入顺序决定优先级）。

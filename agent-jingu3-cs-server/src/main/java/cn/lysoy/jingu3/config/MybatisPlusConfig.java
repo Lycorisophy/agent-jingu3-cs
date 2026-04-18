@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.config;
+package cn.lysoy.jingu3.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;

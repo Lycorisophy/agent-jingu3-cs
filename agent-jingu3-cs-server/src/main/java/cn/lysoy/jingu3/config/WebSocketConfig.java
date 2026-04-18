@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.config;
+package cn.lysoy.jingu3.config;
 
 import cn.lysoy.jingu3.controller.app.ChatStreamWebSocketHandler;
 import org.springframework.context.annotation.Configuration;

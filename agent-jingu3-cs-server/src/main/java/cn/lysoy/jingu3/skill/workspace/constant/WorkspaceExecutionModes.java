@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.constant;
+package cn.lysoy.jingu3.skill.workspace.constant;
 
 /**
  * {@code workspace_execution.run_mode} 取值。

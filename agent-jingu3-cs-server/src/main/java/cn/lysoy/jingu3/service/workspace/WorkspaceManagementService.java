@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.workspace;
+package cn.lysoy.jingu3.service.workspace;
 
 import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;

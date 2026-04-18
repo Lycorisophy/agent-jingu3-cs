@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.tool;
+package cn.lysoy.jingu3.skill.tool;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

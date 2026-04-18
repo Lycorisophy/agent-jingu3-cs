@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.team;
+package cn.lysoy.jingu3.service.mode.team;
 
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import lombok.Getter;

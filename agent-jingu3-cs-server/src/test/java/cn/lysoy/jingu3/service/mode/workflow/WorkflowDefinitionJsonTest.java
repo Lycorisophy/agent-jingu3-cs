@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.mode.workflow;
+package cn.lysoy.jingu3.service.mode.workflow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

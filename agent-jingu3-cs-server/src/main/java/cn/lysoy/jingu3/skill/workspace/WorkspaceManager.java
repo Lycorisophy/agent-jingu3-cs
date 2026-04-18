@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace;
+package cn.lysoy.jingu3.skill.workspace;
 
 import java.io.IOException;
 import java.nio.file.Path;

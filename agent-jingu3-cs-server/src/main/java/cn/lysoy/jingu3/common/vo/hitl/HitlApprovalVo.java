@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.common.vo.hitl;
+package cn.lysoy.jingu3.common.vo.hitl;
 
 import cn.lysoy.jingu3.util.UtcTime;
 import cn.lysoy.jingu3.common.enums.HitlApprovalStatus;

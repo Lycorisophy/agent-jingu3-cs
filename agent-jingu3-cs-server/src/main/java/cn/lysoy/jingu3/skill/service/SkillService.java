@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.service;
+package cn.lysoy.jingu3.skill.service;
 
 import cn.lysoy.jingu3.common.vo.SkillListItemVo;
 import cn.lysoy.jingu3.common.vo.SkillSubscriptionItemVo;

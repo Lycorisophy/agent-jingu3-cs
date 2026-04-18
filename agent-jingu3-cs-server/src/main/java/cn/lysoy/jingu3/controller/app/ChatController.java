@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.controller.app;
+package cn.lysoy.jingu3.controller.app;
 
 import cn.lysoy.jingu3.common.annotation.ChatInboundApi;
 import cn.lysoy.jingu3.common.api.ApiResult;

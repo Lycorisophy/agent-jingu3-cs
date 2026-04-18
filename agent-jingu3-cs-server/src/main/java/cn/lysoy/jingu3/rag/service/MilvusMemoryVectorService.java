@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.rag.service;
+package cn.lysoy.jingu3.rag.service;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import cn.lysoy.jingu3.rag.integration.embedding.OllamaEmbeddingClient;
@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * <strong>Milvus 向量集合网关</strong>（记忆与知识系统）：维护单集合 MVP（字段：{@link #F_MEMORY_ENTRY_ID}、
- * {@link #F_USER_ID}、{@link #F_EMBEDDING}），负责启动时建表/建索引/Load、插入/删除及按 user 过滤的相似检索。
+ * {@link #F_USER_ID}、{@link #F_EMBEDDING}），负责启动时建表/建索引（向量字段为 {@link IndexType#IVF_FLAT}）/Load、插入/删除及按 user 过滤的相似检索。
  * <p>向量维度优先读配置；未配置时用 {@link OllamaEmbeddingClient} 探针向量推断，与 Ollama 嵌入模型输出维一致。</p>
  */
 @Slf4j
@@ -132,12 +132,18 @@ public class MilvusMemoryVectorService {
         log.info("Milvus collection created: {}", name);
     }
 
+    /** IVF_FLAT 建索引参数：nlist 为聚类单元数（1～65536），需与数据规模匹配；过小/过大均影响召回与性能。 */
+    private static final String IVF_INDEX_EXTRA = "{\"nlist\":1024}";
+    /** IVF_FLAT 检索参数：nprobe 为查询时探测的聚类数，通常小于 nlist。 */
+    private static final String IVF_SEARCH_PARAMS = "{\"nprobe\":16}";
+
     private void createIndex(String name) {
         CreateIndexParam indexParam = CreateIndexParam.newBuilder()
                 .withCollectionName(name)
                 .withFieldName(F_EMBEDDING)
-                .withIndexType(IndexType.FLAT)
+                .withIndexType(IndexType.IVF_FLAT)
                 .withMetricType(MetricType.COSINE)
+                .withExtraParam(IVF_INDEX_EXTRA)
                 .build();
         R<?> r = client.createIndex(indexParam);
         if (r.getStatus() != R.Status.Success.getCode()) {
@@ -186,6 +192,7 @@ public class MilvusMemoryVectorService {
                 .withTopK(Math.max(1, topK))
                 .withVectors(searchVectors)
                 .withExpr(expr)
+                .withParams(IVF_SEARCH_PARAMS)
                 .build();
         R<?> r = client.search(searchParam);
         if (r.getStatus() != R.Status.Success.getCode() || r.getData() == null) {

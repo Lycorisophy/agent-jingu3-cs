@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.skill.workspace.tool;
+package cn.lysoy.jingu3.skill.workspace.tool;
 
 import cn.lysoy.jingu3.common.enums.ToolRiskLevel;
 import cn.lysoy.jingu3.component.UserConstants;
