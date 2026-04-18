@@ -98,6 +98,9 @@ jingu3:
     embedding-model: qwen3-embedding:8b
     embedding-dimension: 0
     retrieval-top-k: 5
+  events:
+    search-top-k: 20
+    related-expand-max: 20
   skill:
     # v0.7：技能市场元数据列表（skill 表；MinIO 下载 URL 后续迭代）
     api-enabled: true
@@ -112,11 +115,15 @@ jingu3:
   milvus:
     enabled: false
     collection-name: jingu3_memory
+    events-collection-name: jingu3_events
+    events-hnsw-m: 16
+    events-hnsw-ef-construction: 200
+    events-hnsw-ef: 64
     host: 127.0.0.1
     port: 19530
     user: ""
     password: ""
-  # v0.6-C：Elasticsearch 事件索引（classpath 模板创建 jingu3-events；无 IK 分词）
+  # Elasticsearch：可选；事件检索已使用 MySQL + Milvus，不再写入 jingu3-events
   elasticsearch:
     enabled: false
     host: 127.0.0.1

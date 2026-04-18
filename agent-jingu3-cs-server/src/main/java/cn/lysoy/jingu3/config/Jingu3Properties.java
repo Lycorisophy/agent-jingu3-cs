@@ -35,13 +35,16 @@ public class Jingu3Properties {
     /** 本地/自建 Milvus（向量库）；未接向量检索前仅作配置占位，默认 gRPC 19530 */
     private Milvus milvus = new Milvus();
 
-    /** Elasticsearch（事件全文；v0.6-C）；默认关闭 */
+    /** Elasticsearch 客户端占位；事件检索已迁 MySQL+Milvus，不再使用 ES 事件索引 */
     private Elasticsearch elasticsearch = new Elasticsearch();
 
     private Ollama ollama = new Ollama();
 
     /** 对话侧行为（用户提示词落库等） */
     private Chat chat = new Chat();
+
+    /** 事件域：检索 topK、关系扩展上限等（MySQL + Milvus） */
+    private Events events = new Events();
 
     /** 对称加密密钥（用户提示词密文） */
     private Crypto crypto = new Crypto();
@@ -115,6 +118,16 @@ public class Jingu3Properties {
 
         /** 对话前向量检索条数上限 */
         private int retrievalTopK = 5;
+    }
+
+    @Data
+    public static class Events {
+
+        /** event_search 默认向量召回条数上限 */
+        private int searchTopK = 20;
+
+        /** 关系 1-hop 扩展时最多额外加载的邻居事件数 */
+        private int relatedExpandMax = 20;
     }
 
     @Data
@@ -312,12 +325,24 @@ public class Jingu3Properties {
         private String user = "";
 
         private String password = "";
+
+        /** 事件向量独立集合（与 memory 的 {@link #collectionName} 区分） */
+        private String eventsCollectionName = "jingu3_events";
+
+        /** HNSW 索引：M（每节点最大边数） */
+        private int eventsHnswM = 16;
+
+        /** HNSW 建索引 efConstruction */
+        private int eventsHnswEfConstruction = 200;
+
+        /** 检索时 ef（越大召回/延迟越高） */
+        private int eventsHnswEf = 64;
     }
 
     @Data
     public static class Elasticsearch {
 
-        /** 为 true 时注册 ES 客户端、索引初始化与 {@code /api/v1/events} 实验 API */
+        /** 为 true 时注册 ES 客户端（事件 API 已移除；仅保留可选扩展） */
         private boolean enabled = false;
 
         private String host = "127.0.0.1";
