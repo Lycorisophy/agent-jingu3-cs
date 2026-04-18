@@ -253,6 +253,30 @@ public class Jingu3Properties {
          * 是否暴露 {@code GET /api/v1/tools} 内置工具目录（id、description、riskLevel）；生产可关闭。
          */
         private boolean catalogApiEnabled = true;
+
+        /**
+         * 联网搜索（DuckDuckGo Instant Answer 或 Tavily）；需 {@code web-search.enabled=true} 才注册 {@code web_search}。
+         */
+        private WebSearch webSearch = new WebSearch();
+
+        @Data
+        public static class WebSearch {
+
+            /** 为 true 时注册内置工具 {@code web_search}（外网 HTTP） */
+            private boolean enabled = false;
+
+            /** DuckDuckGo 无需 Key；Tavily 需配置 {@link #tavilyApiKey} */
+            private WebSearchProvider provider = WebSearchProvider.DUCKDUCKGO;
+
+            /** Tavily API Key（{@code tvly-...}）；仅 provider=TAVILY 时使用 */
+            private String tavilyApiKey = "";
+
+            /** 单次搜索 HTTP 超时（秒） */
+            private int timeoutSeconds = 15;
+
+            /** 返回条目数上限（摘要条数） */
+            private int maxResults = 5;
+        }
     }
 
     @Data

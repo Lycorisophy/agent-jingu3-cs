@@ -33,6 +33,13 @@ jingu3:
     enabled: true
     # 是否暴露 GET /api/v1/tools（内置工具 id、description、riskLevel）
     catalog-api-enabled: true
+    # 联网搜索 web_search：默认关闭；开启后外网 HTTP（DuckDuckGo 免 Key，Tavily 需 tavily-api-key）
+    web-search:
+      enabled: false
+      provider: duckduckgo
+      tavily-api-key: ""
+      timeout-seconds: 15
+      max-results: 5
   snowflake:
     worker-id: 1
     datacenter-id: 1
