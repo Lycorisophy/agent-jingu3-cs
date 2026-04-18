@@ -10,7 +10,7 @@
 |------|----------|
 | `workspace_write_file` / 未来 `execute_code` 破坏数据或越权 | 路径限制在 `PathValidator` + 用户子目录；**生产环境**对写/执行类工具要求 **HITL 审批** 或配置开关（见 [详细设计.md](./详细设计.md) 第 4 节） |
 | 模型误调用高危工具 | v0.7 **安全分级**：低危只读默认开启；写/执行与 **hitl_approval** 队列联动（`request_human_approval` 等待 `APPROVED` 后再执行，见 backlog） |
-| 单用户 `001` 阶段 | 与路线图一致：物理隔离以 `jingu3.user.id` 子目录实现；多用户强约束随 v0.8 |
+| 单用户 `001` 阶段 | 与路线图一致：物理隔离以 `jingu3.user.id` 子目录实现；多用户强约束随 **v1.0** |
 
 **评审记录**：本 PRD 将「Phase 2 与 HITL 协同」列为**必选设计输入**；目标态与现状对照见 `docs/v0.7/详细设计.md` 第 4 节（`hitl_approval` 与工具 `toolId` 的硬联动仍待后续迭代）。
 
