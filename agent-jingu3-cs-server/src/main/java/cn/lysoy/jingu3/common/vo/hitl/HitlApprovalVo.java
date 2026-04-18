@@ -1,8 +1,8 @@
-package cn.lysoy.jingu3.common.vo.hitl;
+﻿package cn.lysoy.jingu3.common.vo.hitl;
 
-import cn.lysoy.jingu3.common.util.UtcTime;
-import cn.lysoy.jingu3.hitl.HitlApprovalStatus;
-import cn.lysoy.jingu3.hitl.entity.HitlApprovalEntity;
+import cn.lysoy.jingu3.util.UtcTime;
+import cn.lysoy.jingu3.common.enums.HitlApprovalStatus;
+import cn.lysoy.jingu3.common.entity.HitlApprovalEntity;
 import lombok.Builder;
 import lombok.Value;
 

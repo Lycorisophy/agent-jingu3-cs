@@ -1,13 +1,13 @@
-package cn.lysoy.jingu3.prompt;
+﻿package cn.lysoy.jingu3.service.prompt;
 
 import cn.lysoy.jingu3.common.constant.PromptTemplates;
 import cn.lysoy.jingu3.config.Jingu3Properties;
-import cn.lysoy.jingu3.engine.ActionMode;
-import cn.lysoy.jingu3.engine.ExecutionContext;
-import cn.lysoy.jingu3.engine.routing.RoutingSource;
-import cn.lysoy.jingu3.tool.CalculatorTool;
-import cn.lysoy.jingu3.tool.ToolRegistry;
-import cn.lysoy.jingu3.tool.UtcTimeTool;
+import cn.lysoy.jingu3.service.guard.ActionMode;
+import cn.lysoy.jingu3.service.guard.ExecutionContext;
+import cn.lysoy.jingu3.service.guard.routing.RoutingSource;
+import cn.lysoy.jingu3.skill.tool.CalculatorTool;
+import cn.lysoy.jingu3.skill.tool.ToolRegistry;
+import cn.lysoy.jingu3.skill.tool.UtcTimeTool;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

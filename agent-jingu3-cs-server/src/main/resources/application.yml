@@ -59,6 +59,11 @@ jingu3:
   # 原始用户提示词密文落库（需配置 crypto.user-prompt-aes-key-base64）
   chat:
     persist-user-prompt: false
+    stm-enabled: true
+    stm-max-pairs: 5
+    stm-include-dst-snippet: true
+    stm-max-dst-chars: 600
+    stm-persist-correction-memory: false
   crypto:
     user-prompt-aes-key-base64: ""
   workspace:

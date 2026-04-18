@@ -1,7 +1,7 @@
-package cn.lysoy.jingu3.common.constant;
+﻿package cn.lysoy.jingu3.common.constant;
 
 /**
- * 技能 REST 与订阅 API 的用户可见错误/校验文案（与 {@link cn.lysoy.jingu3.service.skill.DefaultSkillService} 对齐）。
+ * 技能 REST 与订阅 API 的用户可见错误/校验文案（与 {@link cn.lysoy.jingu3.skill.service.DefaultSkillService} 对齐）。
  */
 public final class SkillApiMessages {
 

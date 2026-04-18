@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.workspace;
+﻿package cn.lysoy.jingu3.skill.workspace;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
 import org.junit.jupiter.api.Test;

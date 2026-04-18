@@ -1,8 +1,8 @@
-package cn.lysoy.jingu3.workspace.sandbox;
+﻿package cn.lysoy.jingu3.skill.workspace.sandbox;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
-import cn.lysoy.jingu3.workspace.DefaultWorkspaceManager;
-import cn.lysoy.jingu3.workspace.service.WorkspaceExecutionRecorder;
+import cn.lysoy.jingu3.skill.workspace.DefaultWorkspaceManager;
+import cn.lysoy.jingu3.skill.workspace.service.WorkspaceExecutionRecorder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;

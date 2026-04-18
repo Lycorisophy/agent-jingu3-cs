@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.tool;
+﻿package cn.lysoy.jingu3.skill.tool;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { defaultClientPlatform, postChat, postChatStream } from './api/chatApi';
 import type { ChatRequest, ChatVo, PlanStepVo, StreamEvent } from './api/types';
 
 const MODES = ['ASK', 'REACT', 'PLAN_AND_EXECUTE', 'WORKFLOW', 'AGENT_TEAM'] as const;
+
+const DISCLAIMER_KEY = 'jingu3.disclaimer.accepted';
 
 const message = ref('你好');
 const mode = ref<string>('ASK');
@@ -11,6 +13,27 @@ const workflowId = ref('');
 const useStream = ref(true);
 const sending = ref(false);
 const errorText = ref('');
+
+/** 固定会话 id，便于 STM 多轮与撤销 */
+const conversationId = ref('');
+const disclaimerAccepted = ref(false);
+const correctionNotes = ref('');
+const undoLastStmTurn = ref(false);
+const persistUserCorrectionAsMemory = ref(false);
+
+onMounted(() => {
+  disclaimerAccepted.value = localStorage.getItem(DISCLAIMER_KEY) === '1';
+  try {
+    conversationId.value = crypto.randomUUID();
+  } catch {
+    conversationId.value = `local-${Date.now()}`;
+  }
+});
+
+function acceptDisclaimer(): void {
+  localStorage.setItem(DISCLAIMER_KEY, '1');
+  disclaimerAccepted.value = true;
+}
 
 const reply = ref('');
 const actionMode = ref<string | null>(null);
@@ -58,19 +81,19 @@ function handleStreamEvent(ev: StreamEvent): void {
       break;
     case 'TOOL_RESULT':
       streamTimeline.value.push({
-        kind: 'TOOL_RESULT',
-        text: `[${ev.toolId ?? ''}] ${ev.toolOutput ?? ''}`,
+        kind: '工具结果',
+        text: `${ev.toolId ?? ''} → ${ev.toolOutput ?? ''}`,
       });
       break;
     case 'STEP_BEGIN':
       streamTimeline.value.push({
-        kind: 'STEP',
+        kind: '编排步骤',
         text: `开始 #${ev.step ?? ''} ${ev.label ?? ''}`,
       });
       break;
     case 'STEP_END':
       streamTimeline.value.push({
-        kind: 'STEP',
+        kind: '编排步骤',
         text: `结束 #${ev.step ?? ''}`,
       });
       break;
@@ -89,9 +112,19 @@ function buildRequest(): { body: ChatRequest; platform: string } {
     message: message.value.trim(),
     mode: mode.value,
     clientPlatform: platform,
+    conversationId: conversationId.value || undefined,
   };
   if (mode.value === 'WORKFLOW' && workflowId.value.trim()) {
     body.workflowId = workflowId.value.trim();
+  }
+  if (correctionNotes.value.trim()) {
+    body.correctionNotes = correctionNotes.value.trim();
+  }
+  if (undoLastStmTurn.value) {
+    body.undoLastStmTurn = true;
+  }
+  if (persistUserCorrectionAsMemory.value && correctionNotes.value.trim()) {
+    body.persistUserCorrectionAsMemory = true;
   }
   return { body, platform };
 }
@@ -142,8 +175,17 @@ async function onSend(): Promise<void> {
       </div>
     </header>
 
+    <div v-if="!disclaimerAccepted" class="disclaimer">
+      <p>
+        <strong>能力说明：</strong>本客户端连接本地或配置的 JinGu3 服务；模型可能出错，请以服务端返回的
+        actionMode / routingSource、工具输出为准。不用于医疗/法律等需专业资质决策的场景。
+      </p>
+      <button type="button" class="send secondary" @click="acceptDisclaimer">已知悉</button>
+    </div>
+
     <main class="main">
       <section class="panel controls">
+        <div class="row hint">会话 ID（STM 多轮）：{{ conversationId }}</div>
         <label class="row">
           <span>行动模式</span>
           <select v-model="mode" class="input">
@@ -165,8 +207,25 @@ async function onSend(): Promise<void> {
           <span>消息</span>
           <textarea v-model="message" class="input textarea" rows="4" placeholder="输入后发送"></textarea>
         </label>
-        <button type="button" class="send" :disabled="sending" @click="onSend">
-          {{ sending ? '处理中…' : '发送' }}
+        <label class="row grow">
+          <span>纠正上一轮（可选，写入本轮送模）</span>
+          <textarea
+            v-model="correctionNotes"
+            class="input textarea small"
+            rows="2"
+            placeholder="例如：上一条预算理解错了，应以 500 元为上限"
+          ></textarea>
+        </label>
+        <label class="row check">
+          <input v-model="undoLastStmTurn" type="checkbox" />
+          <span>撤销 STM 最近一轮再生成（undoLastStmTurn）</span>
+        </label>
+        <label class="row check">
+          <input v-model="persistUserCorrectionAsMemory" type="checkbox" />
+          <span>将纠正写入记忆（persistUserCorrectionAsMemory，需服务端开启）</span>
+        </label>
+        <button type="button" class="send" :disabled="!disclaimerAccepted || sending" @click="onSend">
+          {{ sending ? '处理中…' : disclaimerAccepted ? '发送' : '请先确认上方说明' }}
         </button>
         <p v-if="errorText" class="err">{{ errorText }}</p>
       </section>
@@ -291,9 +350,28 @@ async function onSend(): Promise<void> {
   color: #fff;
   cursor: pointer;
 }
+.send.secondary {
+  background: #475569;
+  width: auto;
+  padding: 8px 16px;
+}
 .send:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+.disclaimer {
+  margin: 12px 16px 0;
+  padding: 12px 14px;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.disclaimer p {
+  margin: 0 0 10px;
+}
+.textarea.small {
+  min-height: 52px;
 }
 .err {
   color: #b91c1c;

@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.config;
+﻿package cn.lysoy.jingu3.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -54,6 +54,27 @@ public class Jingu3Properties {
          * {@link Crypto#getUserPromptAesKeyBase64()}。
          */
         private boolean persistUserPrompt = false;
+
+        /**
+         * 是否启用进程内 STM（按 conversationId 保留最近若干轮 user/assistant，写入 {@link cn.lysoy.jingu3.service.guard.ExecutionContext#getHistory()}）。
+         */
+        private boolean stmEnabled = true;
+
+        /** STM 保留的用户-助手轮对上限（每对两条文本）。 */
+        private int stmMaxPairs = 5;
+
+        /**
+         * 是否在 STM 前注入一行 DST {@code stateJson} 摘要（需已 PATCH 过 {@code /api/v1/dst/{conversationId}}）。
+         */
+        private boolean stmIncludeDstSnippet = true;
+
+        /** 注入 DST 时 {@code stateJson} 最大字符数，超出截断。 */
+        private int stmMaxDstChars = 600;
+
+        /**
+         * 当请求体 {@code persistUserCorrectionAsMemory}=true 且带 {@code correctionNotes} 时，是否在对话成功后写入一条 FACT 记忆（需记忆 API 可用）。
+         */
+        private boolean stmPersistCorrectionMemory = false;
     }
 
     @Data
@@ -81,7 +102,7 @@ public class Jingu3Properties {
          */
         private boolean apiEnabled = true;
 
-        /** {@link cn.lysoy.jingu3.service.memory.DefaultMemoryService#listByUserId} 单次最大条数 */
+        /** {@link cn.lysoy.jingu3.rag.service.DefaultMemoryService#listByUserId} 单次最大条数 */
         private int maxListSize = 100;
 
         /**
@@ -109,7 +130,7 @@ public class Jingu3Properties {
          */
         private boolean apiEnabled = true;
 
-        /** {@link cn.lysoy.jingu3.service.skill.DefaultSkillService#listPublicCatalog} 最大条数 */
+        /** {@link cn.lysoy.jingu3.skill.service.DefaultSkillService#listPublicCatalog} 最大条数 */
         private int listMaxSize = 100;
     }
 
@@ -205,7 +226,7 @@ public class Jingu3Properties {
     @Data
     public static class RateLimit {
 
-        /** 是否对 {@link cn.lysoy.jingu3.controller.ChatController} 启用按客户端 IP 的令牌桶限流 */
+        /** 是否对 {@link cn.lysoy.jingu3.controller.app.ChatController} 启用按客户端 IP 的令牌桶限流 */
         private boolean enabled = true;
 
         /** 每分钟允许的聊天请求数（均分到 Guava RateLimiter 的每秒许可） */

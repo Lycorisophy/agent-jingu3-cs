@@ -1,6 +1,6 @@
-package cn.lysoy.jingu3.aspect;
+﻿package cn.lysoy.jingu3.aspect;
 
-import cn.lysoy.jingu3.engine.routing.RoutingDecision;
+import cn.lysoy.jingu3.service.guard.routing.RoutingDecision;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -17,17 +17,17 @@ import org.springframework.stereotype.Component;
 @Order(10)
 public class RoutingLayerMonitorAspect {
 
-    @Around("execution(* cn.lysoy.jingu3.engine.routing.IntentRouter.resolve(..))")
+    @Around("execution(* cn.lysoy.jingu3.service.guard.routing.IntentRouter.resolve(..))")
     public Object aroundIntentRouter(ProceedingJoinPoint pjp) throws Throwable {
         return monitor("IntentRouter.resolve", pjp);
     }
 
-    @Around("execution(* cn.lysoy.jingu3.engine.routing.ModelIntentClassifier.classify(..))")
+    @Around("execution(* cn.lysoy.jingu3.service.guard.routing.ModelIntentClassifier.classify(..))")
     public Object aroundClassifier(ProceedingJoinPoint pjp) throws Throwable {
         return monitor("ModelIntentClassifier.classify", pjp);
     }
 
-    @Around("execution(* cn.lysoy.jingu3.engine.routing.ModelIntentClassifier.classifyOptional(..))")
+    @Around("execution(* cn.lysoy.jingu3.service.guard.routing.ModelIntentClassifier.classifyOptional(..))")
     public Object aroundClassifierOptional(ProceedingJoinPoint pjp) throws Throwable {
         return monitor("ModelIntentClassifier.classifyOptional", pjp);
     }

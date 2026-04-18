@@ -1,7 +1,7 @@
-package cn.lysoy.jingu3.common.constant;
+﻿package cn.lysoy.jingu3.common.constant;
 
 /**
- * {@link cn.lysoy.jingu3.engine.routing.RoutingDecision#getNote()} 中使用的键，便于检索与测试断言。
+ * {@link cn.lysoy.jingu3.service.guard.routing.RoutingDecision#getNote()} 中使用的键，便于检索与测试断言。
  */
 public final class RoutingNotes {
 

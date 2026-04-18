@@ -1,7 +1,7 @@
-package cn.lysoy.jingu3.common.vo.dst;
+﻿package cn.lysoy.jingu3.common.vo.dst;
 
-import cn.lysoy.jingu3.common.util.UtcTime;
-import cn.lysoy.jingu3.dst.entity.DialogueStateEntity;
+import cn.lysoy.jingu3.util.UtcTime;
+import cn.lysoy.jingu3.mapper.dst.DialogueStateEntity;
 import lombok.Builder;
 import lombok.Value;
 

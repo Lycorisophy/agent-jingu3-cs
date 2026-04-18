@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.prompt;
+﻿package cn.lysoy.jingu3.service.prompt;
 
 import org.junit.jupiter.api.Test;
 

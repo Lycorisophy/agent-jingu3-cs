@@ -664,3 +664,12 @@ components:
         clientPlatform:
           type: string
           description: 客户端平台；浏览器 WebSocket 等无法自定义握手头时可仅传本字段；HTTP/SSE 可与 X-Jingu3-Client-Platform 二选一，请求头优先。
+        correctionNotes:
+          type: string
+          description: 可选；用户对上一轮输出的纠正或补充，送模前拼入用户串。
+        undoLastStmTurn:
+          type: boolean
+          description: 可选；为 true 时在加载 STM 前丢弃本会话最近一轮用户+助手记录（用于撤销上一轮再生成）。
+        persistUserCorrectionAsMemory:
+          type: boolean
+          description: 可选；为 true 且 correctionNotes 非空时，在对话成功后写入一条 FACT 记忆（需 jingu3.chat.stm-persist-correction-memory=true 且记忆服务可用）。

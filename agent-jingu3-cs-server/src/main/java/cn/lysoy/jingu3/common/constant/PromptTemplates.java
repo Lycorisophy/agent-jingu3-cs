@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.common.constant;
+﻿package cn.lysoy.jingu3.common.constant;
 
 /**
  * LLM 系统提示词与固定指令模板（不含运行时动态枚举列表）。
@@ -10,6 +10,13 @@ public final class PromptTemplates {
      * Ask 模式：系统角色设定。
      */
     public static final String ASK_SYSTEM = "你是一个有帮助的中文助手，回答简洁准确。";
+
+    /**
+     * 人机认知对齐：不得编造上下文中未出现的事实（与工具输出、【参考记忆】、近期对话一致）。
+     */
+    public static final String COGNITIVE_ALIGNMENT_TRUTHFULNESS =
+            "诚实性：仅基于本提示中给出的「用户输入」「近期对话」「工具输出」「参考记忆」作答；"
+                    + "若信息不足，请直接说明不确定或无法判断，不要编造未提供来源的细节。";
 
     /**
      * ReAct 模式：系统角色与输出约束。
@@ -26,7 +33,7 @@ public final class PromptTemplates {
                     + "若无外部反馈且本步未调用工具，观察可写「（无新观察）」。"
                     + "任务可结束时在正文末行输出 [TASK_COMPLETE]，或按下方 JSON 页脚规则输出 action 为 done。";
 
-    /** Ask：工具路由专用；后接 {@link cn.lysoy.jingu3.tool.ToolRegistry#buildCatalogMarkdown()} */
+    /** Ask：工具路由专用；后接 {@link cn.lysoy.jingu3.skill.tool.ToolRegistry#buildCatalogMarkdown()} */
     public static final String ASK_TOOL_ROUTER_INSTRUCTION =
             "你是工具路由助手。根据用户问题与下列内置工具，只输出一行合法 JSON（不要 Markdown、不要解释）：\n"
                     + "{\"route\":\"direct\"} 表示直接语言回答即可；\n"
@@ -42,7 +49,7 @@ public final class PromptTemplates {
                     + "若本步不再需要工具且任务可结束，第二行 JSON 为 {\"action\":\"done\"} 。";
 
     /**
-     * Plan 子任务：工具路由；后接 {@link cn.lysoy.jingu3.tool.ToolRegistry#buildCatalogMarkdown()} 与子任务正文。
+     * Plan 子任务：工具路由；后接 {@link cn.lysoy.jingu3.skill.tool.ToolRegistry#buildCatalogMarkdown()} 与子任务正文。
      */
     public static final String PLAN_SUBTASK_TOOL_ROUTER_INSTRUCTION =
             "你是工具路由助手。根据下列「计划子任务」与原始用户问题、内置工具列表，只输出一行合法 JSON（不要 Markdown、不要解释）：\n"
@@ -58,7 +65,7 @@ public final class PromptTemplates {
     public static final String WORKFLOW_NODE_HEADER = "工作流节点指令：";
 
     /**
-     * 意图分类器系统指令前缀；运行时在末尾拼接 {@link cn.lysoy.jingu3.engine.ActionMode} 枚举名列表。
+     * 意图分类器系统指令前缀；运行时在末尾拼接 {@link cn.lysoy.jingu3.service.guard.ActionMode} 枚举名列表。
      */
     public static final String INTENT_CLASSIFIER_SYSTEM_PREFIX =
             "你是模式分类器。根据用户输入，只输出下列之一（大写、无空格、无解释）：";
@@ -110,7 +117,7 @@ public final class PromptTemplates {
                     + "子 Agent 输出不得包含需用户点击的卡片或代用户创建定时任务；若用户确有审批或定时诉求，由你在本最终答复中说明产品能力、引导或下一步（勿重复内部角色标签，不要添加「作为 AI」之类套话）。\n\n";
 
     /**
-     * 供 {@link cn.lysoy.jingu3.prompt.ModeRoutingPreamble} 注入：对话层可选模式的自然语言释义，
+     * 供 {@link cn.lysoy.jingu3.service.prompt.ModeRoutingPreamble} 注入：对话层可选模式的自然语言释义，
      * 便于模型判断「是否应建议用户切换模式」。
      */
     public static final String MODE_CATALOG_FOR_LLM =

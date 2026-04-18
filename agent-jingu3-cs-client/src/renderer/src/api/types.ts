@@ -10,6 +10,12 @@ export interface ChatRequest {
   requestId?: string;
   traceId?: string;
   clientPlatform?: string;
+  /** 对上一轮输出的纠正或补充 */
+  correctionNotes?: string;
+  /** 丢弃 STM 最近一轮再生成 */
+  undoLastStmTurn?: boolean;
+  /** 将纠正写入服务端记忆（需配置开启） */
+  persistUserCorrectionAsMemory?: boolean;
 }
 
 export interface PlanStepVo {

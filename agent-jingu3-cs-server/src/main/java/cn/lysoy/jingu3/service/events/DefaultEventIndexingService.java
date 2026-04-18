@@ -6,7 +6,7 @@ import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
 import cn.lysoy.jingu3.common.vo.EventSearchHitVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
-import cn.lysoy.jingu3.events.model.EventDocument;
+import cn.lysoy.jingu3.common.model.EventDocument;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;

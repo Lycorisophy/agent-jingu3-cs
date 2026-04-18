@@ -1,6 +1,6 @@
-package cn.lysoy.jingu3.service.workspace;
+﻿package cn.lysoy.jingu3.service.workspace;
 
-import cn.lysoy.jingu3.workspace.entity.WorkspaceEntity;
+import cn.lysoy.jingu3.skill.workspace.entity.WorkspaceEntity;
 
 import java.io.IOException;
 import java.util.Optional;

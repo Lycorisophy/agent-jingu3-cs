@@ -1,6 +1,6 @@
-package cn.lysoy.jingu3.common.dto.cron;
+﻿package cn.lysoy.jingu3.common.dto.cron;
 
-import cn.lysoy.jingu3.cron.ScheduledTaskScope;
+import cn.lysoy.jingu3.job.ScheduledTaskScope;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

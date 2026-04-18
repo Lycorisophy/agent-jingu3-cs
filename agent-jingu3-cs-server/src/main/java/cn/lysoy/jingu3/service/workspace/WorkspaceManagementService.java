@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.service.workspace;
+﻿package cn.lysoy.jingu3.service.workspace;
 
 import cn.lysoy.jingu3.common.enums.ErrorCode;
 import cn.lysoy.jingu3.common.exception.ServiceException;
@@ -6,11 +6,11 @@ import cn.lysoy.jingu3.common.vo.WorkspaceExecutionItemVo;
 import cn.lysoy.jingu3.common.vo.WorkspaceFileStatsVo;
 import cn.lysoy.jingu3.common.vo.WorkspaceSummaryVo;
 import cn.lysoy.jingu3.config.Jingu3Properties;
-import cn.lysoy.jingu3.workspace.WorkspaceManager;
-import cn.lysoy.jingu3.workspace.WorkspaceStats;
-import cn.lysoy.jingu3.workspace.entity.WorkspaceEntity;
-import cn.lysoy.jingu3.workspace.entity.WorkspaceExecutionEntity;
-import cn.lysoy.jingu3.persistence.mapper.workspace.WorkspaceExecutionMapper;
+import cn.lysoy.jingu3.skill.workspace.WorkspaceManager;
+import cn.lysoy.jingu3.skill.workspace.WorkspaceStats;
+import cn.lysoy.jingu3.skill.workspace.entity.WorkspaceEntity;
+import cn.lysoy.jingu3.skill.workspace.entity.WorkspaceExecutionEntity;
+import cn.lysoy.jingu3.mapper.workspace.WorkspaceExecutionMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 

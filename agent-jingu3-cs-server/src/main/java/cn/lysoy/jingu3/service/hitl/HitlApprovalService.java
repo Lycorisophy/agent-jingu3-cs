@@ -1,13 +1,13 @@
-package cn.lysoy.jingu3.service.hitl;
+﻿package cn.lysoy.jingu3.service.hitl;
 
 import cn.lysoy.jingu3.common.constant.HitlApiMessages;
-import cn.lysoy.jingu3.common.util.UtcTime;
-import cn.lysoy.jingu3.hitl.HitlApprovalStatus;
+import cn.lysoy.jingu3.util.UtcTime;
+import cn.lysoy.jingu3.common.enums.HitlApprovalStatus;
 import cn.lysoy.jingu3.component.UserConstants;
 import cn.lysoy.jingu3.common.dto.hitl.CreateHitlApprovalRequest;
 import cn.lysoy.jingu3.common.vo.hitl.HitlApprovalVo;
-import cn.lysoy.jingu3.hitl.entity.HitlApprovalEntity;
-import cn.lysoy.jingu3.persistence.mapper.hitl.HitlApprovalMapper;
+import cn.lysoy.jingu3.common.entity.HitlApprovalEntity;
+import cn.lysoy.jingu3.mapper.hitl.HitlApprovalMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

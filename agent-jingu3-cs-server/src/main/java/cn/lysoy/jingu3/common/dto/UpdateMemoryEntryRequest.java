@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.common.dto;
+﻿package cn.lysoy.jingu3.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
@@ -26,7 +26,7 @@ public class UpdateMemoryEntryRequest {
     /** kind 为 FACT 时写入或清空标签；传空串可清空 */
     private String factTag;
 
-    /** 最终 kind 为 FACT 时可更新；见 {@link cn.lysoy.jingu3.memory.FactTemporalTier} */
+    /** 最终 kind 为 FACT 时可更新；见 {@link cn.lysoy.jingu3.rag.FactTemporalTier} */
     private String temporalTier;
 
     /** 为 true 时将 fact 标记为已确认（写入 confirmed_at）；为 false 时清空 confirmed_at；null 表示不修改 */

@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.common.constant;
+﻿package cn.lysoy.jingu3.common.constant;
 
 /**
  * 提示词拼装用片段（换行、标签），避免魔法字符串散落。
@@ -22,9 +22,12 @@ public final class PromptFragments {
     public static final String USER_INPUT_LABEL_WITH_NEWLINE = "用户输入：\n";
 
     /**
-     * 编排多步时，将上一步模型输出拼入下一步 {@link cn.lysoy.jingu3.engine.ExecutionContext#getTaskPayload()}。
+     * 编排多步时，将上一步模型输出拼入下一步 {@link cn.lysoy.jingu3.service.guard.ExecutionContext#getTaskPayload()}。
      */
     public static final String PLAN_CHAIN_SEPARATOR = "\n---\n上一步输出：\n";
+
+    /** 用户主动纠正/补充时拼在原始 {@code message} 之前（认知对齐：可纠正性）。 */
+    public static final String USER_CORRECTION_PREFIX = "【用户纠正或补充】\n";
 
     /** 对话前向量检索注入时的段落标题（与 {@code jingu3.memory.injection-enabled} 配合）。 */
     public static final String MEMORY_REFERENCE_HEADER = "【参考记忆】\n";

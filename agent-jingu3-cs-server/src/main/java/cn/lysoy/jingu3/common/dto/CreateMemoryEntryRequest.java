@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.common.dto;
+﻿package cn.lysoy.jingu3.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
@@ -28,7 +28,7 @@ public class CreateMemoryEntryRequest {
     private String factTag;
 
     /**
-     * kind=FACT 时可选：{@link cn.lysoy.jingu3.memory.FactTemporalTier} 名（PERMANENT / LONG_TERM / SHORT_TERM），默认
+     * kind=FACT 时可选：{@link cn.lysoy.jingu3.rag.FactTemporalTier} 名（PERMANENT / LONG_TERM / SHORT_TERM），默认
      * SHORT_TERM。
      */
     private String temporalTier;

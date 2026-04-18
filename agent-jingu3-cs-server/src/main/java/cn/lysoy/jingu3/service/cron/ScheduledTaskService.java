@@ -1,14 +1,14 @@
-package cn.lysoy.jingu3.service.cron;
+﻿package cn.lysoy.jingu3.service.cron;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.common.constant.CronApiMessages;
 import cn.lysoy.jingu3.component.UserConstants;
-import cn.lysoy.jingu3.common.util.UtcTime;
-import cn.lysoy.jingu3.cron.ScheduledTaskScope;
+import cn.lysoy.jingu3.util.UtcTime;
+import cn.lysoy.jingu3.job.ScheduledTaskScope;
 import cn.lysoy.jingu3.common.dto.cron.CreateScheduledTaskRequest;
 import cn.lysoy.jingu3.common.vo.cron.ScheduledTaskVo;
-import cn.lysoy.jingu3.cron.entity.ScheduledTaskEntity;
-import cn.lysoy.jingu3.persistence.mapper.cron.ScheduledTaskMapper;
+import cn.lysoy.jingu3.job.entity.ScheduledTaskEntity;
+import cn.lysoy.jingu3.mapper.cron.ScheduledTaskMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;

@@ -1,8 +1,8 @@
-package cn.lysoy.jingu3.prompt;
+﻿package cn.lysoy.jingu3.service.prompt;
 
-import cn.lysoy.jingu3.engine.ActionMode;
-import cn.lysoy.jingu3.engine.ExecutionContext;
-import cn.lysoy.jingu3.engine.routing.RoutingSource;
+import cn.lysoy.jingu3.service.guard.ActionMode;
+import cn.lysoy.jingu3.service.guard.ExecutionContext;
+import cn.lysoy.jingu3.service.guard.routing.RoutingSource;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

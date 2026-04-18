@@ -1,9 +1,9 @@
-package cn.lysoy.jingu3.service.workspace;
+﻿package cn.lysoy.jingu3.service.workspace;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
-import cn.lysoy.jingu3.workspace.WorkspaceManager;
-import cn.lysoy.jingu3.workspace.entity.WorkspaceEntity;
-import cn.lysoy.jingu3.persistence.mapper.workspace.WorkspaceMapper;
+import cn.lysoy.jingu3.skill.workspace.WorkspaceManager;
+import cn.lysoy.jingu3.skill.workspace.entity.WorkspaceEntity;
+import cn.lysoy.jingu3.mapper.workspace.WorkspaceMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

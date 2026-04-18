@@ -1,9 +1,9 @@
-package cn.lysoy.jingu3.service.workspace;
+﻿package cn.lysoy.jingu3.service.workspace;
 
 import cn.lysoy.jingu3.config.Jingu3Properties;
-import cn.lysoy.jingu3.workspace.WorkspaceManager;
-import cn.lysoy.jingu3.workspace.WorkspaceStats;
-import cn.lysoy.jingu3.workspace.security.PathValidator;
+import cn.lysoy.jingu3.skill.workspace.WorkspaceManager;
+import cn.lysoy.jingu3.skill.workspace.WorkspaceStats;
+import cn.lysoy.jingu3.skill.workspace.security.PathValidator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 

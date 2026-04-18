@@ -1,8 +1,8 @@
-package cn.lysoy.jingu3.component;
+﻿package cn.lysoy.jingu3.component;
 
 import cn.lysoy.jingu3.common.dto.ChatRequest;
-import cn.lysoy.jingu3.engine.ActionMode;
-import cn.lysoy.jingu3.engine.ActionModePolicy;
+import cn.lysoy.jingu3.service.guard.ActionMode;
+import cn.lysoy.jingu3.service.guard.ActionModePolicy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

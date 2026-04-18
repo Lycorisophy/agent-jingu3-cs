@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.common.dto;
+﻿package cn.lysoy.jingu3.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 聊天请求体（REST）。
  * <p>若 {@code modePlan} 非空，优先于单字段 {@code mode}，按序编排执行。</p>
- * <p>选用 {@link cn.lysoy.jingu3.engine.ActionMode#WORKFLOW} 时建议传 {@code workflowId}；未传则回落 ASK（见规范）。</p>
+ * <p>选用 {@link cn.lysoy.jingu3.service.guard.ActionMode#WORKFLOW} 时建议传 {@code workflowId}；未传则回落 ASK（见规范）。</p>
  */
 @Getter
 @Setter
@@ -47,4 +47,19 @@ public class ChatRequest {
      * 浏览器 WebSocket 无法自定义握手头时可仅传本字段。
      */
     private String clientPlatform;
+
+    /**
+     * 可选：用户对上一轮助手输出的纠正或补充说明；送模前拼入用户串（见 {@link cn.lysoy.jingu3.service.context.prepare.UserPromptPreparationService}）。
+     */
+    private String correctionNotes;
+
+    /**
+     * 可选：为 true 时在加载 STM 前丢弃本会话最近一轮「用户+助手」记录，便于「撤销上一轮再生成」。
+     */
+    private Boolean undoLastStmTurn;
+
+    /**
+     * 可选：为 true 且 {@link #correctionNotes} 非空时，在对话成功后尝试写入一条 FACT 记忆（受 {@code jingu3.chat.stm-persist-correction-memory} 与记忆服务约束）。
+     */
+    private Boolean persistUserCorrectionAsMemory;
 }

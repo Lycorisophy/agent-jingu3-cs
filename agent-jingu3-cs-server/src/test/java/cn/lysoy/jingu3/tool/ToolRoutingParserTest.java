@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.tool;
+﻿package cn.lysoy.jingu3.skill.tool;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.config;
+﻿package cn.lysoy.jingu3.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -6,7 +6,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * 为 {@link cn.lysoy.jingu3.service.chat.ChatStreamService} 提供专用线程池：LLM 流式回调与多步阻塞调用在后台执行，
+ * 为 {@link cn.lysoy.jingu3.service.context.chat.ChatStreamService} 提供专用线程池：LLM 流式回调与多步阻塞调用在后台执行，
  * 避免长时间占用 Tomcat 工作线程导致吞吐下降。
  */
 @Configuration

@@ -1,0 +1,9 @@
+﻿package cn.lysoy.jingu3.job;
+
+/**
+ * 定时任务作用域：全局或绑定单会话。
+ */
+public enum ScheduledTaskScope {
+    GLOBAL,
+    CONVERSATION
+}
