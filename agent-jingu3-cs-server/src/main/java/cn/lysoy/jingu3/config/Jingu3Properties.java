@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.config;
+﻿package cn.lysoy.jingu3.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -104,11 +104,6 @@ public class Jingu3Properties {
 
         /** {@link cn.lysoy.jingu3.rag.service.DefaultMemoryService#listByUserId} 单次最大条数 */
         private int maxListSize = 100;
-
-        /**
-         * 是否在对话主链路注入检索到的记忆片段（关闭时与未接向量前行为一致）。
-         */
-        private boolean injectionEnabled = false;
 
         /** Ollama 嵌入模型名，与路线图默认一致 */
         private String embeddingModel = "qwen3-embedding:8b";

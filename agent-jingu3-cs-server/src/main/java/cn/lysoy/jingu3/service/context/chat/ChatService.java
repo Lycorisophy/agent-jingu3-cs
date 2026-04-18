@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.service.context.chat;
+﻿package cn.lysoy.jingu3.service.context.chat;
 
 import cn.lysoy.jingu3.component.ChatInboundPlatformSupport;
 import cn.lysoy.jingu3.component.ChatRequestValidator;
@@ -24,7 +24,7 @@ import java.util.List;
  * <strong>同步对话编排入口</strong>（驾驭工程 + 上下文工程）：HTTP {@code POST /api/v1/chat} 的非流式路径。
  * <p><strong>管线顺序</strong>：平台头合并 → 请求校验 →（可选）用户句密文落库 →
  * 若带 {@code modePlan} 则走 {@link ModePlanExecutor}（多模式顺序执行）；否则经
- * {@link UserPromptPreparationService} 做记忆检索等<strong>送模前用户串改写</strong> →
+ * {@link UserPromptPreparationService} 做纠正语与 UTC/平台等<strong>送模前用户串改写</strong> →
  * {@link IntentRouter} 三源路由并经 {@link RoutingFallbacks} 处理 WORKFLOW 无 id 等回落 →
  * 构造 {@link ExecutionContext} → {@link ModeRegistry} 选中 {@link cn.lysoy.jingu3.service.mode.ActionModeHandler#execute}。</p>
  * <p>流式输出见 {@link ChatStreamService}；二者应保持路由与上下文构造语义一致。</p>

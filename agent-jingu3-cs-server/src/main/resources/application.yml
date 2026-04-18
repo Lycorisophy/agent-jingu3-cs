@@ -95,8 +95,6 @@ jingu3:
     # v0.6 M1：实验性记忆 API；关闭后不注册 MemoryController
     api-enabled: true
     max-list-size: 100
-    # 是否在对话中注入检索到的记忆（需 Milvus + Ollama 嵌入；默认 false）
-    injection-enabled: false
     embedding-model: qwen3-embedding:8b
     embedding-dimension: 0
     retrieval-top-k: 5

@@ -22,7 +22,7 @@ mybatis-plus:
     default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
 
 # 可选：记忆 Redis 缓存 / Milvus 向量 / 对话注入（默认 false，与 application.yml 一致）
-# jingu3.redis.enabled、jingu3.milvus.enabled、jingu3.memory.injection-enabled
+# jingu3.redis.enabled、jingu3.milvus.enabled
 
 logging:
   level:

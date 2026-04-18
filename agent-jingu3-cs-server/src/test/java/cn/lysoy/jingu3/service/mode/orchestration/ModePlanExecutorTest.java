@@ -14,7 +14,6 @@ import cn.lysoy.jingu3.service.mode.handler.StateTrackingModeHandler;
 import cn.lysoy.jingu3.service.mode.handler.WorkflowModeHandler;
 import cn.lysoy.jingu3.service.mode.support.ToolStepService;
 import cn.lysoy.jingu3.service.mode.workflow.WorkflowDefinitionRegistry;
-import cn.lysoy.jingu3.rag.service.MemoryAugmentationService;
 import cn.lysoy.jingu3.service.prompt.PromptAssembly;
 import cn.lysoy.jingu3.service.context.prepare.UserPromptPreparationService;
 import cn.lysoy.jingu3.skill.tool.CalculatorTool;
@@ -30,7 +29,6 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -64,9 +62,7 @@ class ModePlanExecutorTest {
         when(chat.generate(anyString())).thenReturn("gen");
         StreamingChatLanguageModel streaming = Mockito.mock(StreamingChatLanguageModel.class);
         ModeRegistry registry = buildRegistry(chat, streaming);
-        MemoryAugmentationService memAug = Mockito.mock(MemoryAugmentationService.class);
-        when(memAug.augmentUserMessageIfEnabled(anyString(), any())).thenAnswer(inv -> inv.getArgument(0));
-        UserPromptPreparationService prep = new UserPromptPreparationService(memAug);
+        UserPromptPreparationService prep = new UserPromptPreparationService();
         var executor = new ModePlanExecutor(registry, prep);
         UserConstants users = Mockito.mock(UserConstants.class);
         when(users.getId()).thenReturn("001");
@@ -91,9 +87,7 @@ class ModePlanExecutorTest {
         when(chat.generate(anyString())).thenReturn("gen");
         StreamingChatLanguageModel streaming = Mockito.mock(StreamingChatLanguageModel.class);
         ModeRegistry registry = buildRegistry(chat, streaming);
-        MemoryAugmentationService memAug = Mockito.mock(MemoryAugmentationService.class);
-        when(memAug.augmentUserMessageIfEnabled(anyString(), any())).thenAnswer(inv -> inv.getArgument(0));
-        UserPromptPreparationService prep = new UserPromptPreparationService(memAug);
+        UserPromptPreparationService prep = new UserPromptPreparationService();
         var executor = new ModePlanExecutor(registry, prep);
         UserConstants users = Mockito.mock(UserConstants.class);
         when(users.getId()).thenReturn("001");

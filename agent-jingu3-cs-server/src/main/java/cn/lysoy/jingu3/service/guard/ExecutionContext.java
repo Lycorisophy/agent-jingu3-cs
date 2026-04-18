@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.service.guard;
+﻿package cn.lysoy.jingu3.service.guard;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.service.guard.routing.RoutingSource;
@@ -16,8 +16,8 @@ import java.util.List;
  * 「驾驭工程」中连接 HTTP/WebSocket 与模式实现的枢纽类型。
  * </p>
  * <p>
- * 指南 §1.4 中的分层记忆（STM/Episodic/LTM）尚未完全落地时，{@link #history} 仍为占位列表；记忆注入主要发生在
- * {@link cn.lysoy.jingu3.service.context.prepare.UserPromptPreparationService}（送模前的用户串改写），与本字段解耦。
+ * 指南 §1.4 中的分层记忆（STM/Episodic/LTM）尚未完全落地时，{@link #history} 仍为占位列表；长期记忆按需检索由内置工具
+ * {@code memory_search} 完成，不在此字段。送模前用户串改写见 {@link cn.lysoy.jingu3.service.context.prepare.UserPromptPreparationService}。
  * </p>
  */
 @Getter
@@ -30,8 +30,7 @@ public class ExecutionContext {
     /** 会话标识；State Tracking、日志、密文落库等横切能力使用 */
     private final String conversationId;
     /**
-     * 用户本轮原始消息（未经记忆向量检索扩写时即为请求体；经 {@link cn.lysoy.jingu3.service.context.prepare.UserPromptPreparationService}
-     * 处理后传入构造器的常为「已增强」串）。
+     * 用户本轮消息（经 {@link cn.lysoy.jingu3.service.context.prepare.UserPromptPreparationService} 可附加纠正语、UTC/平台行等）。
      */
     private final String userMessage;
     /** 本步选用的行动模式（由 {@link cn.lysoy.jingu3.service.guard.routing.IntentRouter}、显式 mode、modePlan 或回落逻辑决定） */

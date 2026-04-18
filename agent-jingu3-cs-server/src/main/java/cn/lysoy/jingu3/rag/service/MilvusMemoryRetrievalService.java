@@ -9,20 +9,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * <strong>记忆检索 + 拼装</strong>（记忆与知识系统 × 上下文工程）：在 Milvus 启用时，将当前用户句嵌入向量，
+ * <strong>记忆向量检索 + 引用块拼装</strong>（记忆与知识系统）：在 Milvus 启用时，将查询句嵌入向量，
  * 按 user 隔离检索 Top-K {@code memory_entry_id}，回表读取 {@link MemoryEntryEntity} 摘要与正文预览，拼成
- * {@link cn.lysoy.jingu3.common.constant.PromptFragments#MEMORY_REFERENCE_HEADER} 引导的引用块并置于用户消息<strong>之前</strong>。
- * <p>本 Bean 仅在 {@code jingu3.milvus.enabled=true} 时注册；外层降级见 {@link MemoryAugmentationService}。</p>
+ * {@link cn.lysoy.jingu3.common.constant.PromptFragments#MEMORY_REFERENCE_HEADER} 引导的引用块。
+ * <p>供内置工具 {@code memory_search} 按需调用；不再在送模前自动注入用户消息。</p>
+ * <p>本 Bean 仅在 {@code jingu3.milvus.enabled=true} 时注册。</p>
  */
 @Slf4j
 @Service
 @ConditionalOnProperty(prefix = "jingu3.milvus", name = "enabled", havingValue = "true")
 public class MilvusMemoryRetrievalService {
 
-    /** 单条记忆正文注入预览上限，防止提示词爆炸 */
+    /** 单条记忆正文预览上限，防止提示词爆炸 */
     private static final int BODY_PREVIEW_MAX = 500;
 
     private final Jingu3Properties properties;
@@ -48,31 +51,40 @@ public class MilvusMemoryRetrievalService {
     }
 
     /**
-     * 将检索到的记忆摘要拼在用户消息前；失败或无结果时返回原消息。
-     * TODO 先让模型判断是否搜索，如果搜索的话可以输出搜索message和bm25
+     * 按查询文本做向量检索，返回引用块（含 {@link PromptFragments#MEMORY_REFERENCE_HEADER}），不含用户原句。
+     * <p>无命中、查询为空或异常时返回空串（异常会记日志，不冒泡）。</p>
+     *
+     * @param queryText 检索用自然语言（可与用户当前问题不同）
+     * @param userId      用户隔离
+     * @return 非空时为多行引用块；否则空串
      */
-    public String augmentUserMessage(String userMessage, String userId) {
-        if (userMessage == null || userMessage.isBlank()) {
-            return userMessage;
+    public String searchFormattedBlocks(String queryText, String userId) {
+        if (queryText == null || queryText.isBlank()) {
+            return "";
         }
         String uid = userId == null ? "" : userId.trim();
         try {
-            // 1) 查询句嵌入 2) Milvus 相似检索（带 user 过滤）3) 回表取条目 4) 拼引用块
-            float[] q = ollamaEmbeddingClient.embed(userMessage);
+            float[] q = ollamaEmbeddingClient.embed(queryText.trim());
             int topK = Math.max(1, properties.getMemory().getRetrievalTopK());
             List<Long> ids = milvusMemoryVectorService.searchSimilar(uid, q, topK);
             if (ids.isEmpty()) {
-                return userMessage;
+                return "";
             }
             List<MemoryEntryEntity> rows = memoryEntryMapper.selectByIds(ids);
             if (rows.isEmpty()) {
-                return userMessage;
+                return "";
             }
-            // TODO 可加重排序rerank
-            StringBuilder sb = new StringBuilder();
-            sb.append(PromptFragments.MEMORY_REFERENCE_HEADER);
+            Map<Long, MemoryEntryEntity> byId = new HashMap<>(rows.size() * 2);
             for (MemoryEntryEntity e : rows) {
-                sb.append("- ")
+                byId.put(e.getId(), e);
+            }
+            StringBuilder lines = new StringBuilder();
+            for (Long id : ids) {
+                MemoryEntryEntity e = byId.get(id);
+                if (e == null) {
+                    continue;
+                }
+                lines.append("- ")
                         .append(e.getKind() != null ? e.getKind().name() : "?")
                         .append(": ")
                         .append(nullToEmpty(e.getSummary()))
@@ -80,11 +92,13 @@ public class MilvusMemoryRetrievalService {
                         .append(truncate(nullToEmpty(e.getBody()), BODY_PREVIEW_MAX))
                         .append('\n');
             }
-            sb.append(PromptFragments.PARAGRAPH_BREAK).append(userMessage);
-            return sb.toString();
+            if (lines.isEmpty()) {
+                return "";
+            }
+            return PromptFragments.MEMORY_REFERENCE_HEADER + lines;
         } catch (Exception ex) {
-            log.warn("记忆检索注入跳过 userId={}", uid, ex);
-            return userMessage;
+            log.warn("记忆向量检索失败 userId={}", uid, ex);
+            return "";
         }
     }
 

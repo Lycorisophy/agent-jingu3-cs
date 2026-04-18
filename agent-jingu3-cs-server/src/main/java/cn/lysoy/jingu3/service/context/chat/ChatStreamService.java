@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  * <strong>流式对话编排入口</strong>（驾驭工程 + 上下文工程）：SSE / WebSocket 将 {@link cn.lysoy.jingu3.service.context.stream.StreamEvent}
- * 序列推给客户端，与 {@link ChatService} 在「校验、记忆增强、三源路由、modePlan、ExecutionContext」上语义对齐。
+ * 序列推给客户端，与 {@link ChatService} 在「校验、送模前用户串改写、三源路由、modePlan、ExecutionContext」上语义对齐。
  */
 @Slf4j
 @Service

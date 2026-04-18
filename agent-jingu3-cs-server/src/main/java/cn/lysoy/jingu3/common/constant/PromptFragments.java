@@ -29,7 +29,7 @@ public final class PromptFragments {
     /** 用户主动纠正/补充时拼在原始 {@code message} 之前（认知对齐：可纠正性）。 */
     public static final String USER_CORRECTION_PREFIX = "【用户纠正或补充】\n";
 
-    /** 对话前向量检索注入时的段落标题（与 {@code jingu3.memory.injection-enabled} 配合）。 */
+    /** 记忆工具 {@code memory_search} 返回块中的段落标题。 */
     public static final String MEMORY_REFERENCE_HEADER = "【参考记忆】\n";
 
     /** 送入 LLM 的用户段前附加：标准时间（UTC，ISO-8601） */

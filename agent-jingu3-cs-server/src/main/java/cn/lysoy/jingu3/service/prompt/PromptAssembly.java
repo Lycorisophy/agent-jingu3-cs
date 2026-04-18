@@ -1,4 +1,4 @@
-package cn.lysoy.jingu3.service.prompt;
+﻿package cn.lysoy.jingu3.service.prompt;
 
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.common.constant.PromptTemplates;
@@ -13,7 +13,8 @@ import java.util.List;
  * <strong>提示词工程（ENG: Prompt Engineering）</strong>在服务端的中枢：将 {@link PromptTemplates} 中按模式维护的
  * 系统/角色/子任务模板与 {@link PromptFragments} 中的换行、用户标签等拼接为<strong>完整送模串</strong>。
  * <p>
- * <strong>与上下文工程的关系</strong>：本类不负责记忆检索或 UTC/平台行（见 {@link UserPromptPreparationService}），
+ * <strong>与上下文工程的关系</strong>：本类不负责送模前用户串中的纠正语、UTC/平台行等（见 {@link UserPromptPreparationService}），
+ * 长期记忆按需检索由内置工具 {@code memory_search} 完成、不经过本类；
  * 仅假设 {@link ExecutionContext#getUserMessage()} / {@link ExecutionContext#llmInput()} 已是「路由与业务上希望模型看到」的文本；
  * 每条提示均在段首通过 {@link ModeRoutingPreamble} 注入<strong>意图与模式可见性</strong>说明，满足指南与客户端规范对 LLM 透明度的要求。
  * </p>
