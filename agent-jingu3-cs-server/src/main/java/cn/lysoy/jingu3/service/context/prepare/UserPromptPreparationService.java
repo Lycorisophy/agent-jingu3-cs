@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.prepare;
+package cn.lysoy.jingu3.service.context.prepare;
 
 import cn.lysoy.jingu3.common.constant.PromptFragments;
 import cn.lysoy.jingu3.common.dto.ChatRequest;

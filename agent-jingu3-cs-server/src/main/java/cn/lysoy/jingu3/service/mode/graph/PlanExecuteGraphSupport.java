@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.bsc.langgraph4j.StateGraph.END;
@@ -30,6 +31,12 @@ import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
 public final class PlanExecuteGraphSupport {
 
     private PlanExecuteGraphSupport() {
+    }
+
+    @SuppressWarnings("unchecked")
+    private static PlanExecuteState toPlanState(Object initData) {
+        Objects.requireNonNull(initData, "initData");
+        return new PlanExecuteState((Map<String, Object>) initData);
     }
 
     public static String invokeSync(
@@ -127,11 +134,13 @@ public final class PlanExecuteGraphSupport {
             return Map.of(PlanExecuteState.K_RESULT, sb.toString());
         };
 
-        EdgeAction afterParse = state -> state.subtasks().isEmpty() ? "empty" : "run";
+        EdgeAction<PlanExecuteState> afterParse =
+                state -> state.subtasks().isEmpty() ? "empty" : "run";
 
-        EdgeAction afterExec = state -> state.idx() < state.subtasks().size() ? "again" : "done";
+        EdgeAction<PlanExecuteState> afterExec =
+                state -> state.idx() < state.subtasks().size() ? "again" : "done";
 
-        StateGraph graph = new StateGraph(PlanExecuteState.SCHEMA, PlanExecuteState::new)
+        StateGraph graph = new StateGraph(PlanExecuteState.SCHEMA, PlanExecuteGraphSupport::toPlanState)
                 .addNode("parse", node_async(parse))
                 .addNode("exec_step", node_async(execStep))
                 .addNode("finalize", node_async(finalize))

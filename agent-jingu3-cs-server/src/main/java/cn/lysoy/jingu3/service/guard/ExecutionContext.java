@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.guard;
+package cn.lysoy.jingu3.service.guard;
 
 import cn.lysoy.jingu3.common.constant.ConversationConstants;
 import cn.lysoy.jingu3.service.guard.routing.RoutingSource;

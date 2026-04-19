@@ -1,5 +1,20 @@
 # JinGu3 AI Agent 工作流模式设计方案
 
+## 〇、本仓库当前落地（MVP）
+
+以下内容将**已实现能力**与下文「愿景/扩展」区分，避免与对话侧 JSON 工作流混淆。
+
+| 维度 | 对话 JSON 工作流 | Flowable BPMN |
+|------|------------------|---------------|
+| 入口 | `POST /api/v1/chat`，`mode=WORKFLOW`，`workflowId` | `POST /api/v1/bpmn/**`（部署、启动实例等） |
+| 定义来源 | classpath `workflows/*.json`，`WorkflowModeHandler` | BPMN 2.0 XML，引擎表 `ACT_*`，与 Spring **共用同一 DataSource** |
+| 独立前端 | 无（走 Electron 客户端对话） | [`agent-jingu3-cs-workflow-ui/`](../../agent-jingu3-cs-workflow-ui/)（Vite + Vue3 + bpmn-js） |
+| 产品参考 | — | 编排体验可对齐 [扣子工作流指南](https://www.coze.cn/open/docs/guides/workflow) 的心智（**非** Coze 协议或云端 API 对接） |
+
+**安全**：MVP 下 `/api/v1/bpmn/**` **无登录鉴权**，匿名可部署与启停流程，**仅适用于内网/开发**；上线前必须收敛认证与权限。示例 BPMN 见服务端 [`agent-jingu3-cs-server/src/main/resources/processes/demo-llm.bpmn20.xml`](../../agent-jingu3-cs-server/src/main/resources/processes/demo-llm.bpmn20.xml)，Delegate Bean 名为 `jingu3LlmDelegate`。
+
+---
+
 ## 一、项目背景与目标
 
 ### 1.1 项目概述

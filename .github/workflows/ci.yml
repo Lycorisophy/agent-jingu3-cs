@@ -43,3 +43,16 @@ jobs:
       - name: npm ci and build
         working-directory: agent-jingu3-cs-client
         run: npm ci && npm run build && npm run typecheck
+
+  workflow-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: agent-jingu3-cs-workflow-ui/package-lock.json
+      - name: npm ci and build
+        working-directory: agent-jingu3-cs-workflow-ui
+        run: npm ci && npm run build

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://jingu3.local/bpmn/demo">
+  <process id="demoLlm" name="Demo LLM" isExecutable="true">
+    <documentation>启动变量可传 prompt；执行后写入 llmOutput。</documentation>
+    <startEvent id="start" name="Start"/>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="llmTask"/>
+    <serviceTask id="llmTask" name="LLM Step" flowable:delegateExpression="${jingu3LlmDelegate}"/>
+    <sequenceFlow id="flow2" sourceRef="llmTask" targetRef="end"/>
+    <endEvent id="end" name="End"/>
+  </process>
+</definitions>

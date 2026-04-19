@@ -129,6 +129,13 @@
             <artifactId>milvus-sdk-java</artifactId>
         </dependency>
 
+        <!-- Flowable 7：BPMN 编排（独立 /api/v1/bpmn；与 JSON 对话工作流并存） -->
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-process</artifactId>
+            <version>7.1.0</version>
+        </dependency>
+
         <!-- v0.6-C：Elasticsearch 8.x Java API（可选启用 jingu3.elasticsearch.enabled） -->
         <dependency>
             <groupId>co.elastic.clients</groupId>

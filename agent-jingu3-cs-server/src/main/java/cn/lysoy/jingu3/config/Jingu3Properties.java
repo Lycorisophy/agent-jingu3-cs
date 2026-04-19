@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.config;
+package cn.lysoy.jingu3.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -45,6 +45,9 @@ public class Jingu3Properties {
 
     /** 事件域：检索 topK、关系扩展上限等（MySQL + Milvus） */
     private Events events = new Events();
+
+    /** Flowable BPMN 管理 API（/api/v1/bpmn） */
+    private Bpmn bpmn = new Bpmn();
 
     /** 对称加密密钥（用户提示词密文） */
     private Crypto crypto = new Crypto();
@@ -128,6 +131,15 @@ public class Jingu3Properties {
 
         /** 关系 1-hop 扩展时最多额外加载的邻居事件数 */
         private int relatedExpandMax = 20;
+    }
+
+    @Data
+    public static class Bpmn {
+
+        /**
+         * 是否暴露 {@code /api/v1/bpmn/**}；关闭后仍可依赖 classpath {@code processes/*.bpmn20.xml} 自动部署。
+         */
+        private boolean apiEnabled = true;
     }
 
     @Data

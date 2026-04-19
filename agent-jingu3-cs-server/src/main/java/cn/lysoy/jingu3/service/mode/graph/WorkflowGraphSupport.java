@@ -17,6 +17,7 @@ import org.bsc.langgraph4j.action.NodeAction;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
@@ -28,6 +29,13 @@ import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
 public final class WorkflowGraphSupport {
 
     private WorkflowGraphSupport() {
+    }
+
+    /** langgraph4j {@code AgentStateFactory} 入参在部分版本为 {@link Object}，需转为状态 Map。 */
+    @SuppressWarnings("unchecked")
+    private static WorkflowGraphState toWorkflowState(Object initData) {
+        Objects.requireNonNull(initData, "initData");
+        return new WorkflowGraphState((Map<String, Object>) initData);
     }
 
     public static String invokeLinearSync(
@@ -110,7 +118,7 @@ public final class WorkflowGraphSupport {
             ToolStepService toolStepService,
             StreamEventSink sinkOrNull) throws GraphStateException {
 
-        StateGraph graph = new StateGraph(WorkflowGraphState.SCHEMA, WorkflowGraphState::new);
+        StateGraph graph = new StateGraph(WorkflowGraphState.SCHEMA, WorkflowGraphSupport::toWorkflowState);
         String prev = START;
         int step = 1;
         for (WorkflowNode node : nodes) {
@@ -187,7 +195,7 @@ public final class WorkflowGraphSupport {
             return Map.of(WorkflowGraphState.K_ACCUMULATED, out);
         };
 
-        StateGraph graph = new StateGraph(WorkflowGraphState.SCHEMA, WorkflowGraphState::new)
+        StateGraph graph = new StateGraph(WorkflowGraphState.SCHEMA, WorkflowGraphSupport::toWorkflowState)
                 .addNode("fb1", node_async(fb1))
                 .addNode("fb2", node_async(fb2))
                 .addEdge(START, "fb1")

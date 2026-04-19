@@ -1,4 +1,4 @@
-﻿package cn.lysoy.jingu3.service.context.chat;
+package cn.lysoy.jingu3.service.context.chat;
 
 import cn.lysoy.jingu3.component.ChatInboundPlatformSupport;
 import cn.lysoy.jingu3.component.ChatRequestValidator;
